@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/05/18 13:53:38 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/05/18 13:56:25 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -124,12 +124,12 @@ _show_title:
 	@if  [ ! -n "$(LIB_NAME)" ] || [ ! -n "$(SRCS)" ] || [ ! -d "$(SRC_DIR)" ]; then \
         printf "\t$(CYAN)Source files don't exist$(NC)"; \
 		printf "\n\t$(WHITE)────────────────────────$(NC)"; \
-		$(MAKE) -s _progress; \
+		$(MAKE) -s _progress; printf "\n" \
 		$(MAKE) -s _show_cursor; \
 	elif [ -f "$(LIB_DIR)$(LIB_NAME)" ] && [ -z "$$(find $(SRC_PATHS) -newer "$(LIB_DIR)$(LIB_NAME)" 2>/dev/null)" ]; then \
         printf "\t$(GREEN)✓ $(YELLOW)malloc$(CYAN) is up to date$(NC)"; \
 		printf "\n\t$(WHITE)────────────────────────$(NC)"; \
-		$(MAKE) -s _progress; \
+		$(MAKE) -s _progress; printf "\n" \
 		$(MAKE) -s _show_cursor; \
 	else \
 		printf "\n\t$(WHITE)────────────────────────$(NC)\033[1A\r"; \
