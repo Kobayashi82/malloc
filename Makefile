@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/05/18 13:56:25 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/05/20 12:35:38 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -58,15 +58,16 @@ LIB_NAME	= libft_$(NAME)_$(HOSTTYPE).so
 # ───────────────── #
 
 INC_DIR		= inc/
-OBJ_DIR		= build/obj/$(NAME)/
-LIB_DIR		= build/lib/
+BLD_DIR		= build/
+OBJ_DIR		= $(BLD_DIR)obj/$(NAME)/
+LIB_DIR		= $(BLD_DIR)lib/
 SRC_DIR		= src/$(NAME)/
 
 # ─────────── #
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= malloc.c realloc.c free.c
+SRCS		= arena.c malloc.c realloc.c free.c
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
@@ -90,7 +91,7 @@ $(LIB_DIR)/$(LIB_NAME): $(OBJS)
 	@printf "\r%50s\r\t$(CYAN)Compiled    $(GREEN)✓ $(YELLOW)$(NAME)$(NC)\n"
 
 #   Symbolic link
-	@ln -sf $(LIB_DIR)$(LIB_NAME) $(LIB_DIR)libft_$(NAME).so
+	@cd $(LIB_DIR) && ln -sf $(LIB_NAME) libft_$(NAME).so
 
 	@$(MAKE) -s _progress
 	@$(MAKE) -s _show_cursor
@@ -163,8 +164,7 @@ re:
 	fi
 	@printf "\r%50s\r\t$(CYAN)Deleted     $(GREEN)✓ $(YELLOW)library$(NC)\n"
 	@$(MAKE) -s _progress; printf "\n"
-	@-find $(LIB_DIR) -type d -empty -delete >/dev/null 2>&1 || true
-	@-find build -type d -empty -delete >/dev/null 2>&1 || true
+	@-find $(BLD_DIR) -type d -empty -delete >/dev/null 2>&1 || true
 	@printf "\t$(WHITE)────────────────────────\n$(NC)"
 	@printf "\033[1A\033[1A\r"
 
@@ -200,8 +200,7 @@ fclean:
 		rm -f $(LIB_DIR)libft_malloc.so; \
 	fi
 	@printf "\r%50s\r\t$(CYAN)Deleted     $(GREEN)✓ $(YELLOW)library$(NC)\n"
-	@find $(LIB_DIR) -type d -empty -delete >/dev/null 2>&1 || true
-	@find build -type d -empty -delete >/dev/null 2>&1 || true
+	@find $(BLD_DIR) -type d -empty -delete >/dev/null 2>&1 || true
 
 	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
@@ -251,11 +250,10 @@ _delete_objects:
 			fi; \
 		done; \
 	fi; printf "\r%50s\r"
-	@-find $(OBJ_DIR) -type d -empty -delete >/dev/null 2>&1 || true
-	@-find build/obj -type d -empty -delete >/dev/null 2>&1 || true
+	@-find $(BLD_DIR) -type d -empty -delete >/dev/null 2>&1 || true
 
 wipe:
-	@rm -rf build
+	@rm -rf $(BLD_DIR)
 
 # ─────────────────── #
 # ── PROGRESS LINE ── #
