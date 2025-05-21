@@ -11,5 +11,6 @@ doc/subject.pdf
 !Makefile
 !.valgrind.supp
 !leaks
+!run_test.sh
 !.gitignore
 !README.md
