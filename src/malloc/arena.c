@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/24 12:06:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/24 17:12:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@
 			}
 
 			// Para asignaciones grandes, siempre usar la arena principal (la primera creada)
-			if (size > SIZE_LARGE) return (g_arena_manager->arenas);
+			if (size > SMALL_MAX) return (g_arena_manager->arenas);
 			// Para asignaciones normales, intentamos reutilizar
 			arena = arena_reuse();
 			if (!arena) arena = arena_create();
