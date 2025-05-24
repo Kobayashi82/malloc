@@ -4,6 +4,23 @@
 #include <unistd.h>
 #include <pthread.h>
 
+
+// alineacion
+	// #define ALIGNMENT 16
+	// #define ALIGN(size) (((size) + ALIGNMENT - 1) & ~(ALIGNMENT - 1))
+// arenas
+// magic number
+// zonas
+// bitmap
+// freelist
+// tcache
+// free: double free
+// free: invalid pointer
+// fusion de bloques
+// liberacion de zonas
+// lazy coalescing (or not)
+// best fit vs first fit
+
 /*
  * Este programa de prueba utiliza la implementación personalizada de malloc
  * Para compilarlo: gcc -o test_malloc main.c -L/ruta/a/tu/lib -lft_malloc

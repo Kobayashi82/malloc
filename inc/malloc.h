@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:29:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/20 13:47:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/24 12:06:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 	#include <sys/mman.h>
 	#include <errno.h>
 	#include <string.h>
+	#include <unistd.h>
 
 	#ifdef __linux__
 		#include <sys/sysinfo.h>
@@ -34,13 +35,17 @@
 		#define SIZE_MAX ~(size_t)0
 	#endif
 
+	#define TINY_MAX		512
+	#define SMALL_MAX		4096
+	#define TINY_ZONE_SIZE	(get_pagesize() * 16)
+	#define SMALL_ZONE_SIZE	(get_pagesize() * 128)
+
 #pragma endregion
 
 #pragma region "Variables"
 
 	#pragma region "Enumerators"
 
-		typedef enum se_zonesize { SIZE_TINY = 1024, SIZE_SMALL = 2048, SIZE_LARGE = 4096 } e_zonesize;
 		typedef enum se_zonetype { TINY, SMALL, LARGE } e_zonetype;
 		typedef enum se_error {
 			MTX_INIT = 20,
@@ -94,6 +99,8 @@
 
 	extern t_arena_manager	*g_arena_manager;
 
+	size_t	get_pagesize();
+
 	// Arena
 	int		arena_initialize();
 	void	arena_terminate();
@@ -102,8 +109,8 @@
 	t_arena *arena_reuse();
 
 	// Main functions
-	void free(void *ptr);
-	void *malloc(size_t size);
-	void *realloc(void *ptr, size_t size);
+	void	free(void *ptr);
+	void	*malloc(size_t size);
+	void	*realloc(void *ptr, size_t size);
 
 #pragma endregion

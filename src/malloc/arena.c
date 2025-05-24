@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/20 13:45:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/24 12:06:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,7 @@
 	#pragma region "Alloc"
 
 		static void *internal_alloc(size_t size) {
-			void *ptr;
-
-			#ifdef MAP_ANONYMOUS
-				ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			#else
-				ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-			#endif
-
+			void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 			return (ptr == MAP_FAILED ? NULL : ptr);
 		}
 
@@ -48,7 +41,17 @@
 
 	#pragma endregion
 
-#pragma endregion
+	size_t get_pagesize() {
+		#ifdef _WIN32
+			SYSTEM_INFO info;
+			GetSystemInfo(&info);
+			return (info.dwPageSize);
+		#else
+			return ((size_t)sysconf(_SC_PAGESIZE));
+		#endif
+	}
+
+	#pragma endregion
 
 #pragma region "Arena"
 
@@ -91,7 +94,7 @@
 
 				if (pthread_mutex_init(&g_arena_manager->mutex, NULL)) {
 					internal_free(g_arena_manager, sizeof(t_arena_manager));
-					return (MTX_INIT);
+					return (1);
 				}
 
 				return (0);
