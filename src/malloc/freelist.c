@@ -6,18 +6,34 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 10:56:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/25 13:52:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/25 17:45:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
 
-// cambiar freelist a fastbin
-// limitar tamaños de fastbin a 16 - 128 o hasta 160 en sistemas de 64 bits
-// Ejemplo: En 64 bits, los tamaños suelen ser 16, 24, 32, ..., 160 bytes (múltiplos de 16 + 8 debido al alineamiento).
-// LIFO (first in - first out)
-// ... investigar mas sobre fastbin, smallbin y demas.
-// no es tan sencillo como un freelist y ademas esta el tcache que no he investigado aun
+//	Arena
+//	├── Fastbin  [0-9]  (16-160 bytes)										Arrays de listas simples (LIFO)
+//	├── Smallbin [0-30] (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
+//	├── Largebin ???														Doblemente enlazada.  Ordenados internamente
+//	├── Unsorted Bin														Doblemente enlazada
+//	└── Zonas
+//		├── Zonas TINY  (fastbin + smallbin pequeños)
+//		└── Zonas SMALL (smallbin grandes)
+
+//	Flujo de asignación malloc():
+//
+//		Fastbin  (si el tamaño solicitado coincide)
+//		Smallbin (si el tamaño solicitado coincide exactamente)
+//		Large bins
+//		Unsorted bin
+
+//	Flujo de liberación free():
+//
+//		Fastbins  (si el tamaño solicitado coincide)
+//		Smallbins (si el tamaño solicitado coincide exactamente)
+//		Large bins
+//		Unsorted bin
 
 unsigned char get_zonetype(size_t size) {
 	if		(size <= TINY_MAX)		return (TINY);
