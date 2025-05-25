@@ -6,11 +6,18 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 10:56:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/25 12:31:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/25 13:52:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
+
+// cambiar freelist a fastbin
+// limitar tamaños de fastbin a 16 - 128 o hasta 160 en sistemas de 64 bits
+// Ejemplo: En 64 bits, los tamaños suelen ser 16, 24, 32, ..., 160 bytes (múltiplos de 16 + 8 debido al alineamiento).
+// LIFO (first in - first out)
+// ... investigar mas sobre fastbin, smallbin y demas.
+// no es tan sencillo como un freelist y ademas esta el tcache que no he investigado aun
 
 unsigned char get_zonetype(size_t size) {
 	if		(size <= TINY_MAX)		return (TINY);
