@@ -6,9 +6,22 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/24 17:12:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/25 13:17:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+// man mallopt para mas documentacion
+
+//	Leer M_ARENA_TEST y M_ARENA_MAX de las variables (estas son para la funcion mallopt(), mirar man mallopt para las de entorno de verdad)
+
+//	Si M_ARENA_TEST y M_ARENA_MAX no está establecido (0 o no existe):
+//		M_ARENA_TEST = sizeof(long) == 4 ? 2 : 8;
+
+//	Una vez que llegas a M_ARENA_TEST
+//		M_ARENA_MAX = calculate_hardlimit();
+
+//	Si M_ARENA_TEST no está presente pero M_ARENA_MAX sí está definido:
+//		No calcular M_ARENA_TEST y usar el M_ARENA_MAX existente
 
 #pragma region "Includes"
 

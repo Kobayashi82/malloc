@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <pthread.h>
 
-
 // alineacion
 	// #define ALIGNMENT 16
 	// #define ALIGN(size) (((size) + ALIGNMENT - 1) & ~(ALIGNMENT - 1))

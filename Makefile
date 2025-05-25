@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/05/20 12:35:38 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/05/25 11:10:04 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -67,7 +67,7 @@ SRC_DIR		= src/$(NAME)/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= arena.c malloc.c realloc.c free.c
+SRCS		= arena.c malloc.c realloc.c free.c freelist.c
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #

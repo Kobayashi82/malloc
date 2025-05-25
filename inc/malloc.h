@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:29:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/24 12:06:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/25 12:57:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,11 @@
 	#include <errno.h>
 	#include <string.h>
 	#include <unistd.h>
+	#include <stdint.h>
+
+#pragma endregion
+
+#pragma region "Defines"
 
 	#ifdef __linux__
 		#include <sys/sysinfo.h>
@@ -34,11 +39,22 @@
 	#ifndef SIZE_MAX
 		#define SIZE_MAX ~(size_t)0
 	#endif
+	#define INVALID_INDEX ~(unsigned char)0
+
+	#define PAGE_SIZE		get_pagesize();
 
 	#define TINY_MAX		512
+	#define TINY_BLOCKS		128
+	#define TINY_PAGES		(TINY_BLOCKS  * TINY_MAX) / PAGE_SIZE
+	#define TINY_SIZE		PAGE_SIZE * TINY_PAGES
+	#define BITMAP_WORDS	4
+
 	#define SMALL_MAX		4096
-	#define TINY_ZONE_SIZE	(get_pagesize() * 16)
-	#define SMALL_ZONE_SIZE	(get_pagesize() * 128)
+	#define SMALL_BLOCKS	128
+	#define SMALL_PAGES		(SMALL_BLOCKS  * SMALL_MAX) / PAGE_SIZE
+	#define SMALL_SIZE		PAGE_SIZE * SMALL_PAGES
+
+	#define FREELIST_SIZE	32	// MAX = INVALID_INDEX
 
 #pragma endregion
 
@@ -47,6 +63,7 @@
 	#pragma region "Enumerators"
 
 		typedef enum se_zonetype { TINY, SMALL, LARGE } e_zonetype;
+
 		typedef enum se_error {
 			MTX_INIT = 20,
 			MTX_LOCK = 21,
@@ -59,36 +76,44 @@
 
 	#pragma region "Structures"
 
-		typedef pthread_mutex_t	mtx_t;
-		typedef struct s_zone	t_zone;
-		typedef struct s_arena	t_arena;
+		typedef pthread_mutex_t	mtx_t;				// Alias
 
+		typedef struct s_freelist t_freelist;
+		typedef struct s_freelist {
+			void		*ptr;						// Pointer to the free block
+			t_freelist	*next;						// Pointer to next free block
+
+		} t_freelist;
+
+		typedef struct s_zone t_zone;
 		typedef struct s_zone {
-			e_zonetype	type;			// Type
-			// header?
-			size_t		size;			// Zone size
-			size_t		blocks;			// Number of blocks
-			size_t		block_size;		// Block size
-			t_zone		*next;			// pointer to next zone
+			size_t		size;						// Total allocated size of the zone
+			size_t		used;						// Memory used in the zone
+			size_t		free;						// Memory available for allocation in the zone
+			size_t		blocks;						// Number of blocks (TINY_BLOCKS or SMALL_BLOCKS. 0 for LARGE zones)
+			size_t		block_size;					// Size of each block (TINY_MAX or SMALL_MAX. Same as size for LARGE zones)
+			uint64_t	bitmap[BITMAP_WORDS];		// Bitmap for 16-byte blocks (used only in TINY zones)
+			t_freelist	*freelists[FREELIST_SIZE];	// List of available blocks for reuse
+			t_zone		*next;						// Pointer to next zone
 		} t_zone;
-
+		
+		typedef struct s_arena t_arena;
 		typedef struct s_arena {
-			int			id;             // ID
-			int			active;         // Active
-			// header?
-			size_t		used;    		// Memory used
-			t_zone		*zones[3];      // Zones (TINY, SMALL, LARGE)
-			mtx_t		mutex;          // Arena mutex
-			t_arena		*next;          // Pointer to next arena
+			int			id;             			// Arena ID
+			int			active;         			// Active status
+			size_t		used;    					// Memory used
+			t_zone		*zones[3];      			// Memory zones (TINY, SMALL, LARGE)
+			mtx_t		mutex;          			// Mutex for thread safety in the current arena
+			t_arena		*next;          			// Pointer to next arena
 		} t_arena;
 
 		typedef struct s_arena_manager {
-			int			cpu_count;		// CPUs
-			int			arena_test;		// M_ARENA_TEST
-			int			arena_max;		// M_ARENA_MAX
-			int			arena_curr;		// Number of arenas created
-			mtx_t		mutex;			// Global mutex
-			t_arena		*arenas;		// Pointer to arenas
+			int			cpu_count;					// Number of CPUs available
+			int			arena_test;					// Hard limit for arenas based on CPU count (M_ARENA_TEST)
+			int			arena_max;					// Maximum number of arenas that can be created (M_ARENA_MAX)
+			int			arena_curr;					// Current number of arenas created and active
+			mtx_t		mutex;						// Mutex for synchronizing access to the arenas
+			t_arena		*arenas;					// Pointer to arenas
 		} t_arena_manager;
 
 	#pragma endregion
@@ -107,6 +132,15 @@
 	t_arena *arena_get(size_t size);
 	t_arena *arena_create();
 	t_arena *arena_reuse();
+
+	void	set_bit(uint64_t *bitmap, int pos);
+	void	clear_bit(uint64_t *bitmap, int pos);
+	int		is_bit_set(uint64_t *bitmap, int pos);
+	int		find_first_free_bit(uint64_t *bitmap, int max_bits);
+
+	unsigned char	get_zonetype(size_t size);
+	unsigned char	get_freelist_index(size_t size);
+	void			print_freelist_ranges();
 
 	// Main functions
 	void	free(void *ptr);

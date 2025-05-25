@@ -11,7 +11,8 @@ doc/subject.pdf
 !Makefile
 !.valgrind.supp
 !leaks
-!run_test.sh
 !.gitignore
 !README.md
+!run_test.sh
 !testing.c
+!test.sh
