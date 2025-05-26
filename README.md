@@ -1,19 +1,6 @@
 # ft_malloc
 
-este readme es un template, y aunque la idea es incorporar todo lo aquí indicado, a día de hoy no representa el estado actual del proyecto
-
-## 📋 Índice
-
-- [Descripción](#descripción)
-- [Características](#características)
-- [Arquitectura](#arquitectura)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Variables de Entorno](#variables-de-entorno)
-- [Funciones Adicionales](#funciones-adicionales)
-- [Optimizaciones](#optimizaciones)
-- [Testing](#testing)
-- [Detalles Técnicos](#detalles-técnicos)
+este readme es un template, y aunque la idea es incorporar todo lo aquí indicado, a día de hoy no representa el estado actual del proyecto.
 
 ## 🎯 Descripción
 
