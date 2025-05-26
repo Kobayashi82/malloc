@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/05/26 21:11:46 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/05/26 21:39:21 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,7 +38,7 @@ COUNTER 			= 0
 # ─────────── #
 
 CC			= clang
-FLAGS		= -Wall -Wextra -Werror -fPIC
+FLAGS		= -Wall -Wextra -Werror -fPIC # -fvisibility=hidden
 
 # ────────── #
 # ── NAME ── #

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:29:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 19:42:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/26 21:40:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,11 +120,11 @@
 
 	#pragma endregion
 
+	extern t_arena_manager g_arena_manager;
+
 #pragma endregion
 
 #pragma region "Methods"
-
-	extern t_arena_manager	g_arena_manager;
 
 	size_t	get_pagesize();
 

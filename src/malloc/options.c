@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:21:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/26 21:40:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,7 @@
 
 	#pragma region "Initialize"
 
+		__attribute__((visibility("default")))
 		void options_initialize() {
 			char *var = NULL;
 

@@ -4,5 +4,5 @@
 # -lft_malloc				= -l busca lib + ft_malloc + .so
 # -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
 
-gcc -g -Wno-free-nonheap-object -o testing testing.c -I./inc -L./build/lib -lft_malloc -Wl,-rpath=./build/lib -pthread
-./testing
+gcc -g -Wno-free-nonheap-object -o test test.c -I./inc -L./build/lib -lft_malloc -Wl,-rpath=./build/lib -pthread
+./test
