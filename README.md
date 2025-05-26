@@ -63,15 +63,14 @@ Arena 1                Arena 2                Arena N
 ## 🔧 Instalación
 
 ```bash
-# Clonar el repositorio
 git clone git@github.com:Kobayashi82/Malloc.git
 cd ft_malloc
-
-# Compilar la librería
 make
 
-# La librería se genera como:
+# La librería se genera en ./build/lib como:
 # libft_malloc_$(HOSTTYPE).so
+
+# y se crea el enlace simbolico:
 # libft_malloc.so -> libft_malloc_$(HOSTTYPE).so
 ```
 
@@ -80,13 +79,14 @@ make
 ### Uso Básico
 ```bash
 # Precargar la librería
-export LD_PRELOAD=./libft_malloc.so
+export LD_LIBRARY_PATH="./build/lib:$LD_LIBRARY_PATH"
+export LD_PRELOAD="libft_malloc.so"
 
-# Ejecutar programa existente
-./mi_programa
+# Ejecutar
+./program
 
 # O en una sola línea
-LD_PRELOAD=./libft_malloc.so ./mi_programa
+LD_PRELOAD="./build/lib/libft_malloc.so" ./pogram
 ```
 
 ### Integración en Código C
@@ -110,10 +110,10 @@ int main() {
 ### Compilación con la Librería
 ```bash
 # Compilar y enlazar
-gcc programa.c -L. -lft_malloc -o programa
+gcc program.c -L./build/lib -lft_malloc -o program
 
 # Ejecutar
-./programa
+./program
 ```
 
 ## 🔧 Variables de Entorno

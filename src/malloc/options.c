@@ -6,9 +6,12 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/25 19:24:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/26 21:21:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+// g_arena_manager accesible desde el exterior
+// arreglar utils.c
 
 #pragma region "Includes"
 
@@ -16,46 +19,192 @@
 
 #pragma endregion
 
-int validate_mxfast(int value) {
-	int max = (80 * sizeof(size_t)) / 4;
+#pragma region "Validations"
 
-	if (g_arena_manager.first_alloc) return (g_arena_manager.options.MXFAST);
+	#pragma region "MXFAST"
 
-	if (value < 0)		return (0);
-	if (value > max)	return (max);
-	return (value);
-}
+		int validate_mxfast(int value) {
+			int max = (80 * sizeof(size_t)) / 4;
 
-void mallopt_init() {
-	char *var = NULL;
+			if (g_arena_manager.first_alloc) return (g_arena_manager.options.MXFAST);
 
-	var = getenv("MALLOC_MXFAST_");
-	if (var && ft_isdigit_s(var))	g_arena_manager.options.MXFAST = validate_mxfast(ft_atoi(var));
-	else							g_arena_manager.options.MXFAST = (64 * sizeof(size_t)) / 4;
+			if (value < 0)		return (0);
+			if (value > max)	return (max);
+			return (value);
+		}
 
-	var = getenv("MALLOC_TRIM_THRESHOLD_");
-	if (var && ft_isdigit_s(var))	g_arena_manager.options.TRIM_THRESHOLD = validate_mxfast(ft_atoi(var));
-	else							g_arena_manager.options.TRIM_THRESHOLD = (64 * sizeof(size_t)) / 4;
+	#pragma endregion
 
-	g_arena_manager.options.TOP_PAD				= ft_atoi(getenv("MALLOC_TOP_PAD_"));
-	g_arena_manager.options.MMAP_THRESHOLD		= ft_atoi(getenv("MALLOC_MMAP_THRESHOLD_"));
-	g_arena_manager.options.MMAP_MAX			= ft_atoi(getenv("MALLOC_MMAP_MAX_"));
-	g_arena_manager.options.CHECK_ACTION		= ft_atoi(getenv("MALLOC_CHECK_"));
-	g_arena_manager.options.PERTURB				= ft_atoi(getenv("MALLOC_PERTURB_"));
-	g_arena_manager.options.ARENA_TEST			= ft_atoi(getenv("MALLOC_ARENA_TEST"));
-	g_arena_manager.options.ARENA_MAX			= ft_atoi(getenv("MALLOC_ARENA_MAX"));
-}
+	#pragma region "FRAGMENTATION_PERCENT"
 
-int mallopt(int param, int value) {
-	switch (param) {
-		case M_MXFAST:			g_arena_manager.options.MXFAST = validate_mxfast(value);		break;
-		case M_TRIM_THRESHOLD:	g_arena_manager.options.TRIM_THRESHOLD = value;					break;
-		case M_TOP_PAD:			g_arena_manager.options.TOP_PAD = value;						break;
-		case M_MMAP_THRESHOLD:	g_arena_manager.options.MMAP_THRESHOLD = value;					break;
-		case M_MMAP_MAX:		g_arena_manager.options.MMAP_MAX = value;						break;
-		case M_CHECK_ACTION:	g_arena_manager.options.CHECK_ACTION = value;					break;
-		case M_PERTURB:			g_arena_manager.options.PERTURB = value;						break;
-		case M_ARENA_TEST:		g_arena_manager.options.ARENA_TEST = value;						break;
-		case M_ARENA_MAX:		g_arena_manager.options.ARENA_MAX = value;						break;
-	}
-}
+		int validate_frag_percent(int value) {
+			if (value < 0)		return (0);
+			if (value > 100)	return (100);
+			return (value);
+		}
+
+	#pragma endregion
+
+	#pragma region "MIN_ZONE_USAGE_PERCENT"
+
+		int validate_min_usage_percent(int value) {
+			if (value < 0)		return (0);
+			if (value > 100)	return (100);
+			return (value);
+		}
+
+	#pragma endregion
+
+	#pragma region "CHECK_ACTION"
+
+		int validate_check_action(int value) {
+			if (value < 0)	return (0);
+			return (value & 7);
+		}
+
+	#pragma endregion
+
+	#pragma region "PERTURB"
+
+		unsigned char validate_perturb(int value) {
+			return ((unsigned char)(value & 0xFF));
+		}
+
+	#pragma endregion
+
+	#pragma region "ARENA_TEST"
+
+		int validate_arena_test(int value) {
+			int max = (ARCHITECTURE == 32 ? 2 : 8) * 10;
+
+			if (value <= 0)		return (1);
+			if (value > max)	return (max);
+			return (value);
+		}
+
+	#pragma endregion
+
+	#pragma region "ARENA_MAX"
+
+		int validate_arena_max(int value) {
+			int max = 32;
+
+			if ((value <= 0 || value > max) && g_arena_manager.options.ARENA_MAX) return (g_arena_manager.options.ARENA_MAX);
+			if (value < 0)		return (0);
+			if (value > max)	return (max);
+			return (value);
+		}
+
+	#pragma endregion
+
+	#pragma region "LOGFILE"
+
+		void validate_logfile(char *value) {
+			if (!value || !*value) value = "auto";
+
+			char filename[64] = {0};
+			char pid_str[16] = {0};
+			time_t now = time(NULL);
+			struct tm *tm_info = localtime(&now);
+			pid_t pid = getpid();
+
+			// Default filename with PID
+			ft_strlcpy(filename, "malloc_log_", sizeof(filename));
+			ft_itoa_buffered(pid, pid_str, sizeof(pid_str));
+			ft_strlcat(filename, pid_str, sizeof(filename));
+			ft_strlcat(filename, "_", sizeof(filename));
+			
+			// Add timestamp
+			size_t current_len = ft_strlen(filename);
+			strftime(filename + current_len, sizeof(filename) - current_len, "%Y%m%d_%H%M%S.log", tm_info);
+			size_t value_len = ft_strlen(value);
+
+			if (!ft_strcmp(value, "auto")) {
+				ft_strlcpy(g_arena_manager.options.LOGFILE, "/tmp/", PATH_MAX);				// Temp directory
+				ft_strlcat(g_arena_manager.options.LOGFILE, filename, PATH_MAX);			// Default filename
+			} else if (ft_strchr(value, '/')) {
+				ft_strlcpy(g_arena_manager.options.LOGFILE, value, PATH_MAX);				// Directory + filename
+				if (value[value_len - 1] == '/')
+					ft_strlcat(g_arena_manager.options.LOGFILE, filename, PATH_MAX);		// Directory + default filename
+			} else {
+				if (!getcwd(g_arena_manager.options.LOGFILE, PATH_MAX))						// Current directory
+					ft_strlcpy(g_arena_manager.options.LOGFILE, "/tmp", PATH_MAX);			// Temp directory (getcwd failed)
+				ft_strlcat(g_arena_manager.options.LOGFILE, "/", PATH_MAX);
+				ft_strlcat(g_arena_manager.options.LOGFILE, value, PATH_MAX);				// filename
+			}
+		}
+
+	#pragma endregion
+
+#pragma endregion
+
+#pragma region "Methods"
+
+	#pragma region "Initialize"
+
+		void options_initialize() {
+			char *var = NULL;
+
+			var = getenv("MALLOC_MXFAST_");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.MXFAST = validate_mxfast(ft_atoi(var));
+			else							g_arena_manager.options.MXFAST = (64 * sizeof(size_t)) / 4;
+
+			var = getenv("MALLOC_FRAGMENTATION_");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.FRAG_PERCENT = validate_frag_percent(ft_atoi(var));
+			else							g_arena_manager.options.FRAG_PERCENT = 75;
+
+			var = getenv("MALLOC_MIN_USAGE_");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.MIN_USAGE_PERCENT = validate_min_usage_percent(ft_atoi(var));
+			else							g_arena_manager.options.MIN_USAGE_PERCENT = 10;
+
+			var = getenv("MALLOC_CHECK_");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.CHECK_ACTION = validate_check_action(ft_atoi(var));
+			else							g_arena_manager.options.CHECK_ACTION = 0;
+
+			var = getenv("MALLOC_PERTURB_");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.PERTURB = validate_perturb(ft_atoi(var));
+			else							g_arena_manager.options.PERTURB = 0;
+
+			var = getenv("MALLOC_ARENA_TEST");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.ARENA_TEST = validate_arena_test(ft_atoi(var));
+			else							g_arena_manager.options.ARENA_TEST = ARCHITECTURE == 32 ? 2 : 8;
+
+			var = getenv("MALLOC_ARENA_MAX");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.ARENA_MAX = validate_arena_max(ft_atoi(var));
+			else							g_arena_manager.options.ARENA_MAX = 0;
+
+			var = getenv("MALLOC_DEBUG");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.DEBUG = (ft_atoi(var));
+			else							g_arena_manager.options.DEBUG = 0;
+
+			var = getenv("MALLOC_LOGGING");
+			if (var && ft_isdigit_s(var))	g_arena_manager.options.LOGGING = (ft_atoi(var));
+			else							g_arena_manager.options.LOGGING = 0;
+
+			var = getenv("MALLOC_LOGFILE");
+			if (var)						validate_logfile(var);
+			else							validate_logfile("auto");
+		}
+
+	#pragma endregion
+
+	#pragma region "Mallopt"
+
+		int mallopt(int param, int value) {
+			switch (param) {
+				case M_MXFAST:				g_arena_manager.options.MXFAST				= validate_mxfast(value);				return (1);
+				case M_FRAG_PERCENT:		g_arena_manager.options.FRAG_PERCENT		= validate_frag_percent(value);			return (1);
+				case M_MIN_USAGE_PERCENT:	g_arena_manager.options.MIN_USAGE_PERCENT	= validate_min_usage_percent(value);	return (1);
+				case M_CHECK_ACTION:		g_arena_manager.options.CHECK_ACTION		= validate_check_action(value);			return (1);
+				case M_PERTURB:				g_arena_manager.options.PERTURB				= validate_perturb(value);				return (1);
+				case M_ARENA_TEST:			g_arena_manager.options.ARENA_TEST			= validate_arena_test(value);			return (1);
+				case M_ARENA_MAX:			g_arena_manager.options.ARENA_MAX			= validate_arena_max(value);			return (1);
+				case M_DEBUG:				g_arena_manager.options.DEBUG				= (value);								return (1);
+				case M_LOGGING:				g_arena_manager.options.LOGGING				= (value);								return (1);
+			}
+			return (0);
+		}
+
+	#pragma endregion
+
+#pragma endregion

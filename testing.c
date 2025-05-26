@@ -55,6 +55,9 @@ int main() {
 	printf("Zone: %u - index: %u\n", get_zonetype(4096), get_freelist_index(4096));
 	printf("Zone: %u - index: %u\n\n", get_zonetype(5000), get_freelist_index(5000));
 
+	options_initialize();
+	printf("%s\n", g_arena_manager.options.LOGFILE);
+
 	// print_freelist_ranges();
 	//while(1);
 }

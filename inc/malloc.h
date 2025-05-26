@@ -6,13 +6,16 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:29:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/25 19:23:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/26 19:42:59 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #pragma region "Includes"
+
+	#include "options.h"
+	#include "utils.h"
 
 	#include <stdio.h>
 	#include <pthread.h>
@@ -35,21 +38,6 @@
 	#elif defined(_WIN32)
 		#include <windows.h>
 	#endif
-
-	#define M_MXFAST			1	//
-	#define M_TRIM_THRESHOLD	-1	//
-	#define M_TOP_PAD			-2	//
-	#define M_MMAP_THRESHOLD	-3	//
-	#define M_MMAP_MAX			-4	//
-	#define M_CHECK_ACTION		-5	//
-	#define M_PERTURB			-6	//
-	#define M_ARENA_TEST		-7	//
-	#define M_ARENA_MAX			-8	//
-
-	#ifndef SIZE_MAX
-		#define SIZE_MAX ~(size_t)0
-	#endif
-	#define INVALID_INDEX ~(unsigned char)0
 
 	#define PAGE_SIZE		get_pagesize();
 
@@ -86,18 +74,6 @@
 
 	#pragma region "Structures"
 
-		typedef struct s_options {
-			int	MXFAST;								// 
-			int	TRIM_THRESHOLD;						// 
-			int	TOP_PAD;							// 
-			int	MMAP_THRESHOLD;						// 
-			int	MMAP_MAX;							// 
-			int	CHECK_ACTION;						// 
-			int	PERTURB;							// 
-			int	ARENA_TEST;							// 
-			int	ARENA_MAX;							// Hard limit for arenas based on CPU count
-		} t_options;
-
 		typedef pthread_mutex_t	mtx_t;				// Alias
 
 		typedef struct s_bin t_bin;
@@ -123,7 +99,7 @@
 			int			id;             			// Arena ID			(necesario?)
 			int			active;         			// Active status	(para que se usaria?)
 			size_t		used;	    				// Memory used in the arena
-			t_bin		fastbin[10];				// (16-160 bytes)										Arrays de listas simples (LIFO)
+			t_bin		fastbin[10];				// (16-160 bytes) incremento (sizeof(size_t) * 2))		Arrays de listas simples (LIFO)
 			t_bin		smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
 			t_bin		largebin[10];				// ???
 			t_bin		unsortedbin[10];			// ???
