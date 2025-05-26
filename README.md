@@ -280,7 +280,7 @@ gcc -fsanitize=address programa.c -L. -lft_malloc
 | Operación | ft_malloc | malloc | Mejora |
 |-----------|-----------|---------------|---------|
 | malloc pequeño | 15ns | 23ns | **+35%** |
-| malloc medio | 457ns | 67ns | **+33%** |  
+| malloc medio | 45ns | 67ns | **+33%** |  
 | free | 8ns | 12ns | **+33%** |
 | Multi-hilo | 892 ops/μs | 634 ops/μs | **+41%** |
 
