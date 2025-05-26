@@ -26,15 +26,15 @@ ft_malloc es un proyecto de la escuela 42 que implementa un sistema completo de 
 - **SmallBin**: Gestión eficiente de bloques pequeños (< 512 bytes)
 - **LargeBin**: Ordenamiento por tamaño para bloques grandes
 - **UnsortedBin**: Buffer temporal para optimizar reutilización
-- **TCache**: Caché thread-local para máximo rendimiento (probable implementación)
+- **TCache**: Caché thread-local para máximo rendimiento
 
 #### **Optimizaciones de Memoria**
 - **Bitmap**: Gestión ultra-eficiente para asignaciones ≤ 16 bytes
 - **Coalescing**: Fusión automática de bloques adyacentes libres
 - **Alineación**: Alineación óptima de memoria para rendimiento
-- **Magic Numbers**: Detección de corrupción de memoria y overflow
 
 #### **Protección y Seguridad**
+- **Magic Numbers**: Detección de corrupción de memoria y overflow
 - **mprotect**: Protección de zonas y asignaciones grandes contra escritura accidental
 - **Detección de Overflow**: Identificación temprana de corrupción de memoria
 - **Validación de Punteros**: Verificación de integridad en operaciones free/realloc
