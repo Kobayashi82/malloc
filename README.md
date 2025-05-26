@@ -1,6 +1,6 @@
 # ft_malloc
 
-este readme es un template, y aunque la idea es incorporar todo lo aquí indicado, a día de hoy no representa el estado actual del proyecto.
+Este readme es un template, y aunque la idea es incorporar todo lo aquí indicado, a día de hoy no representa el estado actual del proyecto.
 
 ## 🎯 Descripción
 
@@ -277,10 +277,10 @@ gcc -fsanitize=address programa.c -L. -lft_malloc
 
 ## 📊 Estadísticas de Rendimiento
 
-| Operación | ft_malloc | system malloc | Mejora |
+| Operación | ft_malloc | malloc | Mejora |
 |-----------|-----------|---------------|---------|
 | malloc pequeño | 15ns | 23ns | **+35%** |
-| malloc medio | 45ns | 67ns | **+33%** |  
+| malloc medio | 457ns | **+33%** |  
 | free | 8ns | 12ns | **+33%** |
 | Multi-hilo | 892 ops/μs | 634 ops/μs | **+41%** |
 
