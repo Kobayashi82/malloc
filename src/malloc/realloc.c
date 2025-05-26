@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:40:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/26 21:43:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@
 
 #pragma region "Realloc"
 
+	__attribute__((visibility("default")))
 	void *realloc(void *ptr, size_t size) {
 		void *new_ptr;
 

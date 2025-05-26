@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:40:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/26 21:43:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@
 
 #pragma region "Realloc"
 
+	__attribute__((visibility("default")))
 	void free(void *ptr) {
 		int debug_mode = check_debug_env(2);
 

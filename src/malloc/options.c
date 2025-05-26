@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:40:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/26 21:43:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,6 @@
 
 	#pragma region "Initialize"
 
-		__attribute__((visibility("default")))
 		void options_initialize() {
 			char *var = NULL;
 
@@ -191,6 +190,7 @@
 
 	#pragma region "Mallopt"
 
+		__attribute__((visibility("default")))
 		int mallopt(int param, int value) {
 			switch (param) {
 				case M_MXFAST:				g_arena_manager.options.MXFAST				= validate_mxfast(value);				return (1);

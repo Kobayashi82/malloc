@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:40:53 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/26 21:43:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@
 
 #pragma region "Malloc"
 
+	__attribute__((visibility("default")))
 	void *malloc(size_t size) {
 		t_arena *arena;
 		void *ptr = NULL;
