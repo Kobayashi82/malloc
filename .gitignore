@@ -9,13 +9,10 @@ doc/subject.pdf
 !src
 !src/**
 !Makefile
-!.valgrind.supp
-!leaks
 !.gitignore
 !README.md
 !tester
 !tester/test.c
+!tester/basic.c
 !tester/test.sh
-!test.c
-!test.sh
 !TODO

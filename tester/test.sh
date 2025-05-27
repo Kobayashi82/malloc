@@ -58,12 +58,26 @@ leaks_test() {
 	echo
 }
 
+basic_test() {
+    echo -e " ${GREEN}===============================================${NC}"
+    echo -e "${YELLOW}              Malloc Tester (BASIC)            ${NC}"
+    echo -e " ${GREEN}===============================================${NC}\n"
+    clang -g -Wno-free-nonheap-object -o test basic.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR} -pthread
+    ./test
+	echo
+}
+
 case "$1" in
     "debug")	debug_test;;
     "leak")		leaks_test;;
 	"leaks")	leaks_test;;
 	"valgrind")	leaks_test;;
+	"basic")	basic_test;;
     *)			normal_test;;
 esac
 
 rm test
+
+# -Wno-free-nonheap-object	= Desactiva advertencia de free() al compilar
+# -lft_malloc				= -l busca lib + ft_malloc + .so
+# -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
