@@ -65,3 +65,5 @@ case "$1" in
 	"valgrind")	leaks_test;;
     *)			normal_test;;
 esac
+
+rm test

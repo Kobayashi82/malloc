@@ -6,12 +6,9 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/27 11:39:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/27 22:31:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-// arreglar utils.c
-// ft_printf not thread safe
 
 #pragma region "Includes"
 
