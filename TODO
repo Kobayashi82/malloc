@@ -1,0 +1,43 @@
+
+- ft_printf not thread safe
+- borrar *.o y make no funciona bien
+
+Variables de entorno y mallopt solo asignación de valores.
+
+- Arena arreglar con datos correctos (arena_test y arena_max)
+- Arena switch en caso de fallos.
+- Arena principal en stack
+- Arena como se establece para thread local (en cualquier función de allocation)
+- Free sin first malloc no hace nada
+
+Estructuras:
+- bitmap
+- fastbin (MXFAST)
+- smallbin
+- unsortedbin
+- largebin
+- tcache
+
+Alignment
+Coalescing
+Fragmentation
+Free zone
+Mprotect
+Magic number
+Perturb
+Validacion de header
+
+Free
+- Double free prevention
+- Not allocated
+- Invalid pointer
+
+Abort
+Signals
+
+Reducir header al maximo
+Imitar estructuras de malloc
+
+Print memory
+Print memory hex
+Debug/Trace/Log
