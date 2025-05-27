@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/05/26 21:39:21 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/05/27 11:31:18 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,15 +59,15 @@ LIB_NAME	= libft_$(NAME)_$(HOSTTYPE).so
 
 INC_DIR		= inc/
 BLD_DIR		= build/
-OBJ_DIR		= $(BLD_DIR)obj/$(NAME)/
+OBJ_DIR		= $(BLD_DIR)obj/
 LIB_DIR		= $(BLD_DIR)lib/
-SRC_DIR		= src/$(NAME)/
+SRC_DIR		= src/
 
 # ─────────── #
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= arena.c malloc.c realloc.c free.c freelist.c options.c utils.c
+SRCS		= arena.c malloc.c realloc.c free.c freelist.c options.c utils.c printf.c
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
@@ -82,6 +82,7 @@ DEPS		= $(OBJS:.o=.d)
 -include $(DEPS)
 
 $(LIB_DIR)/$(LIB_NAME): $(OBJS)
+	@$(MAKE) -s _hide_cursor
 #	Create folder
 	@mkdir -p $(LIB_DIR)
 
@@ -93,7 +94,7 @@ $(LIB_DIR)/$(LIB_NAME): $(OBJS)
 #   Symbolic link
 	@cd $(LIB_DIR) && ln -sf $(LIB_NAME) libft_$(NAME).so
 
-	@$(MAKE) -s _progress
+	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
 
 # ───────────── #
@@ -103,6 +104,7 @@ $(LIB_DIR)/$(LIB_NAME): $(OBJS)
 -include $(DEPS)
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
+	@$(MAKE) -s _hide_cursor
 #	Create folder
 	@mkdir -p $(@D)
 
@@ -135,6 +137,7 @@ _show_title:
 	else \
 		printf "\n\t$(WHITE)────────────────────────$(NC)\033[1A\r"; \
 	fi
+	@$(MAKE) -s _show_cursor
 
 # ───────────────────────────────────────────────────────────── #
 # ───────────────────────── RE - CLEAN ─────────────────────────#

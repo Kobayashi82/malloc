@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:29:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:40:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/27 11:21:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,10 +143,6 @@
 	unsigned char	get_zonetype(size_t size);
 	unsigned char	get_freelist_index(size_t size);
 	void			print_freelist_ranges();
-
-	// Options
-	int		mallopt(int param, int value);
-	void	mallopt_init();
 
 	// Main functions
 	void	free(void *ptr);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:12:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/27 11:35:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,5 +25,6 @@
 	void	*ft_memcpy(void *dst, const void *src, int n);
 	void	ft_itoa_buffered(int n, char *buffer, size_t size);
 	int		ft_strlcat(char *dst, const char *src, int dstsize);
+	int		ft_printf(int fd, char const *format, ...);
 
 #pragma endregion

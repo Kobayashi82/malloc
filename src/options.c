@@ -6,12 +6,12 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:43:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/27 11:39:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// g_arena_manager accesible desde el exterior
 // arreglar utils.c
+// ft_printf not thread safe
 
 #pragma region "Includes"
 

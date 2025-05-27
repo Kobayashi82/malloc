@@ -1,6 +1,7 @@
 {
 	"files.associations": {
 		"types.h": "c",
-		"sysinfo.h": "c"
+		"sysinfo.h": "c",
+		"malloc.h": "c"
 	}
 }

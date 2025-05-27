@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:40:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/27 09:55:37 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,8 @@
 
 			int arena_initialize() {
 				g_arena_manager.cpu_count = get_CPUs();
-				//g_arena_manager.arena_test = sizeof(long) == 4 ? 2 : 8;
-				//g_arena_manager.arena_max = 0;
+				g_arena_manager.options.ARENA_TEST = sizeof(long) == 4 ? 2 : 8;
+				g_arena_manager.options.ARENA_MAX = 0;
 				g_arena_manager.arena_curr = 1;
 				g_arena_manager.arenas = NULL;
 
@@ -141,10 +141,9 @@
 			t_arena *arena;
 
 			if (!g_arena_manager.initialized) {
-				if (!arena_initialize())		return (NULL);
+				if (arena_initialize())			return (NULL);
 				if (!g_arena_manager.arenas)	return ((arena = arena_create()) ? arena : NULL);
 			}
-
 			// Para asignaciones grandes, siempre usar la arena principal (la primera creada)
 			if (size > SMALL_MAX) return (g_arena_manager.arenas);
 			// Para asignaciones normales, intentamos reutilizar
@@ -162,14 +161,14 @@
 		#pragma region "Can Create"
 
 			static int arena_can_create() {
-				// if (g_arena_manager.arena_curr < g_arena_manager.arena_test) return (1);
+				if (g_arena_manager.arena_curr < g_arena_manager.options.ARENA_TEST) return (1);
 
-				// if (!g_arena_manager.arena_max) {
-				// 	g_arena_manager.arena_max = g_arena_manager.cpu_count * 2;
-				// 	if (g_arena_manager.arena_max < 2) g_arena_manager.arena_max = g_arena_manager.arena_test;
-				// }
+				if (!g_arena_manager.options.ARENA_MAX) {
+					g_arena_manager.options.ARENA_MAX = g_arena_manager.cpu_count * 2;
+					if (g_arena_manager.options.ARENA_MAX < 2) g_arena_manager.options.ARENA_MAX = g_arena_manager.options.ARENA_TEST;
+				}
 
-				// return (g_arena_manager.arena_curr < g_arena_manager.arena_max);
+				return (g_arena_manager.arena_curr < g_arena_manager.options.ARENA_MAX);
 				return (0);
 			}
 

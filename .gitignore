@@ -13,6 +13,8 @@ doc/subject.pdf
 !leaks
 !.gitignore
 !README.md
-!run_test.sh
-!testing.c
+!tester
+!tester/test.c
+!tester/test.sh
+!test.c
 !test.sh
