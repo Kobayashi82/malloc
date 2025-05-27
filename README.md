@@ -1,4 +1,4 @@
-# ft_malloc
+# Malloc
 
 Este readme es un template, y aunque la idea es incorporar todo lo aquí indicado, a día de hoy no representa el estado actual del proyecto.
 
