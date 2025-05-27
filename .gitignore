@@ -12,7 +12,5 @@ doc/subject.pdf
 !.gitignore
 !README.md
 !tester
-!tester/test.c
-!tester/basic.c
-!tester/test.sh
+!tester/**
 !TODO
