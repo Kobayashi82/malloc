@@ -108,6 +108,7 @@ void test_zones() {
 
 int main() {
 	mallopt(7, DEBUG_MODE);
+	
 	test_zones();
 	test_realloc();
 

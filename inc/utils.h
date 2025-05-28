@@ -6,11 +6,17 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/27 22:16:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:57:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+
+#pragma region "Includes"
+
+	#include <unistd.h>
+
+#pragma endregion
 
 #pragma region "Methods"
 

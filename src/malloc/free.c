@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/27 11:35:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:09:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,13 @@
 
 	__attribute__((visibility("default")))
 	void free(void *ptr) {
-		int debug_mode = g_arena_manager.options.DEBUG;
-
 		if (!ptr) return;
+		int debug_mode = g_manager.options.DEBUG;
+
+		if (!thread_arena) {
+			write(2, "free(): invalid pointer\n", 24);
+			abort();
+		}
 
 		if (debug_mode)
 			ft_printf(1, "[FREE] Liberando memoria en %p\n", ptr);
@@ -33,10 +37,8 @@
 		// 2. Marcar ese bloque como libre
 		// 3. Unir bloques libres adyacentes o zonas... no se aun
 
-		// Trying something
-		munmap(ptr, 8);
-
-		if (debug_mode) ft_printf(1, "[FREE] Memoria liberada en %p\n", ptr);
+		if (munmap(ptr, 8) != 0)	ft_printf(1, "munmap failed");
+		else if (debug_mode)		ft_printf(1, "[FREE] Memoria liberada en %p\n", ptr);
 	}
 
 #pragma endregion

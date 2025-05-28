@@ -57,6 +57,8 @@ leaks_test() {
     valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./test
 	echo
 }
+# export LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
+# export LD_PRELOAD="libft_malloc.so"
 
 basic_test() {
     echo -e " ${GREEN}===============================================${NC}"

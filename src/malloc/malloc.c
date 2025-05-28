@@ -6,30 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/27 11:35:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 18:03:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "malloc.h"
-
-#pragma endregion
-
-#pragma region "Variables"
-
-	static __thread t_arena *thread_arena;
-
-#pragma endregion
-
-#pragma region "Constructor"
-
-	__attribute__((constructor)) static void malloc_initialize() {
-		options_initialize();
-		arena_initialize();
-	}
-
-	__attribute__((destructor)) static void malloc_terminate() { arena_terminate(); }
 
 #pragma endregion
 
@@ -40,13 +23,13 @@
 		t_arena *arena;
 		void *ptr = NULL;
 
-		int debug_mode = g_arena_manager.options.DEBUG;
+		int debug_mode = g_manager.options.DEBUG;
 
 		if (size == 0) return (NULL);
 		if (debug_mode) ft_printf(1, "[MALLOC] Solicitando %d bytes\n", size);
 
 		if (!thread_arena) {
-			arena = arena_get(size);
+			arena = arena_get();
 			if (!arena) {
 				if (debug_mode) ft_printf(1, "[MALLOC] Error: No se pudo obtener arena\n");
 				return (NULL);

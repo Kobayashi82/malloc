@@ -16,7 +16,11 @@
 // -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
 
 int main() {
-	
+	// printf("WTF\n");
+	char *ptr = malloc(8);
+	*ptr = 'a';
+	free(ptr);
+
 	// free(): double free detected in tcache 2
 	// char popo[] = "hola";
 	// free(popo);
@@ -46,8 +50,8 @@ int main() {
 	// printf("Zone: %u - index: %u\n", get_zonetype(4096), get_freelist_index(4096));
 	// printf("Zone: %u - index: %u\n\n", get_zonetype(5000), get_freelist_index(5000));
 
-	options_initialize();
-	printf("%s\n", g_arena_manager.options.LOGFILE);
+	//options_initialize();
+	//printf("%s\n", g_manager.options.LOGFILE);
 
 	// print_freelist_ranges();
 	//while(1);

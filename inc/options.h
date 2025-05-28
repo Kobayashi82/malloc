@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/26 21:04:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 19:00:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,29 @@
 
 #pragma region "Includes"
 
+	#include "utils.h"
+
 	#include <time.h>
 	#include <stdbool.h>
-	
+	#include <unistd.h>
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <sys/mman.h>
+	#include <errno.h>
+	#include <string.h>
+
+	#ifdef _WIN32
+		#include <windows.h>
+	#endif
+
 #pragma endregion
 
 #pragma region "Defines"
 
 	#define ARCHITECTURE				32 * ((sizeof(long) != 4) + 1)
+	#define PAGE_SIZE					get_pagesize();
 	#define INVALID_INDEX				~(unsigned char)0
+
 	#ifndef SIZE_MAX
 		#define SIZE_MAX				~(size_t)0
 	#endif
@@ -68,6 +82,7 @@
 
 #pragma region "Methods"
 
+	size_t	get_pagesize();
 	int		mallopt(int param, int value);
 	void	options_initialize();
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/27 11:35:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 17:22:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 	void *realloc(void *ptr, size_t size) {
 		void *new_ptr;
 
-		int debug_mode = g_arena_manager.options.DEBUG;
+		int debug_mode = g_manager.options.DEBUG;
 
 		// ptr NULL equivale a malloc(size)
 		if (ptr == NULL) return malloc(size);

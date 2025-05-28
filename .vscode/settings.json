@@ -2,6 +2,9 @@
 	"files.associations": {
 		"types.h": "c",
 		"sysinfo.h": "c",
-		"malloc.h": "c"
+		"malloc.h": "c",
+		"pthread.h": "c",
+		"errno.h": "c",
+		"stdlib.h": "c"
 	}
 }
