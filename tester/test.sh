@@ -28,9 +28,11 @@ normal_test() {
     echo -e "${YELLOW}                 Malloc Tester                 ${NC}"
     echo -e " ${GREEN}===============================================${NC}"
     clang -g -o test test.c
-	export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
-	export LD_PRELOAD="libft_malloc.so"
-    ./test
+	(
+		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+		export LD_PRELOAD="libft_malloc.so"
+		./test
+	)
 }
 
 debug_test() {
@@ -38,9 +40,11 @@ debug_test() {
     echo -e "${YELLOW}             Malloc Tester (DEBUG)             ${NC}"
     echo -e " ${GREEN}===============================================${NC}"
     clang -g -o test test.c -DDEBUG_MODE
-	export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
-	export LD_PRELOAD="libft_malloc.so"
-    ./test
+	(
+		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+		export LD_PRELOAD="libft_malloc.so"
+		./test
+	)
 }
 
 leaks_test() {
@@ -52,13 +56,13 @@ leaks_test() {
     echo -e "${YELLOW}             Malloc Tester (LEAKS)             ${NC}"
     echo -e " ${GREEN}===============================================${NC}\n"
     clang -g -o test test.c
-	export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
-	export LD_PRELOAD="libft_malloc.so"
-    valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./test
+	(
+		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+		export LD_PRELOAD="libft_malloc.so"
+		valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./test
+	)
 	echo
 }
-# export LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
-# export LD_PRELOAD="libft_malloc.so"
 
 basic_test() {
     echo -e " ${GREEN}===============================================${NC}"
@@ -83,3 +87,8 @@ rm test
 # -Wno-free-nonheap-object	= Desactiva advertencia de free() al compilar
 # -lft_malloc				= -l busca lib + ft_malloc + .so
 # -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
+
+# En terminal:
+# export LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
+# export LD_PRELOAD="libft_malloc.so"
+# ./test

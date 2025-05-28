@@ -6,13 +6,14 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 18:57:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 22:08:32 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
+	#include "utils.h"
 
 #pragma endregion
 
@@ -101,33 +102,28 @@
 
 			char filename[64] = {0};
 			char pid_str[16] = {0};
-			time_t now = time(NULL);
-			struct tm *tm_info = localtime(&now);
 			pid_t pid = getpid();
 
 			// Default filename with PID
-			ft_strlcpy(filename, "malloc_log_", sizeof(filename));
+			ft_strlcpy(filename, "malloc_", sizeof(filename));
 			ft_itoa_buffered(pid, pid_str, sizeof(pid_str));
 			ft_strlcat(filename, pid_str, sizeof(filename));
-			ft_strlcat(filename, "_", sizeof(filename));
-			
-			// Add timestamp
-			size_t current_len = ft_strlen(filename);
-			strftime(filename + current_len, sizeof(filename) - current_len, "%Y%m%d_%H%M%S.log", tm_info);
+			ft_strlcat(filename, ".log", sizeof(filename));
+
 			size_t value_len = ft_strlen(value);
 
 			if (!ft_strcmp(value, "auto")) {
-				ft_strlcpy(g_manager.options.LOGFILE, "/tmp/", PATH_MAX);				// Temp directory
-				ft_strlcat(g_manager.options.LOGFILE, filename, PATH_MAX);			// Default filename
+				ft_strlcpy(g_manager.options.LOGFILE, "/tmp/", PATH_MAX);			// Temp Directory
+				ft_strlcat(g_manager.options.LOGFILE, filename, PATH_MAX);			// Default Filename
 			} else if (ft_strchr(value, '/')) {
-				ft_strlcpy(g_manager.options.LOGFILE, value, PATH_MAX);				// Directory + filename
+				ft_strlcpy(g_manager.options.LOGFILE, value, PATH_MAX);				// Directory + Filename
 				if (value[value_len - 1] == '/')
-					ft_strlcat(g_manager.options.LOGFILE, filename, PATH_MAX);		// Directory + default filename
+					ft_strlcat(g_manager.options.LOGFILE, filename, PATH_MAX);		// Directory + Default Filename
 			} else {
-				if (!getcwd(g_manager.options.LOGFILE, PATH_MAX))						// Current directory
-					ft_strlcpy(g_manager.options.LOGFILE, "/tmp", PATH_MAX);			// Temp directory (getcwd failed)
+				if (!getcwd(g_manager.options.LOGFILE, PATH_MAX))					// Current Directory
+					ft_strlcpy(g_manager.options.LOGFILE, "/tmp", PATH_MAX);		// Temp Directory (getcwd failed)
 				ft_strlcat(g_manager.options.LOGFILE, "/", PATH_MAX);
-				ft_strlcat(g_manager.options.LOGFILE, value, PATH_MAX);				// filename
+				ft_strlcat(g_manager.options.LOGFILE, value, PATH_MAX);				// Filename
 			}
 		}
 
@@ -204,15 +200,15 @@
 		__attribute__((visibility("default")))
 		int mallopt(int param, int value) {
 			switch (param) {
-				case M_MXFAST:				g_manager.options.MXFAST				= validate_mxfast(value);				return (1);
+				case M_MXFAST:				g_manager.options.MXFAST			= validate_mxfast(value);				return (1);
 				case M_FRAG_PERCENT:		g_manager.options.FRAG_PERCENT		= validate_frag_percent(value);			return (1);
 				case M_MIN_USAGE_PERCENT:	g_manager.options.MIN_USAGE_PERCENT	= validate_min_usage_percent(value);	return (1);
 				case M_CHECK_ACTION:		g_manager.options.CHECK_ACTION		= validate_check_action(value);			return (1);
-				case M_PERTURB:				g_manager.options.PERTURB				= validate_perturb(value);				return (1);
-				case M_ARENA_TEST:			g_manager.options.ARENA_TEST			= validate_arena_test(value);			return (1);
+				case M_PERTURB:				g_manager.options.PERTURB			= validate_perturb(value);				return (1);
+				case M_ARENA_TEST:			g_manager.options.ARENA_TEST		= validate_arena_test(value);			return (1);
 				case M_ARENA_MAX:			g_manager.options.ARENA_MAX			= validate_arena_max(value);			return (1);
 				case M_DEBUG:				g_manager.options.DEBUG				= (value);								return (1);
-				case M_LOGGING:				g_manager.options.LOGGING				= (value);								return (1);
+				case M_LOGGING:				g_manager.options.LOGGING			= (value);								return (1);
 			}
 			return (0);
 		}

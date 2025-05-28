@@ -6,11 +6,11 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 10:56:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 18:56:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 22:43:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "malloc.h"
+#include "arena.h"
 
 //	Arena
 //	├── Fastbin  [0-9]  (16-160 bytes)										Arrays de listas simples (LIFO)

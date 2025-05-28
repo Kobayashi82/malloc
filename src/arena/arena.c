@@ -6,13 +6,14 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 18:52:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 22:32:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
+	#include "utils.h"
 
 #pragma endregion
 
@@ -57,6 +58,25 @@
 
 	#pragma endregion
 
+	#pragma region "Mutex"
+
+		int mutex(mtx_t *ptr_mutex, e_mutex action) {
+			int result = 0;
+
+			switch (action) {
+				case MTX_INIT:		result = pthread_mutex_init(ptr_mutex, NULL);	break;
+				case MTX_LOCK:		result = pthread_mutex_lock(ptr_mutex);			break;
+				case MTX_UNLOCK:	result = pthread_mutex_unlock(ptr_mutex);		break;
+				case MTX_DESTROY:	return (pthread_mutex_destroy(ptr_mutex));
+				case MTX_TRYLOCK:	return (pthread_mutex_trylock(ptr_mutex));
+			}
+
+			if (result) abort();
+			return (result);
+		}
+
+	#pragma endregion
+
 #pragma endregion
 
 #pragma region "Arena"
@@ -71,7 +91,7 @@
 			arena->heap[1] = NULL;
 			arena->heap[2] = NULL;
 			arena->next = NULL;
-			if (pthread_mutex_init(&arena->mutex, NULL)) return (1);
+			mutex(&arena->mutex, MTX_INIT);
 			g_manager.arena_count++;
 
 			return (0);
@@ -84,12 +104,12 @@
 		void arena_terminate() {
 			t_arena *current, *next;
 
-			pthread_mutex_lock(&g_manager.mutex);
+			mutex(&g_manager.mutex, MTX_LOCK);
 
-				pthread_mutex_destroy(&g_manager.arena.mutex);
+				mutex(&g_manager.arena.mutex, MTX_DESTROY);
 				current = g_manager.arena.next;
 				while (current) {
-					pthread_mutex_destroy(&current->mutex);
+					mutex(&current->mutex, MTX_DESTROY);
 
 					// liberar zonas
 
@@ -98,8 +118,8 @@
 					current = next;
 				}
 
-			pthread_mutex_unlock(&g_manager.mutex);
-			pthread_mutex_destroy(&g_manager.mutex);
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+			mutex(&g_manager.mutex, MTX_DESTROY);
 		}
 
 	#pragma endregion
@@ -173,12 +193,12 @@
 
 			current = &g_manager.arena;
 			while (current) {
-				if (!pthread_mutex_trylock(&current->mutex)) {
+				if (!mutex(&current->mutex, MTX_TRYLOCK)) {
 					best_arena = current;
-					pthread_mutex_unlock(&current->mutex);
+					mutex(&current->mutex, MTX_UNLOCK);
 					break;
 				} else {
-					ft_printf(1, "WTF\n");
+					ft_aprintf(1, "WTF\n");
 				}
 				current = current->next;
 			}
@@ -192,21 +212,20 @@
 
 		t_arena *arena_get() {
 			t_arena *arena = NULL;
-			
-			pthread_mutex_lock(&g_manager.mutex);
 
-			if (!g_manager.initialized) {
-				g_manager.initialized = true;
-				g_manager.arena_count = 0;
-				if (arena_initialize(&g_manager.arena)) abort();
-				arena = &g_manager.arena;
-			}
-			if (!arena) arena = arena_reuse();
-			if (!arena) arena = arena_create();
-			if (!arena) arena = &g_manager.arena;
-			ft_printf(1, "CPU: %d - Arena: %d\n", get_CPUs(), arena->id);
-		
-			pthread_mutex_unlock(&g_manager.mutex);
+			mutex(&g_manager.mutex, MTX_LOCK);
+
+				if (!g_manager.initialized) {
+					g_manager.initialized = true;
+					g_manager.arena_count = 0;
+					if (arena_initialize(&g_manager.arena)) abort();
+					arena = &g_manager.arena;
+				}
+				if (!arena) arena = arena_reuse();
+				if (!arena) arena = arena_create();
+				if (!arena) arena = &g_manager.arena;
+
+			mutex(&g_manager.mutex, MTX_UNLOCK);
 
 			return (arena);
 		}

@@ -6,13 +6,14 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 17:22:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 22:32:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "malloc.h"
+	#include "utils.h"
 
 #pragma endregion
 
@@ -30,7 +31,7 @@
 		// size es 0 equivale a free(ptr)
 		if (size == 0) return (free(ptr), NULL);
 
-		if (debug_mode) ft_printf(1, "[REALLOC] Reasignando memoria en %p a %d bytes\n", ptr, size);
+		if (debug_mode) ft_aprintf(1, "[REALLOC] Reasignando memoria en %p a %d bytes\n", ptr, size);
 
 		// En la implementación real:
 		// 1. Verificar si el bloque actual puede ser extendido
@@ -38,7 +39,7 @@
 
 		new_ptr = malloc(size);
 		if (!new_ptr) {
-			if (debug_mode) ft_printf(1, "[REALLOC] Error: No se pudo asignar memoria nueva\n");
+			if (debug_mode) ft_aprintf(1, "[REALLOC] Error: No se pudo asignar memoria nueva\n");
 			return (NULL);
 		}
 
@@ -48,7 +49,7 @@
 		memcpy(new_ptr, ptr, copy_size);
 		free(ptr);
 
-		if (debug_mode) ft_printf(1, "[REALLOC] Memoria reasignada de %p a %p (%d bytes)\n", ptr, new_ptr, size);
+		if (debug_mode) ft_aprintf(1, "[REALLOC] Memoria reasignada de %p a %p (%d bytes)\n", ptr, new_ptr, size);
 
 		return (new_ptr);
 	}

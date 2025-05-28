@@ -18,3 +18,28 @@ M_CHECK_ACTION
 	3	Print detailed error message, stack trace, and memory mappings, and abort the program.
 	5	Print a simple error message and continue execution.
 	7	Print simple error message, stack trace, and memory mappings, and abort the program.
+
+
+	// ARENA
+	// Estructura compartida entre hilos que contiene HEAPs y BINs
+
+	// HEAP
+	// Region de memoria contigua que se divide en CHUNKs
+
+	// CHUNK
+	// Porción de memoria que envuelve un BLOCK y contiene METADATA
+	
+	// METADATA
+	// Informacion sobre una BLOCK y que se encuentra antes y despues de un BLOCK
+
+	// BLOCK
+	// Region dentro de un CHUNK y perteneciente a un HEAP donde se guardan datos. Es lo que devuelve malloc y libera free
+
+	// BIN
+	// Listas enlazadas con informacion a CHUNKs libres. Se usa para la reutilizacion de espacios de memoria
+
+	// TCACHE
+	// Array de listas enlazadas con informacion a CHUNKs libres. Se usa para para la reutilizacion de espacios de memoria, pero cada hilo tiene su propio TCACHE
+	
+	// mcheck(3), mtrace(3)
+

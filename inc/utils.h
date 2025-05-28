@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 18:57:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/28 22:43:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 #pragma region "Includes"
 
-	#include <unistd.h>
+	#include "unistd.h"
 
 #pragma endregion
 
@@ -32,7 +32,7 @@
 	void	ft_itoa_buffered(int n, char *buffer, size_t size);
 	int		ft_isdigit_s(char *str);
 
-	// PRINTF
-	int		ft_printf(int fd, char const *format, ...);
+	// ATOMIC PRINTF
+	int		ft_aprintf(int fd, char const *format, ...);
 
 #pragma endregion
