@@ -64,7 +64,7 @@ Arena 1                Arena 2                Arena N
 
 ```bash
 git clone git@github.com:Kobayashi82/Malloc.git
-cd ft_malloc
+cd malloc
 make
 
 # La librería se genera en ./build/lib como:
@@ -136,19 +136,19 @@ export MALLOC_PERTURB_=0x42
 export MALLOC_TRACE=malloc_log.txt
 ```
 
-### Variables Específicas de ft_malloc
+### Variables Específicas de Malloc
 ```bash
 # Configurar número de arenas
-export FT_MALLOC_ARENAS=8
+export MALLOC_ARENAS=8
 
 # Habilitar protección mprotect
-export FT_MALLOC_MPROTECT=1
+export MALLOC_MPROTECT=1
 
 # Mostrar información detallada
-export FT_MALLOC_VERBOSE=1
+export MALLOC_VERBOSE=1
 
 # Configurar tamaño de TCache
-export FT_MALLOC_TCACHE_SIZE=64
+export MALLOC_TCACHE_SIZE=64
 ```
 
 ## 📚 Funciones Adicionales
@@ -161,7 +161,7 @@ void show_alloc_mem_ex();
 
 **Salida ejemplo:**
 ```
-=== ft_malloc Memory Report ===
+=== Malloc Memory Report ===
 ARENA 0 (Thread: 12345)
   FastBins [16]: 3 chunks
   FastBins [24]: 1 chunk  
@@ -188,7 +188,7 @@ Fragmentation: 19.6%
 
 ### mallopt() - Control de Comportamiento
 ```c
-#include "ft_malloc.h"
+#include "malloc.h"
 
 // Configurar número máximo de arenas
 mallopt(M_ARENA_MAX, 4);
@@ -243,7 +243,7 @@ make test-compatibility  # Programas reales
 ./benchmark_malloc
 
 # Resultados ejemplo:
-# ft_malloc:    1,234,567 ops/sec
+# malloc:    1,234,567 ops/sec
 # system malloc: 987,654 ops/sec
 # Mejora: +25% en operaciones mixtas
 ```
@@ -277,7 +277,7 @@ gcc -fsanitize=address programa.c -L. -lft_malloc
 
 ## 📊 Estadísticas de Rendimiento
 
-| Operación | ft_malloc | malloc | Mejora |
+| Operación | malloc | malloc (glibc) | Mejora |
 |-----------|-----------|---------------|---------|
 | malloc pequeño | 15ns | 23ns | **+35%** |
 | malloc medio | 45ns | 67ns | **+33%** |  
