@@ -167,8 +167,6 @@ void *my_malloc(size_t size) {
 }
 
 void sfree(void *ptr, size_t size) {
-	free(ptr);
-	return;
     if (!ptr) return;
     
     if (munmap(ptr, size) != 0) {
@@ -177,6 +175,17 @@ void sfree(void *ptr, size_t size) {
         ft_aprintf(1, "SFree: \t\t\t\t(%p)\n", ptr);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 void *thread_test(void *arg) {
 	int thread_num = *(int *)arg;
@@ -189,7 +198,7 @@ void *thread_test(void *arg) {
 		if (str) {
 			str[0] = 'a';
 			ft_aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
-			sfree(str, 64);
+			free(str);
 		} else {
 			ft_aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
 		}
@@ -200,7 +209,7 @@ void *thread_test(void *arg) {
 	if (str) {
 		str[0] = 'a';
 		ft_aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
-		sfree(str, 1024 * 1024);
+		free(str);
 	} else {
 		ft_aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
 	}
@@ -209,24 +218,24 @@ void *thread_test(void *arg) {
 }
 
 void test_realloc() {
-	// ft_aprintf(1, "\n=== Realloc ===\n\n");
+	ft_aprintf(1, "\n=== Realloc ===\n\n");
 
 	int initial = 8, extended = 128;
 	char *ptr = malloc(initial);
 	if (ptr) {
 		strcpy(ptr, "inicial");
-		// ft_aprintf(1, "Asignación %s    (%d bytes)\t(%p)\n", ptr, initial, ptr);
+		ft_aprintf(1, "Asignación %s    (%d bytes)\t(%p)\n", ptr, initial, ptr);
 
 		ptr = realloc(ptr, extended);
 		if (ptr) {
 			strcpy(ptr, "ampliada");
-			// ft_aprintf(1, "Asignación %s (%d bytes)\t(%p)\n", ptr, extended, ptr);
+			ft_aprintf(1, "Asignación %s (%d bytes)\t(%p)\n", ptr, extended, ptr);
 		} else {
-			// ft_aprintf(1, "Realloc failed\n");
+			ft_aprintf(1, "Realloc failed\n");
 		}
-		sfree(ptr, 128);
+		free(ptr);
 	} else {
-		// ft_aprintf(1, "Realloc failed\n");
+		ft_aprintf(1, "Realloc failed\n");
 	}
 }
 
@@ -237,26 +246,26 @@ void test_zones() {
 	char *small = (char *)malloc(16);
 	if (small) {
 		strcpy(small, "TINY");
-		// ft_aprintf(1, "Asignación %s\t\t\t(%p)\n", small, small);
+		ft_aprintf(1, "Asignación %s\t\t\t(%p)\n", small, small);
 	}
 
 	// Asignación SMALL
 	char *medium = (char *)malloc(570);
 	if (medium) {
 		strcpy(medium, "SMALL");
-		// ft_aprintf(1, "Asignación %s\t\t(%p)\n", medium, medium);
+		ft_aprintf(1, "Asignación %s\t\t(%p)\n", medium, medium);
 	}
 
 	// Asignación LARGE
 	char *large = (char *)malloc(10240);
 	if (large) {
 		strcpy(large, "LARGE");
-		// ft_aprintf(1, "Asignación %s\t\t(%p)\n", large, large);
+		ft_aprintf(1, "Asignación %s\t\t(%p)\n", large, large);
 	}
 
-	sfree(small, 16);
-	sfree(medium, 570);
-	sfree(large, 10240);
+	free(small);
+	free(medium);
+	free(large);
 }
 
 int main() {
@@ -266,7 +275,7 @@ int main() {
 	test_realloc();
 
 	ft_aprintf(1, "\n=== Threads ===\n\n");
-	int i, n_threads = 5;
+	int i, n_threads = 10;
 	int thread_args[n_threads];
 	pthread_t threads[n_threads];
 	

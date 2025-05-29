@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 22:09:38 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 19:31:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 
 	#include <time.h>
 	#include <stdbool.h>
+	#include <dlfcn.h>
 
 	#ifdef _WIN32
 		#include <windows.h>
