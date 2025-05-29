@@ -285,3 +285,7 @@ gcc -fsanitize=address programa.c -L. -lft_malloc
 | Multi-hilo | 892 ops/μs | 634 ops/μs | **+41%** |
 
 esto está por ver... lol
+
+## License
+
+This project is licensed under the WTFPL – [Do What the Fuck You Want to Public License](http://www.wtfpl.net/about/).
