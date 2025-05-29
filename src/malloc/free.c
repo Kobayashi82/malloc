@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 22:32:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 14:43:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,11 @@
 		if (!ptr) return;
 		int debug_mode = g_manager.options.DEBUG;
 
+		// Si el puntero es de nuestro range pero invalido, error y abort
+		// Si no hay thread_arena o el puntero no es nuestro, return
 		if (!thread_arena) {
-			write(2, "free(): invalid pointer\n", 24);
-			abort();
+			//ft_aprintf(2, "free(): invalid pointer\t\t(%p)\n", ptr);
+			return;
 		}
 
 		if (debug_mode)
@@ -38,7 +40,7 @@
 		// 2. Marcar ese bloque como libre
 		// 3. Unir bloques libres adyacentes o zonas... no se aun
 
-		if (munmap(ptr, 8) != 0)	ft_aprintf(1, "munmap failed");
+		if (munmap(ptr, 8) != 0)	ft_aprintf(1, "munmap failed Hilo: #%d\t\t(%p)\n", thread_arena->id, ptr);
 		else if (debug_mode)		ft_aprintf(1, "[FREE] Memoria liberada en %p\n", ptr);
 	}
 

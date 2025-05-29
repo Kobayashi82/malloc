@@ -5,6 +5,7 @@
 		"malloc.h": "c",
 		"pthread.h": "c",
 		"errno.h": "c",
-		"stdlib.h": "c"
+		"stdlib.h": "c",
+		"options.h": "c"
 	}
 }

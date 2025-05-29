@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 22:32:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 14:14:34 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,13 @@
 #pragma region "Constructor"
 
 	__attribute__((constructor)) static void malloc_initialize() {
+		pthread_mutex_init(&g_manager.mutex, NULL);
 		options_initialize();
 	}
 
 	__attribute__((destructor)) static void malloc_terminate() {
 		arena_terminate();
+		pthread_mutex_destroy(&g_manager.mutex);
 	}
 
 #pragma endregion
@@ -176,8 +178,6 @@
 				t_arena *current = &g_manager.arena;
 				while (current->next) current = current->next;
 				current->next = new_arena;
-				g_manager.arena_count++;
-				new_arena->id = g_manager.arena_count;
 
 				return (new_arena);
 			}
@@ -196,9 +196,10 @@
 				if (!mutex(&current->mutex, MTX_TRYLOCK)) {
 					best_arena = current;
 					mutex(&current->mutex, MTX_UNLOCK);
+					return (NULL);
 					break;
 				} else {
-					ft_aprintf(1, "WTF\n");
+					ft_aprintf(1, "Arena %d locked\n", current->id);
 				}
 				current = current->next;
 			}
@@ -225,6 +226,7 @@
 				if (!arena) arena = arena_create();
 				if (!arena) arena = &g_manager.arena;
 
+				ft_aprintf(1, "MAX: %d, TEST: %d, Arena: %d\n", g_manager.options.ARENA_MAX, g_manager.options.ARENA_TEST, arena->id);
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 
 			return (arena);
