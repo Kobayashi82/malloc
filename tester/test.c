@@ -167,6 +167,8 @@ void *my_malloc(size_t size) {
 }
 
 void sfree(void *ptr, size_t size) {
+	free(ptr);
+	return;
     if (!ptr) return;
     
     if (munmap(ptr, size) != 0) {
@@ -187,23 +189,21 @@ void *thread_test(void *arg) {
 		if (str) {
 			str[0] = 'a';
 			ft_aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
-			sleep(1);
 			sfree(str, 64);
-			//free(str);
 		} else {
 			ft_aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
 		}
 	}
 
 	// Asignación LARGE
-	// str = malloc(1024 * 1024);
-	// if (str) {
-	// 	sprintf(str, "Asignación #%d", i);
-	// 	// ft_aprintf(1, "Hilo %d: %s\t\t(%p)\n", thread_num, str, str);
-	// 	sfree(str, 1024 * 1024);
-	// } else {
-	// 	// ft_aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
-	// }
+	str = malloc(1024 * 1024);
+	if (str) {
+		str[0] = 'a';
+		ft_aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
+		sfree(str, 1024 * 1024);
+	} else {
+		ft_aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
+	}
 
 	return (NULL);
 }
@@ -260,11 +260,12 @@ void test_zones() {
 }
 
 int main() {
-	//mallopt(7, DEBUG_MODE);
+	mallopt(7, DEBUG_MODE);
 	
-	// test_zones();
-	// test_realloc();
-	// ft_aprintf(1, "\n=== Threads ===\n\n");
+	test_zones();
+	test_realloc();
+
+	ft_aprintf(1, "\n=== Threads ===\n\n");
 	int i, n_threads = 5;
 	int thread_args[n_threads];
 	pthread_t threads[n_threads];
@@ -272,18 +273,13 @@ int main() {
 	for (i = 0; i < n_threads; i++) {
 		thread_args[i] = i + 1;
 		if (pthread_create(&threads[i], NULL, thread_test, &thread_args[i]) != 0) {
-			// ft_aprintf(1, "Thread creation failed\n");
+			ft_aprintf(1, "Thread creation failed\n");
 			n_threads = i; break;
 		}
 	}
-	sleep(2);
-	ft_aprintf(1, "fin\n");
 	for (i = 0; i < n_threads; i++) {
-		ft_aprintf(1, "Esperando hilo %d...\n", i+1);
 		if (pthread_join(threads[i], NULL) != 0) {
 			ft_aprintf(1, "Error en pthread_join para hilo %d\n", i+1);
-		} else {
-			ft_aprintf(1, "Hilo %d terminó correctamente\n", i+1);
 		}
 	}
 	

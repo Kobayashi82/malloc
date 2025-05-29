@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 14:43:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:32:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 		// 2. Marcar ese bloque como libre
 		// 3. Unir bloques libres adyacentes o zonas... no se aun
 
-		if (munmap(ptr, 8) != 0)	ft_aprintf(1, "munmap failed Hilo: #%d\t\t(%p)\n", thread_arena->id, ptr);
+		if (munmap(ptr, 8) != 0)	; //ft_aprintf(1, "munmap failed Hilo: #%d\t\t(%p)\n", thread_arena->id, ptr);
 		else if (debug_mode)		ft_aprintf(1, "[FREE] Memoria liberada en %p\n", ptr);
 	}
 

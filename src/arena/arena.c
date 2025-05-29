@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 14:14:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 16:35:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,7 +196,6 @@
 				if (!mutex(&current->mutex, MTX_TRYLOCK)) {
 					best_arena = current;
 					mutex(&current->mutex, MTX_UNLOCK);
-					return (NULL);
 					break;
 				} else {
 					ft_aprintf(1, "Arena %d locked\n", current->id);
