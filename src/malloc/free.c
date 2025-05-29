@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 19:43:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 21:30:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,12 @@ static void realfree(void *ptr) {
 		// Si el puntero es de nuestro range pero invalido, error y abort
 		// Si no hay thread_arena o el puntero no es nuestro, return
 		// if (!thread_arena) {
-		// 	//ft_aprintf(2, "free(): invalid pointer\t\t(%p)\n", ptr);
+		// 	//aprintf(2, "free(): invalid pointer\t\t(%p)\n", ptr);
 		// 	return;
 		// }
 
 		if (debug_mode)
-			ft_aprintf(1, "[FREE] Liberando memoria en %p\n", ptr);
+			aprintf(1, "[FREE] Liberando memoria en %p\n", ptr);
 
 		// Por ahora, solo se usara munmap
 		// En la implementación real:
@@ -58,11 +58,11 @@ static void realfree(void *ptr) {
 		// 3. Unir bloques libres adyacentes o zonas... no se aun
 
 		if (!thread_arena || munmap(ptr, 8) != 0) {
-			// ft_aprintf(1, "munmap failed Hilo: #%d\t\t(%p)\n", thread_arena->id, ptr);
-			ft_aprintf(1, "Real free llamado: Arena: #%d\t(%p)\n", thread_arena->id, ptr);
+			// aprintf(1, "munmap failed Hilo: #%d\t\t(%p)\n", thread_arena->id, ptr);
+			// aprintf(1, "Real free llamado: Arena: #%d\t(%p)\n", thread_arena->id, ptr);
 			realfree(ptr);
 		}
-		else if (debug_mode)		ft_aprintf(1, "[FREE] Memoria liberada en %p\n", ptr);
+		else if (debug_mode) aprintf(1, "[FREE] Memoria liberada en %p\n", ptr);
 	}
 
 #pragma endregion

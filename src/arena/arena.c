@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 18:25:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 21:30:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,7 +198,7 @@
 					mutex(&current->mutex, MTX_UNLOCK);
 					break;
 				} else {
-					ft_aprintf(1, "Arena %d locked\n", current->id);
+					aprintf(1, "Arena %d locked\n", current->id);
 				}
 				current = current->next;
 			}
@@ -225,7 +225,7 @@
 				if (!arena) arena = arena_create();
 				if (!arena) arena = &g_manager.arena;
 
-				ft_aprintf(1, "MAX: %d, TEST: %d, Arena: %d\n", g_manager.options.ARENA_MAX, g_manager.options.ARENA_TEST, arena->id);
+				aprintf(1, "MAX: %d, TEST: %d, Arena: %d\n", g_manager.options.ARENA_MAX, g_manager.options.ARENA_TEST, arena->id);
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 
 			return (arena);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 22:43:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 21:30:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,6 @@
 	int		ft_isdigit_s(char *str);
 
 	// ATOMIC PRINTF
-	int		ft_aprintf(int fd, char const *format, ...);
+	int		aprintf(int fd, char const *format, ...);
 
 #pragma endregion

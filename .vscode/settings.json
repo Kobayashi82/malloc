@@ -6,6 +6,7 @@
 		"pthread.h": "c",
 		"errno.h": "c",
 		"stdlib.h": "c",
-		"options.h": "c"
+		"options.h": "c",
+		"stdio.h": "c"
 	}
 }

@@ -1,298 +1,188 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <malloc.h>	// para mallopt()
-	#include <unistd.h>
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <sys/mman.h>
-	#include <errno.h>
-	#include <string.h>
-	#include <stdarg.h>
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   test.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/05/29 21:43:03 by vzurera-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #pragma region "Includes"
 
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	#include <unistd.h>
+	#include <pthread.h>
+	#include <malloc.h>	// para mallopt()
+	#include <sys/mman.h>
+	#include <errno.h>
 
 #pragma endregion
 
-#ifndef DEBUG_MODE
-	#define DEBUG_MODE 0
-#endif
+#pragma region "Defines"
 
-#pragma region "Structures"
+	#ifndef DEBUG_MODE
+		#define DEBUG_MODE 0
+	#endif
 
-	typedef struct {
-		char    *buffer;
-		size_t  size;
-		size_t  pos;
-		int     error;
-	} t_buffer;
+	#define M_ARENA_MAX					-8			//
+	#define M_ARENA_TEST				-7			//
+	#define M_PERTURB					-6			//
+	#define M_CHECK_ACTION				-5			//
+	#define M_MXFAST			 		 1			//
+	#define M_FRAG_PERCENT			 	 2			// Si una zona esta mas fragmentada que esto, no usarla (crear nueva si es necesario)
+	#define M_MIN_USAGE_PERCENT			 3			// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
+	#define M_DEBUG						 7			// (DEBUG) Enable debug mode
+	#define M_LOGGING					 8			// (DEBUG) Captura backtrace con backtrace() y lo guardas junto con cada allocación.
+	#define M_LOGFILE					 9			// (DEBUG) Con diferentes comportamientos según el valor:
+
+	int aprintf(int fd, char const *format, ...);
 
 #pragma endregion
 
-#pragma region "Atomic Printf"
+#pragma region "Tests"
 
-	#pragma region "Char"
+	#pragma region "Thread"
 
-		static void print_c_buf(int c, t_buffer *buf) {
-			if (buf->error || buf->pos >= buf->size - 1) { buf->error = 1; return; }
-			buf->buffer[buf->pos++] = c;
+		void *thread_test(void *arg) {
+			int thread_num = *(int *)arg;
+			char *str;
+			int i;
+
+			// Asignación y liberación
+			for (i = 0; i < 5; i++) {
+				str = malloc(64);
+				if (str) {
+					str[0] = 'a';
+					aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
+					free(str);
+				} else {
+					aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
+				}
+			}
+
+			// Asignación LARGE
+			str = malloc(1024 * 1024);
+			if (str) {
+				str[0] = 'a';
+				aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
+				free(str);
+			} else {
+				aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
+			}
+
+			return (NULL);
 		}
 
 	#pragma endregion
 
-	#pragma region "String"
+	#pragma region "Realloc"
 
-		static void print_s_buf(char *s, t_buffer *buf) {
-			if (!s) s = "(null)";
-			while (*s && !buf->error) print_c_buf(*s++, buf);
-		}
+		void realloc_test() {
+			aprintf(1, "\n=== Realloc ===\n\n");
 
-	#pragma endregion
+			int initial = 8, extended = 128;
+			char *ptr = malloc(initial);
+			if (ptr) {
+				strcpy(ptr, "inicial");
+				aprintf(1, "Asignación %s    (%d bytes)\t(%p)\n", ptr, initial, ptr);
 
-	#pragma region "Number"
-
-		static void print_n_buf(unsigned long n, unsigned int base, t_buffer *buf, int uppercase) {
-			char *strbase = uppercase ? "0123456789ABCDEF" : "0123456789abcdef";
-
-			if		(base == 11) {	print_c_buf('-', buf);	base = 10; }
-			else if (base == 17) {	print_s_buf("0x", buf);	base = 16; }
-
-			if (n >= base)			print_n_buf(n / base, base, buf, uppercase);
-			if (!buf->error)		print_c_buf(strbase[n % base], buf);
-		}
-
-	#pragma endregion
-
-	#pragma region "Chooser"
-
-		static void chooser_buf(int c, va_list args, t_buffer *buf) {
-			if		(c == '%')		print_c_buf('%', buf);
-			else if (c == 'c')		print_c_buf(va_arg(args, int), buf);
-			else if (c == 's')		print_s_buf(va_arg(args, char *), buf);
-			else if (c == 'u')		print_n_buf(va_arg(args, unsigned int), 10, buf, 0);
-			else if (c == 'p')		print_n_buf(va_arg(args, unsigned long), 17, buf, 0);
-			else if (c == 'x')		print_n_buf(va_arg(args, unsigned int), 16, buf, 0);
-			else if (c == 'X')		print_n_buf(va_arg(args, unsigned int), 16, buf, 1);
-			else if (c == 'd' || c == 'i') {
-				long long n = va_arg(args, int);
-				if (n < 0)			print_n_buf(n * -1, 11, buf, 0);
-				else				print_n_buf(n, 10, buf, 0);
+				ptr = realloc(ptr, extended);
+				if (ptr) {
+					strcpy(ptr, "ampliada");
+					aprintf(1, "Asignación %s (%d bytes)\t(%p)\n", ptr, extended, ptr);
+				} else {
+					aprintf(1, "Realloc failed\n");
+				}
+				free(ptr);
+			} else {
+				aprintf(1, "Realloc failed\n");
 			}
 		}
 
 	#pragma endregion
 
-	#pragma region "Atomic Printf"
+	#pragma region "Heap"
 
-		int ft_aprintf(int fd, char const *format, ...) {
-			if (fd < 1) return (0);
+		void heap_test() {
+			aprintf(1, "\n=== Heap ===\n\n");
 
-			char buffer[4096];
-			t_buffer buf = {
-				.buffer = buffer,
-				.size = sizeof(buffer),
-				.pos = 0,
-				.error = 0
-			};
-
-			va_list args;
-			va_start(args, format);
-
-			while (format && *format && !buf.error) {
-				if (*format == '%')	chooser_buf(*(++format), args, &buf);
-				else				print_c_buf(*format, &buf);
-				format++;
+			// Asignación TINY
+			char *small = (char *)malloc(16);
+			if (small) {
+				strcpy(small, "TINY");
+				aprintf(1, "Asignación %s\t\t\t(%p)\n", small, small);
 			}
 
-			va_end(args);
-
-			if (buf.error && buf.pos > 0) buf.pos = buf.size - 1;
-			if (buf.pos > 0) {
-				int result = write(fd, buffer, buf.pos);
-				return (result == -1 ? -1 : result);
+			// Asignación SMALL
+			char *medium = (char *)malloc(570);
+			if (medium) {
+				strcpy(medium, "SMALL");
+				aprintf(1, "Asignación %s\t\t(%p)\n", medium, medium);
 			}
 
-			return (0);
+			// Asignación LARGE
+			char *large = (char *)malloc(10240);
+			if (large) {
+				strcpy(large, "LARGE");
+				aprintf(1, "Asignación %s\t\t(%p)\n", large, large);
+			}
+
+			free(small);
+			free(medium);
+			free(large);
 		}
 
 	#pragma endregion
 
 #pragma endregion
 
+#pragma region "Main"
 
+	int main() {
+		mallopt(M_DEBUG, DEBUG_MODE);
+		mallopt(M_ARENA_TEST, 20);
+		mallopt(M_ARENA_MAX, 0);
 
+		heap_test();
+		realloc_test();
 
+		aprintf(1, "\n=== Threads ===\n\n");
+		int i, n_threads = 4;
+		int thread_args[n_threads];
+		pthread_t threads[n_threads];
 
-
-
-
-
-
-
-
-
-
-
-
-
-// alineacion
-	// #define ALIGNMENT 16
-	// #define ALIGN(size) (((size) + ALIGNMENT - 1) & ~(ALIGNMENT - 1))
-// arenas
-// magic number
-// zonas
-// bitmap
-// freelist
-// tcache
-// free: double free
-// free: invalid pointer
-// fusion de bloques
-// liberacion de zonas
-// lazy coalescing (or not)
-// best fit vs first fit
-
-void *my_malloc(size_t size) {   
-    void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
-    
-    if (ptr == MAP_FAILED) {
-        perror("mmap failed in malloc");
-        return NULL;
-    }
-
-    return ptr;
-}
-
-void sfree(void *ptr, size_t size) {
-    if (!ptr) return;
-    
-    if (munmap(ptr, size) != 0) {
-        ft_aprintf(1, "SFree failed: \t\t\t(%p)\n", ptr);
-    } else {
-        ft_aprintf(1, "SFree: \t\t\t\t(%p)\n", ptr);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-void *thread_test(void *arg) {
-	int thread_num = *(int *)arg;
-	char *str;
-	int i;
-
-	// Asignación y liberación
-	for (i = 0; i < 1; i++) {
-		str = malloc(64);
-		if (str) {
-			str[0] = 'a';
-			ft_aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
-			free(str);
-		} else {
-			ft_aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
+		for (i = 0; i < n_threads; i++) {
+			thread_args[i] = i + 1;
+			if (pthread_create(&threads[i], NULL, thread_test, &thread_args[i]) != 0) {
+				aprintf(1, "Thread creation failed\n");
+				n_threads = i; break;
+			}
 		}
-	}
-
-	// Asignación LARGE
-	str = malloc(1024 * 1024);
-	if (str) {
-		str[0] = 'a';
-		ft_aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
-		free(str);
-	} else {
-		ft_aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
-	}
-
-	return (NULL);
-}
-
-void test_realloc() {
-	ft_aprintf(1, "\n=== Realloc ===\n\n");
-
-	int initial = 8, extended = 128;
-	char *ptr = malloc(initial);
-	if (ptr) {
-		strcpy(ptr, "inicial");
-		ft_aprintf(1, "Asignación %s    (%d bytes)\t(%p)\n", ptr, initial, ptr);
-
-		ptr = realloc(ptr, extended);
-		if (ptr) {
-			strcpy(ptr, "ampliada");
-			ft_aprintf(1, "Asignación %s (%d bytes)\t(%p)\n", ptr, extended, ptr);
-		} else {
-			ft_aprintf(1, "Realloc failed\n");
+		for (i = 0; i < n_threads; i++) {
+			if (pthread_join(threads[i], NULL) != 0) {
+				aprintf(1, "Error en pthread_join para hilo %d\n", i+1);
+			}
 		}
-		free(ptr);
-	} else {
-		ft_aprintf(1, "Realloc failed\n");
-	}
-}
 
-void test_zones() {
-	// ft_aprintf(1, "\n=== Zones ===\n\n");
-
-	// Asignación TINY
-	char *small = (char *)malloc(16);
-	if (small) {
-		strcpy(small, "TINY");
-		ft_aprintf(1, "Asignación %s\t\t\t(%p)\n", small, small);
+		aprintf(1, "\n");
+		return (0);
 	}
 
-	// Asignación SMALL
-	char *medium = (char *)malloc(570);
-	if (medium) {
-		strcpy(medium, "SMALL");
-		ft_aprintf(1, "Asignación %s\t\t(%p)\n", medium, medium);
-	}
+#pragma endregion
 
-	// Asignación LARGE
-	char *large = (char *)malloc(10240);
-	if (large) {
-		strcpy(large, "LARGE");
-		ft_aprintf(1, "Asignación %s\t\t(%p)\n", large, large);
-	}
+#pragma region "Information"
 
-	free(small);
-	free(medium);
-	free(large);
-}
+	// NOTE: Con n_threads = 152 se produce un segfault
 
-int main() {
-	mallopt(7, DEBUG_MODE);
-	
-	test_zones();
-	test_realloc();
+	// A partir del 5º hilo parece ser que pthread_create deja de usar el pool de threads y empieza a usar malloc de la glibc.
+	// La llamada la hace internamente y no la puedo interceptar con mi malloc.
+	// Lo curioso es que en pthread_join se llama a free y esta si se intercepta. Lo cual da lugar a que mi free recibe un puntero
+	// por hilo (a partir del 5º) que no puede liberar porque no pertenece a mi malloc.
+	// La solucion es que si mi free recibe un puntero que no pertenece a mi malloc, llama a free de la glibc para que lo procese.
 
-	ft_aprintf(1, "\n=== Threads ===\n\n");
-	int i, n_threads = 10;
-	int thread_args[n_threads];
-	pthread_t threads[n_threads];
-	
-	for (i = 0; i < n_threads; i++) {
-		thread_args[i] = i + 1;
-		if (pthread_create(&threads[i], NULL, thread_test, &thread_args[i]) != 0) {
-			ft_aprintf(1, "Thread creation failed\n");
-			n_threads = i; break;
-		}
-	}
-	for (i = 0; i < n_threads; i++) {
-		if (pthread_join(threads[i], NULL) != 0) {
-			ft_aprintf(1, "Error en pthread_join para hilo %d\n", i+1);
-		}
-	}
-	
-	return (0);
-}
-
-// A partir del 5º hilo hay un munmap failed por hilo, pero lo raro es que solo pasa en el hilo 1
+#pragma endregion

@@ -19,15 +19,15 @@ else
 fi
 
 if [ ! -f "$LIB_DIR/libft_malloc.so" ]; then
-    echo -e "${RED}No se pudo encontrar la librería ${YELLOW}libft_malloc.so${NC}\n"
-    exit 1
+	echo -e "${RED}No se pudo encontrar la librería ${YELLOW}libft_malloc.so${NC}\n"
+	exit 1
 fi
 
 normal_test() {
-    echo -e " ${GREEN}===============================================${NC}"
-    echo -e "${YELLOW}                 Malloc Tester                 ${NC}"
-    echo -e " ${GREEN}===============================================${NC}"
-    clang -g -o test test.c
+	echo -e " ${GREEN}===============================================${NC}"
+	echo -e "${YELLOW}                 Malloc Tester                 ${NC}"
+	echo -e " ${GREEN}===============================================${NC}"
+	clang -g -o test aprintf.c test.c
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -36,10 +36,10 @@ normal_test() {
 }
 
 debug_test() {
-    echo -e " ${GREEN}===============================================${NC}"
-    echo -e "${YELLOW}             Malloc Tester (DEBUG)             ${NC}"
-    echo -e " ${GREEN}===============================================${NC}"
-    clang -g -o test test.c -DDEBUG_MODE
+	echo -e " ${GREEN}===============================================${NC}"
+	echo -e "${YELLOW}             Malloc Tester (DEBUG)             ${NC}"
+	echo -e " ${GREEN}===============================================${NC}"
+	clang -g -o test aprintf.c test.c -DDEBUG_MODE
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -48,14 +48,14 @@ debug_test() {
 }
 
 leaks_test() {
-    if ! command -v valgrind &> /dev/null; then
-        echo -e "${RED}valgrind no está instalado${NC}\n"
-        exit 1
-    fi
-    echo -e " ${GREEN}===============================================${NC}"
-    echo -e "${YELLOW}             Malloc Tester (LEAKS)             ${NC}"
-    echo -e " ${GREEN}===============================================${NC}\n"
-    clang -g -o test test.c
+	if ! command -v valgrind &> /dev/null; then
+		echo -e "${RED}valgrind no está instalado${NC}\n"
+		exit 1
+	fi
+	echo -e " ${GREEN}===============================================${NC}"
+	echo -e "${YELLOW}             Malloc Tester (LEAKS)             ${NC}"
+	echo -e " ${GREEN}===============================================${NC}\n"
+	clang -g -o test aprintf.c test.c
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -65,21 +65,21 @@ leaks_test() {
 }
 
 basic_test() {
-    echo -e " ${GREEN}===============================================${NC}"
-    echo -e "${YELLOW}              Malloc Tester (BASIC)            ${NC}"
-    echo -e " ${GREEN}===============================================${NC}\n"
-    clang -g -Wno-free-nonheap-object -o test basic.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR} -pthread
-    ./test
+	echo -e " ${GREEN}===============================================${NC}"
+	echo -e "${YELLOW}              Malloc Tester (BASIC)            ${NC}"
+	echo -e " ${GREEN}===============================================${NC}\n"
+	clang -g -Wno-free-nonheap-object -o test aprintf.c basic.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR} -pthread
+	./test
 	echo
 }
 
 case "$1" in
-    "debug")	debug_test;;
-    "leak")		leaks_test;;
+	"debug")	debug_test;;
+	"leak")		leaks_test;;
 	"leaks")	leaks_test;;
 	"valgrind")	leaks_test;;
 	"basic")	basic_test;;
-    *)			normal_test;;
+	*)			normal_test;;
 esac
 
 rm test

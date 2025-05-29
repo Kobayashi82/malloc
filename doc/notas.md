@@ -88,3 +88,19 @@ La fragmentación se mide típicamente como la diferencia entre el espacio libre
 ### OTROS
 
 - mcheck(3), mtrace(3)
+
+- alineacion
+- #define ALIGNMENT 16
+- #define ALIGN(size) (((size) + ALIGNMENT - 1) & ~(ALIGNMENT - 1))
+- arenas
+- magic number
+- zonas
+- bitmap
+- freelist
+- tcache
+- free: double free
+- free: invalid pointer
+- fusion de bloques
+- liberacion de zonas
+- lazy coalescing (or not)
+- best fit vs first fit

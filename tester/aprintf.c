@@ -6,14 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/31 23:43:13 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 21:42:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/29 21:42:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "utils.h"
-
+	#include <unistd.h>
 	#include <stdarg.h>
 
 #pragma endregion
@@ -85,6 +84,7 @@
 	#pragma region "Atomic Printf"
 
 		int aprintf(int fd, char const *format, ...) {
+			return (0);
 			if (fd < 1) return (0);
 
 			char buffer[4096];
