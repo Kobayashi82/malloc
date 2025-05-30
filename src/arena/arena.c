@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 18:56:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 22:13:59 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,23 @@
 
 	static int	arena_initialize(t_arena *arena);
 	static void	arena_terminate();
+	static void	prepare_fork();
+	static void	parent_fork();
+	static void	child_fork();
 
 #pragma endregion
 
 #pragma region "Constructor"
 
 	__attribute__((constructor)) static void malloc_initialize() {
+		static int atfork_registered = 0;
+
 		mutex(&g_manager.mutex, MTX_INIT);
 		options_initialize();
+		if (!atfork_registered) {
+			atfork_registered = 1;
+			pthread_atfork(prepare_fork, parent_fork, child_fork);
+		}
 	}
 
 	__attribute__((destructor)) static void malloc_terminate() {
@@ -76,6 +85,52 @@
 			if (result) abort();
 			return (result);
 		}
+
+	#pragma endregion
+
+	#pragma region "Fork"
+
+		#pragma region "Prepare"
+
+			static void prepare_fork() {
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Prepare fork\n");
+				mutex(&g_manager.mutex, MTX_LOCK);
+				t_arena *arena = &g_manager.arena;
+				while (arena) {
+					mutex(&arena->mutex, MTX_LOCK);
+					arena = arena->next;
+				}
+			}
+
+		#pragma endregion
+
+		#pragma region "Parent"
+
+			static void parent_fork() {
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Parent fork\n");
+				t_arena *arena = &g_manager.arena;
+				while (arena) {
+					mutex(&arena->mutex, MTX_UNLOCK);
+					arena = arena->next;
+				}
+				mutex(&g_manager.mutex, MTX_UNLOCK);
+			}
+
+		#pragma endregion
+
+		#pragma region "Child"
+
+			static void child_fork() {
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Child fork\n");
+				t_arena *arena = &g_manager.arena;
+				while (arena) {
+					mutex(&arena->mutex, MTX_UNLOCK);
+					arena = arena->next;
+				}
+				mutex(&g_manager.mutex, MTX_UNLOCK);
+			}
+
+		#pragma endregion
 
 	#pragma endregion
 
@@ -201,7 +256,7 @@
 					// return (NULL);	// Force arena creation
 					break;
 				} else {
-					aprintf(1, "Arena %d locked\n", current->id);
+					if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena %d locked\n", current->id);
 				}
 				current = current->next;
 			}
