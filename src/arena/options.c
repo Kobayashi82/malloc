@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 22:08:32 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 13:47:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@
 	#pragma region "ARENA_TEST"
 
 		int validate_arena_test(int value) {
-			int max = (ARCHITECTURE == 32 ? 2 : 8) * 10;
+			int max = ARCHITECTURE;
 
 			if (value <= 0)		return (1);
 			if (value > max)	return (max);
@@ -85,7 +85,7 @@
 	#pragma region "ARENA_MAX"
 
 		int validate_arena_max(int value) {
-			int max = 32;
+			int max = ARENAS_MAX;
 
 			if ((value <= 0 || value > max) && g_manager.options.ARENA_MAX) return (g_manager.options.ARENA_MAX);
 			if (value < 0)		return (0);

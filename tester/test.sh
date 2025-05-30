@@ -10,12 +10,9 @@ TESTER_DIR="$BASE_DIR"
 LIB_DIR="../build/lib"
 
 if [ -f ".gitignore" ]; then
-	make
-	cd tester
+	make; cd tester
 else
-	cd ..
-	make
-	cd tester
+	cd ..; make; cd tester
 fi
 
 if [ ! -f "$LIB_DIR/libft_malloc.so" ]; then
@@ -26,28 +23,32 @@ fi
 normal_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}                 Malloc Tester                 ${NC}"
-	echo -e " ${GREEN}===============================================${NC}"
+	echo -e " ${GREEN}===============================================${NC}\n"
 	clang -g -o test aprintf.c test.c
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
 		./test
 	)
+	echo
 }
 
 debug_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}             Malloc Tester (DEBUG)             ${NC}"
-	echo -e " ${GREEN}===============================================${NC}"
+	echo -e " ${GREEN}===============================================${NC}\n"
 	clang -g -o test aprintf.c test.c -DDEBUG_MODE
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
 		./test
 	)
+	echo
 }
 
 leaks_test() {
+	echo -e "${RED}valgrind fuerza el uso del allocator native${NC}\n"
+	exit 1
 	if ! command -v valgrind &> /dev/null; then
 		echo -e "${RED}valgrind no está instalado${NC}\n"
 		exit 1
@@ -74,12 +75,10 @@ basic_test() {
 }
 
 case "$1" in
-	"debug")	debug_test;;
-	"leak")		leaks_test;;
-	"leaks")	leaks_test;;
-	"valgrind")	leaks_test;;
-	"basic")	basic_test;;
-	*)			normal_test;;
+	"debug")					debug_test;;
+	"leak"|"leaks"|"valgrind")	leaks_test;;
+	"basic")					basic_test;;
+	*)							normal_test;;
 esac
 
 rm test

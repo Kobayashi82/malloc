@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:07:54 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 21:56:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 17:50:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,13 @@
 	#pragma region "Structures"
 
 		typedef pthread_mutex_t	mtx_t;
+
+		typedef struct s_range t_range;
+		typedef struct s_range {
+			void		*start[HEAPS_MAX];
+			void		*end[HEAPS_MAX];
+		} t_range;
+
 		typedef struct s_arena t_arena;
 		typedef struct s_arena {
 			int			id;
@@ -49,6 +56,7 @@
 			t_bin		smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
 			t_bin		largebin[10];				// ???
 			t_heap		*heap[3];    	  			// Memory zones (TINY, SMALL, LARGE)
+			t_range		range;						// 
 			mtx_t		mutex;          			// Mutex for thread safety in the current arena
 			t_arena		*next;          			// Pointer to next arena
 		} t_arena;
@@ -57,15 +65,20 @@
 			bool		initialized;				// 
 			bool		first_alloc;				// 
 			int			arena_count;				// Current number of arenas created and active
+			t_range		range[ARENAS_MAX];			// 
 			mtx_t		mutex;						// Mutex for synchronizing access to the arenas
 			t_arena		arena;						// Main arena
 			t_options	options;					// 
 		} t_manager;
 
 	#pragma endregion
-	
-	extern __thread t_arena	*thread_arena;
-	extern t_manager		g_manager;
+
+	typedef struct s_tcache {
+		t_arena		*arena;
+	} t_tcache;
+
+	extern __thread t_tcache	tcache;
+	extern t_manager			g_manager;
 
 #pragma endregion
 

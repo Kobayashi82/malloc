@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 21:30:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 18:56:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #pragma region "Variables"
 
 	t_manager			g_manager;
-	__thread t_arena	*thread_arena;
+	__thread t_tcache	tcache;
 
 	static int	arena_initialize(t_arena *arena);
 	static void	arena_terminate();
@@ -30,13 +30,13 @@
 #pragma region "Constructor"
 
 	__attribute__((constructor)) static void malloc_initialize() {
-		pthread_mutex_init(&g_manager.mutex, NULL);
+		mutex(&g_manager.mutex, MTX_INIT);
 		options_initialize();
 	}
 
 	__attribute__((destructor)) static void malloc_terminate() {
 		arena_terminate();
-		pthread_mutex_destroy(&g_manager.mutex);
+		mutex(&g_manager.mutex, MTX_DESTROY);
 	}
 
 #pragma endregion
@@ -151,7 +151,7 @@
 			static int arena_can_create() {
 				if (!g_manager.options.ARENA_MAX) {
 					if (g_manager.arena_count >= g_manager.options.ARENA_TEST) {
-						g_manager.options.ARENA_MAX = get_CPUs() * 2;
+						g_manager.options.ARENA_MAX = ft_min(get_CPUs() * 2, ARENAS_MAX);
 						return (g_manager.arena_count < g_manager.options.ARENA_MAX);
 					} else return (1);
 				}
@@ -179,6 +179,8 @@
 				while (current->next) current = current->next;
 				current->next = new_arena;
 
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d created\n", new_arena->id);
+
 				return (new_arena);
 			}
 
@@ -194,8 +196,9 @@
 			current = &g_manager.arena;
 			while (current) {
 				if (!mutex(&current->mutex, MTX_TRYLOCK)) {
-					best_arena = current;
+						best_arena = current;
 					mutex(&current->mutex, MTX_UNLOCK);
+					// return (NULL);	// Force arena creation
 					break;
 				} else {
 					aprintf(1, "Arena %d locked\n", current->id);
@@ -220,12 +223,12 @@
 					g_manager.arena_count = 0;
 					if (arena_initialize(&g_manager.arena)) abort();
 					arena = &g_manager.arena;
+					if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
 				}
 				if (!arena) arena = arena_reuse();
 				if (!arena) arena = arena_create();
 				if (!arena) arena = &g_manager.arena;
 
-				aprintf(1, "MAX: %d, TEST: %d, Arena: %d\n", g_manager.options.ARENA_MAX, g_manager.options.ARENA_TEST, arena->id);
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 
 			return (arena);

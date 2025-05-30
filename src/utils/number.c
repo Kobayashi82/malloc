@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 22:01:29 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 18:54:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 13:43:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,5 +76,17 @@
 
 		return (1);
 	}
+
+#pragma endregion
+
+#pragma region "MAX"
+
+	int	ft_max(int n1, int n2) { if (n1 > n2) { return (n1); } return (n2); }
+
+#pragma endregion
+
+#pragma region "MIN"
+
+	int ft_min(int n1, int n2) { if (n1 < n2) { return (n1); } return (n2); }
 
 #pragma endregion

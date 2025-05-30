@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 22:11:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 17:21:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,5 +14,11 @@
 
 	#include "arena.h"
 	#include "utils.h"
+
+#pragma endregion
+
+#pragma region "Methods"
+
+
 
 #pragma endregion

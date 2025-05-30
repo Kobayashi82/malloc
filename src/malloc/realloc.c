@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 21:30:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 18:54:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,13 @@
 	void *realloc(void *ptr, size_t size) {
 		void *new_ptr;
 
-		int debug_mode = g_manager.options.DEBUG;
-
 		// ptr NULL equivale a malloc(size)
 		if (ptr == NULL) return malloc(size);
 
 		// size es 0 equivale a free(ptr)
 		if (size == 0) return (free(ptr), NULL);
 
-		if (debug_mode) aprintf(1, "[REALLOC] Reasignando memoria en %p a %d bytes\n", ptr, size);
+		// if (g_manager.options.DEBUG) aprintf(1, "%p\t[REALLOC] Reasignando memoria en %p a %d bytes\n", ptr, size);
 
 		// En la implementación real:
 		// 1. Verificar si el bloque actual puede ser extendido
@@ -39,7 +37,7 @@
 
 		new_ptr = malloc(size);
 		if (!new_ptr) {
-			if (debug_mode) aprintf(1, "[REALLOC] Error: No se pudo asignar memoria nueva\n");
+			if (g_manager.options.DEBUG) aprintf(1, "\t\t[REALLOC] Error: No se pudo asignar memoria nueva\n");
 			return (NULL);
 		}
 
@@ -49,7 +47,7 @@
 		memcpy(new_ptr, ptr, copy_size);
 		free(ptr);
 
-		if (debug_mode) aprintf(1, "[REALLOC] Memoria reasignada de %p a %p (%d bytes)\n", ptr, new_ptr, size);
+		if (g_manager.options.DEBUG) aprintf(1, "%p\t[REALLOC] Memoria reasignada a %p (%d bytes)\n", ptr, new_ptr, size);
 
 		return (new_ptr);
 	}

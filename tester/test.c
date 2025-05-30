@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 21:43:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 19:19:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,14 +54,14 @@
 			int i;
 
 			// Asignación y liberación
-			for (i = 0; i < 5; i++) {
+			for (i = 0; i < 1; i++) {
 				str = malloc(64);
 				if (str) {
 					str[0] = 'a';
-					aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
+					if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d bytes) for thread #%d\t\t(%p)\n", 64, thread_num, str);
 					free(str);
 				} else {
-					aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
+					if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
 				}
 			}
 
@@ -69,10 +69,10 @@
 			str = malloc(1024 * 1024);
 			if (str) {
 				str[0] = 'a';
-				aprintf(1, "Hilo %d: Asignación #%d\t\t(%p)\n", thread_num, i, str);
+				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d bytes) for thread #%d\t\t(%p)\n", 1024 * 1024, thread_num, str);
 				free(str);
 			} else {
-				aprintf(1, "Hilo %d: Malloc failed\n", thread_num);
+				if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
 			}
 
 			return (NULL);
@@ -89,18 +89,18 @@
 			char *ptr = malloc(initial);
 			if (ptr) {
 				strcpy(ptr, "inicial");
-				aprintf(1, "Asignación %s    (%d bytes)\t(%p)\n", ptr, initial, ptr);
+				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d bytes)\t\t\t\t(%p)\n", initial, ptr);
 
 				ptr = realloc(ptr, extended);
 				if (ptr) {
 					strcpy(ptr, "ampliada");
-					aprintf(1, "Asignación %s (%d bytes)\t(%p)\n", ptr, extended, ptr);
+					if (!DEBUG_MODE) aprintf(1, "[REALLOC]\tExtended (%d bytes)\t\t\t\t(%p)\n", extended, ptr);
 				} else {
-					aprintf(1, "Realloc failed\n");
+					if (!DEBUG_MODE) aprintf(1, "[ERROR]\tRealloc failed\n");
 				}
 				free(ptr);
 			} else {
-				aprintf(1, "Realloc failed\n");
+				if (!DEBUG_MODE) aprintf(1, "[ERROR]\tRealloc failed\n");
 			}
 		}
 
@@ -115,21 +115,21 @@
 			char *small = (char *)malloc(16);
 			if (small) {
 				strcpy(small, "TINY");
-				aprintf(1, "Asignación %s\t\t\t(%p)\n", small, small);
+				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d bytes)\t\t\t\t(%p)\n", 16, small);
 			}
 
 			// Asignación SMALL
 			char *medium = (char *)malloc(570);
 			if (medium) {
 				strcpy(medium, "SMALL");
-				aprintf(1, "Asignación %s\t\t(%p)\n", medium, medium);
+				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d bytes)\t\t\t\t(%p)\n", 570, medium);
 			}
 
 			// Asignación LARGE
 			char *large = (char *)malloc(10240);
 			if (large) {
 				strcpy(large, "LARGE");
-				aprintf(1, "Asignación %s\t\t(%p)\n", large, large);
+				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d bytes)\t\t\t\t(%p)\n", 10240, large);
 			}
 
 			free(small);
@@ -152,24 +152,23 @@
 		realloc_test();
 
 		aprintf(1, "\n=== Threads ===\n\n");
-		int i, n_threads = 4;
+		int i, n_threads = 3;
 		int thread_args[n_threads];
 		pthread_t threads[n_threads];
 
 		for (i = 0; i < n_threads; i++) {
 			thread_args[i] = i + 1;
 			if (pthread_create(&threads[i], NULL, thread_test, &thread_args[i]) != 0) {
-				aprintf(1, "Thread creation failed\n");
+				aprintf(1, "[ERROR]\tThread creation failed for thread %d\n", i + 1);
 				n_threads = i; break;
 			}
 		}
 		for (i = 0; i < n_threads; i++) {
 			if (pthread_join(threads[i], NULL) != 0) {
-				aprintf(1, "Error en pthread_join para hilo %d\n", i+1);
+				aprintf(1, "[ERROR]\tThread join failed for thread %d\n", i + 1);
 			}
 		}
 
-		aprintf(1, "\n");
 		return (0);
 	}
 

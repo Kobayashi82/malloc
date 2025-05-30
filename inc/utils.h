@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/29 21:30:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 13:43:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@
 	int		ft_atoi(const char *str);
 	void	ft_itoa_buffered(int n, char *buffer, size_t size);
 	int		ft_isdigit_s(char *str);
+	int		ft_max(int n1, int n2);
+	int		ft_min(int n1, int n2);
 
 	// ATOMIC PRINTF
 	int		aprintf(int fd, char const *format, ...);
