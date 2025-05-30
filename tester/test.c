@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 22:12:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 22:32:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,7 @@
 			aprintf(1, "[ERROR]\tFork failed\n");
 			return (1);
 		} else if (pid == 0) {
+			fork();
 			heap_test();
 			return (0);
 		}

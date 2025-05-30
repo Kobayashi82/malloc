@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 22:13:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 22:31:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,9 @@
 #pragma region "Constructor"
 
 	__attribute__((constructor)) static void malloc_initialize() {
-		static int atfork_registered = 0;
-
 		mutex(&g_manager.mutex, MTX_INIT);
 		options_initialize();
-		if (!atfork_registered) {
-			atfork_registered = 1;
-			pthread_atfork(prepare_fork, parent_fork, child_fork);
-		}
+		pthread_atfork(prepare_fork, parent_fork, child_fork);
 	}
 
 	__attribute__((destructor)) static void malloc_terminate() {
@@ -94,6 +89,7 @@
 
 			static void prepare_fork() {
 				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Prepare fork\n");
+
 				mutex(&g_manager.mutex, MTX_LOCK);
 				t_arena *arena = &g_manager.arena;
 				while (arena) {
@@ -108,6 +104,7 @@
 
 			static void parent_fork() {
 				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Parent fork\n");
+
 				t_arena *arena = &g_manager.arena;
 				while (arena) {
 					mutex(&arena->mutex, MTX_UNLOCK);
@@ -122,6 +119,7 @@
 
 			static void child_fork() {
 				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Child fork\n");
+
 				t_arena *arena = &g_manager.arena;
 				while (arena) {
 					mutex(&arena->mutex, MTX_UNLOCK);
