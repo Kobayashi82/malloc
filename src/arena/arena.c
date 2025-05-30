@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 22:31:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/30 23:04:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,13 +87,47 @@
 
 		#pragma region "Prepare"
 
+			static int try_lock_timeout(mtx_t *mtx_ptr, int timeout) {
+				for (int i = 0; i < timeout; i++) {
+					int ret = mutex(mtx_ptr, MTX_TRYLOCK);
+					if (!ret) return (0);
+
+					if (ret != EBUSY) {
+						if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] locking mutex in fork\n");
+						return (ret);
+					}
+					
+					// Wait 1ms before next try
+					#ifdef _WIN32
+						Sleep(1);
+					#else
+						usleep(1000);
+					#endif
+				}
+
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] timeout locking mutex in fork\n");
+				return (ETIMEDOUT);
+			}
+
 			static void prepare_fork() {
 				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Prepare fork\n");
-
-				mutex(&g_manager.mutex, MTX_LOCK);
+				
+				int ret = try_lock_timeout(&g_manager.mutex, 1000);
+				if (ret) return;
+				
 				t_arena *arena = &g_manager.arena;
 				while (arena) {
-					mutex(&arena->mutex, MTX_LOCK);
+					ret = try_lock_timeout(&arena->mutex, 1000);
+					if (ret) {
+						t_arena *arena_ptr = arena;
+						arena = &g_manager.arena;
+						while (arena && arena != arena_ptr) {
+							mutex(&arena->mutex, MTX_UNLOCK);
+							arena = arena->next;
+						}
+						mutex(&g_manager.mutex, MTX_UNLOCK);
+						return;
+					}
 					arena = arena->next;
 				}
 			}
