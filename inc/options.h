@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 18:06:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 20:34:39 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 #pragma region "Includes"
 
-	#include <time.h>
 	#include <stdbool.h>
+	#include <time.h>
 	#include <dlfcn.h>
 	
 	#define _GNU_SOURCE
@@ -30,7 +30,7 @@
 	#pragma region "Defines"
 
 		#define ARCHITECTURE				32 * ((sizeof(long) != 4) + 1)	// 32 or 64 bits
-		#define PAGE_SIZE					get_pagesize();					// 4096
+		#define PAGE_SIZE					get_pagesize()					// 4096
 		#define ARENAS_MAX					2 * ARCHITECTURE				// 64 or 128
 		#define HEAPS_MAX					4 * ARCHITECTURE				// 128 or 256
 		#define INVALID_INDEX				~(unsigned char)0				// 255

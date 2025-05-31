@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 22:09:49 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 20:31:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,20 +132,6 @@
 #pragma endregion
 
 #pragma region "Methods"
-
-	#pragma region "PageSize"
-
-		size_t get_pagesize() {
-			#ifdef _WIN32
-				SYSTEM_INFO info;
-				GetSystemInfo(&info);
-				return (info.dwPageSize);
-			#else
-				return ((size_t)sysconf(_SC_PAGESIZE));
-			#endif
-		}
-
-	#pragma endregion
 
 	#pragma region "Initialize"
 

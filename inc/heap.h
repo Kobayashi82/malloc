@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 13:54:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 21:46:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,10 @@
 #pragma region "Variables"
 
 	#pragma region "Defines"
+
+		#define TOP_CHUNK		0x4					// Bit 2  
+		#define IS_MMAPPED		0x2					// Bit 1
+		#define PREV_INUSE		0x1					// Bit 0
 
 		#define TINY_MAX		512
 		#define TINY_BLOCKS		128
@@ -42,6 +46,12 @@
 	#pragma endregion
 
 	#pragma region "Structures"
+
+		typedef struct s_chunk {
+			size_t		prev_size;					// 
+			size_t		size;						// Total allocated size of the heap
+		} t_chunk;
+
 
 		typedef struct s_heap t_heap;
 		typedef struct s_heap {
@@ -66,7 +76,9 @@
 
 #pragma region "Methods"
 
-	int	range_add(t_heap *heap);
-	int	range_del(t_heap *heap);
+	size_t	get_pagesize();
+
+	int		range_del(void *ptr, size_t size);
+	int		range_add(void *ptr, size_t size);
 
 #pragma endregion
