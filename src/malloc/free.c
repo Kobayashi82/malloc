@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 21:49:39 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 14:01:37 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 #pragma endregion
 
 #define _GNU_SOURCE
-
 
 #pragma region "Real Free"
 
@@ -81,7 +80,7 @@
 		t_arena	*arena_ptr = NULL;
 		int		result = 2;
 		
-		return (free_ptr(arena, ptr));
+		return (0);						// Prevent segfault in real free (for now)
 		if (arena) {
 			mutex(&arena->mutex, MTX_LOCK);
 
@@ -101,12 +100,12 @@
 			mutex(&g_manager.mutex, MTX_LOCK);
 
 				for (int a = 0; a < ARENAS_MAX; ++a) {
-					if (arena && arena->id == a + 1) continue;
+					if (arena && arena->id - 1 == a) continue;
 					for (int i = 0; i < HEAPS_MAX; ++i) {
 						if (!g_manager.range[a].start[i] || !g_manager.range[a].end[i]) break;
 						if (ptr >= g_manager.range[a].start[i] && ptr <= g_manager.range[a].end[i]) {
 							arena_ptr = &g_manager.arena;
-							while (arena_ptr && arena_ptr->id != a + 1)
+							while (arena_ptr && arena_ptr->id - 1 != a)
 								arena_ptr = arena_ptr->next;
 							if (arena_ptr) {
 								mutex(&g_manager.mutex, MTX_UNLOCK);
@@ -136,6 +135,7 @@
 	void free(void *ptr) {
 		if (!ptr) return;
 
+		
 		if (free_ptr_arena(ptr) == 2) {
 			if (g_manager.options.DEBUG)
 				aprintf(1, "%p\t   [FREE] Delegated to the native allocator\n", ptr);

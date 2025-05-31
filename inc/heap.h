@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/28 20:54:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 13:54:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,19 @@
 			t_heap		*next;						// Pointer to next zone
 		} t_heap;
 
+		typedef struct s_range t_range;
+		typedef struct s_range {
+			void		*start[HEAPS_MAX + 1];		// 
+			void		*end[HEAPS_MAX + 1];		// 
+		} t_range;
+
 	#pragma endregion
 
 #pragma endregion
 
 #pragma region "Methods"
+
+	int	range_add(t_heap *heap);
+	int	range_del(t_heap *heap);
 
 #pragma endregion

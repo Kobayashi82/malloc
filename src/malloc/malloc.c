@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 21:40:53 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 13:48:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,13 @@
 			ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 			if (ptr == MAP_FAILED) { ptr = NULL;
 				if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Error: No se pudo asignar memoria\n");
-			} else if (g_manager.options.DEBUG) {
-				aprintf(1, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
+				mutex(&arena->mutex, MTX_UNLOCK);
+				return (NULL);
 			}
 
 		mutex(&arena->mutex, MTX_UNLOCK);
+
+		if (g_manager.options.DEBUG) aprintf(1, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
 
 		return (ptr);
 	}

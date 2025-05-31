@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 23:04:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 14:15:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +181,7 @@
 			arena->heap[2] = NULL;
 			arena->next = NULL;
 			mutex(&arena->mutex, MTX_INIT);
+			ft_memset(&arena->range, 0, sizeof(t_range));
 			g_manager.arena_count++;
 
 			return (0);
@@ -288,7 +289,7 @@
 					// return (NULL);	// Force arena creation
 					break;
 				} else {
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena %d locked\n", current->id);
+					if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d locked\n", current->id);
 				}
 				current = current->next;
 			}
@@ -301,13 +302,13 @@
 	#pragma region "Get"
 
 		t_arena *arena_get() {
+			static bool initialized;
 			t_arena *arena = NULL;
 
 			mutex(&g_manager.mutex, MTX_LOCK);
 
-				if (!g_manager.initialized) {
-					g_manager.initialized = true;
-					g_manager.arena_count = 0;
+				if (!initialized) {
+					initialized = true;
 					if (arena_initialize(&g_manager.arena)) abort();
 					arena = &g_manager.arena;
 					if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
@@ -315,6 +316,8 @@
 				if (!arena) arena = arena_reuse();
 				if (!arena) arena = arena_create();
 				if (!arena) arena = &g_manager.arena;
+
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d assigned\n", arena->id);
 
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 

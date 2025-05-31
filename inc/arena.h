@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:07:54 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 17:50:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 14:11:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,6 @@
 
 		typedef pthread_mutex_t	mtx_t;
 
-		typedef struct s_range t_range;
-		typedef struct s_range {
-			void		*start[HEAPS_MAX];
-			void		*end[HEAPS_MAX];
-		} t_range;
-
 		typedef struct s_arena t_arena;
 		typedef struct s_arena {
 			int			id;
@@ -65,7 +59,7 @@
 			bool		initialized;				// 
 			bool		first_alloc;				// 
 			int			arena_count;				// Current number of arenas created and active
-			t_range		range[ARENAS_MAX];			// 
+			t_range		range[ARENAS_MAX + 1];		// 
 			mtx_t		mutex;						// Mutex for synchronizing access to the arenas
 			t_arena		arena;						// Main arena
 			t_options	options;					// 

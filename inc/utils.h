@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/30 13:43:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 14:13:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,9 @@
 	int		ft_isdigit_s(char *str);
 	int		ft_max(int n1, int n2);
 	int		ft_min(int n1, int n2);
+
+	// MEM
+	void	*ft_memset(void *b, int c, size_t len);
 
 	// ATOMIC PRINTF
 	int		aprintf(int fd, char const *format, ...);

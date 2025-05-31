@@ -23,27 +23,25 @@ fi
 normal_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}                 Malloc Tester                 ${NC}"
-	echo -e " ${GREEN}===============================================${NC}\n"
+	echo -e " ${GREEN}===============================================${NC}"
 	clang -g -o test aprintf.c test.c
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
 		./test
 	)
-	echo
 }
 
 debug_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}             Malloc Tester (DEBUG)             ${NC}"
-	echo -e " ${GREEN}===============================================${NC}\n"
+	echo -e " ${GREEN}===============================================${NC}"
 	clang -g -o test aprintf.c test.c -DDEBUG_MODE
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
 		./test
 	)
-	echo
 }
 
 leaks_test() {
