@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 14:01:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 18:06:44 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,21 +17,35 @@
 
 #pragma endregion
 
-#define _GNU_SOURCE
-
 #pragma region "Real Free"
 
-	static void realfree(void *ptr) {
+	void realfree(void *ptr) {
 		#ifdef _WIN32
-			static void (__cdecl *real_free_win)(void*) = NULL;
+			static void (__cdecl *real_free_win)(void*);
 			if (!real_free_win) {
 				HMODULE m = GetModuleHandleA("msvcrt.dll");
-				real_free_win = (void(__cdecl*)(void*))GetProcAddress(m, "free");
+				if (m) real_free_win = (void(__cdecl*)(void*))GetProcAddress(m, "free");
 			}
+			if (!ptr) return;
+
+			if (!real_free_win) {
+				if (g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Failed to delegate free to native allocator\n", ptr);	
+				return ;
+			}
+
+			if (g_manager.options.DEBUG) aprintf(1, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
 			real_free_win(ptr);
 		#else
-			static void (*real_free_unix)(void*) = NULL;
+			static void (*real_free_unix)(void*);
 			if (!real_free_unix) real_free_unix = dlsym(RTLD_NEXT, "free");
+			if (!ptr) return;
+
+			if (!real_free_unix) {
+				if (g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Failed to delegate free to native allocator\n", ptr);
+				return ;
+			}
+
+			if (g_manager.options.DEBUG) aprintf(1, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
 			real_free_unix(ptr);
 		#endif
 	}
@@ -51,7 +65,7 @@
 		//		Free to no allocated
 		// Si se libera correctamente (y DEBUG)
 		//		if (g_manager.options.DEBUG)
-		//			aprintf(1, "[FREE] Memory freed\t\t(%p)\n", ptr);
+		//			aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
 
 		// 1. Encontrar el bloque de memoria que contiene ptr
 		// 2. Marcar ese bloque como libre (bins, etc)
@@ -71,25 +85,24 @@
 	
 #pragma endregion
 
-#pragma region "Free PTR Arena"
+#pragma region "Free"
 
-	static int free_ptr_arena(void *ptr) {
-		if (!ptr) return (0);
+	__attribute__((visibility("default")))
+	void free(void *ptr) {
+		if (!ptr) return;
 
 		t_arena	*arena = tcache.arena;
 		t_arena	*arena_ptr = NULL;
-		int		result = 2;
 		
-		return (0);						// Prevent segfault in real free (for now)
 		if (arena) {
 			mutex(&arena->mutex, MTX_LOCK);
 
 				for (int i = 0; i < HEAPS_MAX; ++i) {
 					if (!arena->range.start[i] || !arena->range.end[i]) break;
 					if (ptr >= arena->range.start[i] && ptr <= arena->range.end[i]) {
-						result = free_ptr(arena, ptr);
+						free_ptr(arena, ptr);
 						mutex(&arena->mutex, MTX_UNLOCK);
-						return (result);
+						return;
 					}
 				}
 
@@ -108,14 +121,13 @@
 							while (arena_ptr && arena_ptr->id - 1 != a)
 								arena_ptr = arena_ptr->next;
 							if (arena_ptr) {
-								mutex(&g_manager.mutex, MTX_UNLOCK);
 								mutex(&arena_ptr->mutex, MTX_LOCK);
+								mutex(&g_manager.mutex, MTX_UNLOCK);
 
-									result = free_ptr(arena_ptr, ptr);
+									free_ptr(arena_ptr, ptr);
 
 								mutex(&arena_ptr->mutex, MTX_UNLOCK);
-
-								return (result);
+								return;
 							}
 						}
 					}
@@ -124,23 +136,8 @@
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 		}
 
-		return (result);
-	}
-
-#pragma endregion
-
-#pragma region "Free"
-
-	__attribute__((visibility("default")))
-	void free(void *ptr) {
-		if (!ptr) return;
-
-		
-		if (free_ptr_arena(ptr) == 2) {
-			if (g_manager.options.DEBUG)
-				aprintf(1, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
-			realfree(ptr);
-		}
+		return;			// Prevent segfault in real free (for now)
+		realfree(ptr);
 	}
 
 #pragma endregion

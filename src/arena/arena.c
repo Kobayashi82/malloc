@@ -6,13 +6,14 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 14:15:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 17:47:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
+	#include "malloc.h"
 	#include "utils.h"
 
 #pragma endregion
@@ -34,6 +35,7 @@
 
 	__attribute__((constructor)) static void malloc_initialize() {
 		mutex(&g_manager.mutex, MTX_INIT);
+		realfree(NULL);
 		options_initialize();
 		pthread_atfork(prepare_fork, parent_fork, child_fork);
 	}

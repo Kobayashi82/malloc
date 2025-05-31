@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 14:45:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/05/31 18:05:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,28 +58,6 @@
 
 #pragma region "Tests"
 
-	#pragma region "Fork"
-
-		static int fork_test() {
-			int pid = fork();
-
-			if (pid == -1)			{ aprintf(1, "[ERROR]\tFork failed\n");		return (1); }
-			else if (pid == 0) {
-				int pid2 = fork();
-
-				if (pid2 == -1)		{ aprintf(1, "[ERROR]\tFork 2 failed\n");	return (1); }
-				else if (pid2 == 0)	{ heap_test();								return (0); }
-
-				heap_test();
-				waitpid(pid2, NULL, 0);
-				return (0);
-			}
-
-			return (pid);
-		}
-
-	#pragma endregion
-
 	#pragma region "Thread"
 
 		#pragma region "Test"
@@ -119,13 +97,16 @@
 
 			static void threads_create() {
 				static int thread_args[THREADS];
+				
+				for (int i = 0; i < THREADS; i++)
+					thread_args[i] = i + 1;
 
 				for (int i = 0; i < THREADS; i++) {
-					thread_args[i] = i + 1;
 					if (pthread_create(&threads[i], NULL, thread_test, &thread_args[i]) != 0) {
 						aprintf(1, "[ERROR]\tThread creation failed for thread %d\n", i + 1);
-						n_threads = i; break;
+						break;
 					}
+					n_threads++;
 				}
 			}
 
@@ -199,6 +180,28 @@
 				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d)\t\t\t(%p)\n", LARGE_ALLOC, large);
 			} else if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed\n");
 			free(large);
+		}
+
+	#pragma endregion
+
+	#pragma region "Fork"
+
+		static int fork_test() {
+			int pid = fork();
+
+			if (pid == -1)			{ aprintf(1, "[ERROR]\tFork failed\n");		exit(1); }
+			else if (pid == 0) {
+				int pid2 = fork();
+
+				if (pid2 == -1)		{ aprintf(1, "[ERROR]\tFork 2 failed\n");	exit(1); }
+				else if (pid2 == 0)	{ heap_test();								exit(0); }
+
+				heap_test();
+				waitpid(pid2, NULL, 0);
+				exit(0);
+			}
+
+			return (pid);
 		}
 
 	#pragma endregion
