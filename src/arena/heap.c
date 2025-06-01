@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 15:02:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/01 18:47:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,38 @@
 
 #pragma region "Heap"
 
+	#pragma region "Find"
+
+		t_heap *heap_find(void *ptr, t_arena *arena) {
+			if (!ptr || !arena) return (NULL);
+
+			t_heap *curr = arena->tiny;
+			while (curr) {
+				if (ptr >= curr->ptr && ptr <= (void *)((char *)curr->ptr + curr->size)) return (curr);
+				curr = curr->next;
+			}
+			curr = arena->small;
+			while (curr) {
+				if (ptr >= curr->ptr && ptr <= (void *)((char *)curr->ptr + curr->size)) return (curr);
+				curr = curr->next;
+			}
+			curr = arena->large;
+			while (curr) {
+				if (ptr >= curr->ptr && ptr <= (void *)((char *)curr->ptr + curr->size)) return (curr);
+				curr = curr->next;
+			}
+
+			return (NULL);
+		}
+
+	#pragma endregion
+
 	#pragma region "Create"
 
 		#pragma region "Allocate"
 
 			static void *heap_allocate(size_t size, e_heaptype type, t_heap **heap) {
-				if (!size || type < 0 || type > 2 || !heap || !*heap) {
+				if (!size || type < 0 || type > 2 || !heap) {
 					if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] Failed to allocate %d bytes\n", size);
 					return (NULL);
 				}
@@ -82,6 +108,7 @@
 					ptr = (void *)((char *)chunk + sizeof(t_chunk));
 				}
 
+				if (g_manager.options.DEBUG) aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", new_heap->ptr, new_heap->size);
 				return (ptr);
 			}
 
@@ -129,7 +156,7 @@
 			int heap_free(void *ptr, size_t size, e_heaptype type, t_heap **heap) {
 				if (!ptr || !size || type < 0 || type > 2 || !heap || !*heap) {
 					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
-					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Failed to free memory\n", ptr);
+					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] 1Failed to free memory\n", ptr);
 					return (1);
 				}
 
@@ -141,7 +168,7 @@
 
 				if (!curr) {
 					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
-					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Failed to free memory\n", ptr);
+					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] 2Failed to free memory\n", ptr);
 					return (1);
 				}
 
@@ -149,7 +176,7 @@
 				if (munmap(ptr, size)) {
 					result = 1;
 					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
-					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Failed to free memory\n", ptr);
+					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] 3Failed to free memory\n", ptr);
 					if		(g_manager.options.DEBUG)					aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);	
 				}
 
@@ -159,6 +186,11 @@
 				if (internal_free(curr, sizeof(t_heap))) {
 					result = 1;
 					if (g_manager.options.DEBUG)						aprintf(1, "\t\t  [ERROR] Failed to unmap heap structure\n");
+				}
+
+				if (!result) {
+					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", ptr);
+					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
 				}
 
 				return (result);

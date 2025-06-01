@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 18:05:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/01 18:45:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@
 						str[0] = 'a';
 						if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d) for thread #%d\t\t(%p)\n", SMALL_ALLOC, thread_num, str);
 						free(str);
+						if (str && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
 					} else {
 						if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
 					}
@@ -84,6 +85,7 @@
 					str[0] = 'a';
 					if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d) for thread #%d\t(%p)\n", LARGE_ALLOC, thread_num, str);
 					free(str);
+					if (str && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
 				} else {
 					if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
 				}
@@ -145,6 +147,7 @@
 					if (!DEBUG_MODE) aprintf(1, "[ERROR]\tRealloc failed\n");
 				}
 				free(ptr);
+				if (ptr && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", ptr);
 			} else {
 				if (!DEBUG_MODE) aprintf(1, "[ERROR]\tRealloc failed\n");
 			}
@@ -164,6 +167,7 @@
 				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, small);
 			} else if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed\n");
 			free(small);
+			if (small && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", small);
 
 			// MEDIUM allocation
 			char *medium = (char *)malloc(MEDIUM_ALLOC);
@@ -172,6 +176,7 @@
 				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, medium);
 			} else if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed\n");
 			free(medium);
+			if (medium && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", medium);
 
 			// LARGE allocation
 			char *large = (char *)malloc(LARGE_ALLOC);
@@ -180,6 +185,7 @@
 				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d)\t\t\t(%p)\n", LARGE_ALLOC, large);
 			} else if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed\n");
 			free(large);
+			if (large && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", large);
 		}
 
 	#pragma endregion

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 15:05:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/01 18:48:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 
 			if (!real_free_win) {
 				if (g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Failed to delegate free to native allocator\n", ptr);	
-				return ;
+				return;
 			}
 
 			if (g_manager.options.DEBUG) aprintf(1, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
@@ -42,7 +42,7 @@
 
 			if (!real_free_unix) {
 				if (g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Failed to delegate free to native allocator\n", ptr);
-				return ;
+				return;
 			}
 
 			if (g_manager.options.DEBUG) aprintf(1, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
@@ -54,8 +54,8 @@
 
 #pragma region "Free PTR"
 
-	int free_ptr(t_arena *arena, void *ptr) {
-		if (!arena || !ptr) return (0);
+	static int free_ptr(void *ptr, t_arena *arena, t_heap *heap) {
+		if (!ptr ||!arena || !heap) return (0);
 
 		// Si el puntero no esta al inicio de un chunk
 		//		Invalid pointer
@@ -71,14 +71,21 @@
 		// 2. Marcar ese bloque como libre (bins, etc)
 		// Se usara munmap temporalmente
 
-		if (munmap(ptr, 8)) {
-			if (g_manager.options.DEBUG)
-				aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
-			return (1);
+		if (heap->type == LARGE) {
+			if (ptr == (void *)((char *)heap->ptr + sizeof(t_lchunk)))	heap_destroy(heap->ptr, heap->size, LARGE);
+			else if (g_manager.options.DEBUG)							aprintf(1, "%p\t   [FREE] Invalid pointer\n", ptr);
 		} else {
-			if (g_manager.options.DEBUG)
-				aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
+			if (munmap(ptr, 8)) {
+				if (g_manager.options.DEBUG)
+					aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
+				return (1);
+			} else {
+				if (g_manager.options.DEBUG)
+					aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
+			}
+			// free chunk
 		}
+
 
 		return (0);
 	}
@@ -93,54 +100,40 @@
 
 		t_arena	*arena = tcache;
 		t_arena	*arena_ptr = NULL;
+		t_heap	*heap_ptr = NULL;
 		
 		if (arena) {
 			mutex(&arena->mutex, MTX_LOCK);
 
-				// BUSCAR EN tiny, small y large
-
-				// for (int i = 0; i < HEAPS_MAX; ++i) {
-				// 	if (!arena->range.start[i] || !arena->range.end[i]) break;
-				// 	if (ptr >= arena->range.start[i] && ptr <= arena->range.end[i]) {
-				// 		free_ptr(arena, ptr);
-				// 		mutex(&arena->mutex, MTX_UNLOCK);
-				// 		return;
-				// 	}
-				// }
-
+				heap_ptr = heap_find(ptr, arena);
+				
 			mutex(&arena->mutex, MTX_UNLOCK);
+			if (heap_ptr) arena_ptr = arena;
 		}
 
 		if (!arena_ptr) {
 			mutex(&g_manager.mutex, MTX_LOCK);
 
-				// BUSCAR EN tiny, small y large de cada arena menos la actual
+				t_arena *curr_arena = &g_manager.arena;
+				while (curr_arena) {
+					if (arena == curr_arena) { curr_arena = curr_arena->next; continue; }
+					mutex(&curr_arena->mutex, MTX_LOCK);
 
-				// for (int a = 0; a < ARENAS_MAX; ++a) {
-				// 	if (arena && arena->id - 1 == a) continue;
-				// 	for (int i = 0; i < HEAPS_MAX; ++i) {
-				// 		if (!g_manager.range[a].start[i] || !g_manager.range[a].end[i]) break;
-				// 		if (ptr >= g_manager.range[a].start[i] && ptr <= g_manager.range[a].end[i]) {
-				// 			arena_ptr = &g_manager.arena;
-				// 			while (arena_ptr && arena_ptr->id - 1 != a)
-				// 				arena_ptr = arena_ptr->next;
-				// 			if (arena_ptr) {
-				// 				mutex(&arena_ptr->mutex, MTX_LOCK);
-				// 				mutex(&g_manager.mutex, MTX_UNLOCK);
+						heap_ptr = heap_find(ptr, curr_arena);
 
-				// 					free_ptr(arena_ptr, ptr);
-
-				// 				mutex(&arena_ptr->mutex, MTX_UNLOCK);
-				// 				return;
-				// 			}
-				// 		}
-				// 	}
-				// }
+					mutex(&curr_arena->mutex, MTX_UNLOCK);
+					if (heap_ptr) { arena_ptr = curr_arena; break; }
+					curr_arena = curr_arena->next;
+				}
 
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 		}
 
-		return;			// Prevent segfault in real free (for now)
+		if (arena_ptr && heap_ptr) {
+			free_ptr(ptr, arena_ptr, heap_ptr);
+			return;
+		}
+
 		realfree(ptr);
 	}
 

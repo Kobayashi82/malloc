@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 15:02:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/01 18:49:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@
 
 	#pragma region "Structures"
 
+		typedef struct s_arena t_arena;
+
 		typedef struct s_chunk {
 			uint16_t	prev_size;					// Size of the previous chunk
 			uint16_t	size;						// Size of the chunk
@@ -74,5 +76,9 @@
 #pragma region "Methods"
 
 	size_t	get_pagesize();
+
+	t_heap	*heap_find(void *ptr, t_arena *arena);
+	void	*heap_create(e_heaptype type, size_t size);
+	int		heap_destroy(void *ptr, size_t size, e_heaptype type);
 
 #pragma endregion
