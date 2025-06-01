@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 13:48:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/01 12:59:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@
 		if (size == 0) return (NULL);
 		// if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Solicitando %d bytes\n", size);
 
-		if (!tcache.arena) {
+		if (!tcache) {
 			arena = arena_get();
-			tcache.arena = arena;
+			tcache = arena;
 			if (!arena) {
 				if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Error: No se pudo obtener arena\n");
 				return (NULL);
 			}
-		} else arena = tcache.arena;
+		} else arena = tcache;
 		
 		mutex(&arena->mutex, MTX_LOCK);
 

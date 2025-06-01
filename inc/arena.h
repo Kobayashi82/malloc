@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:07:54 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 14:11:45 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/01 15:03:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 	#include <unistd.h>
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include <sys/mman.h>
 	#include <errno.h>
 	#include <string.h>
 
@@ -44,35 +43,30 @@
 		typedef struct s_arena t_arena;
 		typedef struct s_arena {
 			int			id;
-			size_t		used;	    				// Memory used in the arena
 			t_bin		fastbin[10];				// (16-160 bytes) incremento (sizeof(size_t) * 2))		Arrays de listas simples (LIFO)
 			t_bin		unsortedbin[10];			// ???
 			t_bin		smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
 			t_bin		largebin[10];				// ???
-			t_heap		*heap[3];    	  			// Memory zones (TINY, SMALL, LARGE)
-			t_range		range;						// 
+			t_heap		*tiny;						// Linked list of TINY heaps
+			t_heap		*small;						// Linked list of SMALL heaps
+			t_heap		*large;						// Linked list of LARGE heaps (single chunk per heap)
+			t_arena		*next;          			// Pointer to the next arena
 			mtx_t		mutex;          			// Mutex for thread safety in the current arena
-			t_arena		*next;          			// Pointer to next arena
 		} t_arena;
 
 		typedef struct s_manager {
 			bool		initialized;				// 
 			bool		first_alloc;				// 
 			int			arena_count;				// Current number of arenas created and active
-			t_range		range[ARENAS_MAX + 1];		// 
-			mtx_t		mutex;						// Mutex for synchronizing access to the arenas
-			t_arena		arena;						// Main arena
 			t_options	options;					// 
+			t_arena		arena;						// Main arena
+			mtx_t		mutex;						// Mutex for synchronizing access to the arenas
 		} t_manager;
 
 	#pragma endregion
 
-	typedef struct s_tcache {
-		t_arena		*arena;
-	} t_tcache;
-
-	extern __thread t_tcache	tcache;
-	extern t_manager			g_manager;
+	extern __thread t_arena	*tcache;
+	extern t_manager		g_manager;
 
 #pragma endregion
 

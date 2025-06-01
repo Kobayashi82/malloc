@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 17:47:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/01 15:04:40 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #pragma region "Variables"
 
 	t_manager			g_manager;
-	__thread t_tcache	tcache;
+	__thread t_arena	*tcache;
 
 	static int	arena_initialize(t_arena *arena);
 	static void	arena_terminate();
@@ -49,22 +49,6 @@
 
 #pragma region "Internal"
 
-	#pragma region "Alloc"
-
-		static void *internal_alloc(size_t size) {
-			void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			return (ptr == MAP_FAILED ? NULL : ptr);
-		}
-
-	#pragma endregion
-
-	#pragma region "Free"
-
-		static void internal_free(void *ptr, size_t size) {
-			if (ptr && size > 0) munmap(ptr, size);
-		}
-
-	#pragma endregion
 
 	#pragma region "Mutex"
 
@@ -176,14 +160,12 @@
 
 		int arena_initialize(t_arena *arena) {
 			arena->id = g_manager.arena_count + 1;
-			arena->used = 0;
 			// bins
-			arena->heap[0] = NULL;
-			arena->heap[1] = NULL;
-			arena->heap[2] = NULL;
+			arena->tiny = NULL;
+			arena->small = NULL;
+			arena->large = NULL;
 			arena->next = NULL;
 			mutex(&arena->mutex, MTX_INIT);
-			ft_memset(&arena->range, 0, sizeof(t_range));
 			g_manager.arena_count++;
 
 			return (0);
