@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 18:47:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/01 21:16:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,6 @@
 	#include "utils.h"
 
 #pragma endregion
-
-// size_t para chunk de LARGE
 
 #pragma region "PageSize"
 
