@@ -6,151 +6,15 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 15:04:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:01:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
-	#include "malloc.h"
-	#include "utils.h"
 
 #pragma endregion
-
-#pragma region "Variables"
-
-	t_manager			g_manager;
-	__thread t_arena	*tcache;
-
-	static int	arena_initialize(t_arena *arena);
-	static void	arena_terminate();
-	static void	prepare_fork();
-	static void	parent_fork();
-	static void	child_fork();
-
-#pragma endregion
-
-#pragma region "Constructor"
-
-	__attribute__((constructor)) static void malloc_initialize() {
-		mutex(&g_manager.mutex, MTX_INIT);
-		realfree(NULL);
-		options_initialize();
-		pthread_atfork(prepare_fork, parent_fork, child_fork);
-	}
-
-	__attribute__((destructor)) static void malloc_terminate() {
-		arena_terminate();
-		mutex(&g_manager.mutex, MTX_DESTROY);
-	}
-
-#pragma endregion
-
-#pragma region "Internal"
-
-
-	#pragma region "Mutex"
-
-		int mutex(mtx_t *ptr_mutex, e_mutex action) {
-			int result = 0;
-
-			switch (action) {
-				case MTX_INIT:		result = pthread_mutex_init(ptr_mutex, NULL);	break;
-				case MTX_LOCK:		result = pthread_mutex_lock(ptr_mutex);			break;
-				case MTX_UNLOCK:	result = pthread_mutex_unlock(ptr_mutex);		break;
-				case MTX_DESTROY:	return (pthread_mutex_destroy(ptr_mutex));
-				case MTX_TRYLOCK:	return (pthread_mutex_trylock(ptr_mutex));
-			}
-
-			if (result) abort();
-			return (result);
-		}
-
-	#pragma endregion
-
-	#pragma region "Fork"
-
-		#pragma region "Prepare"
-
-			static int try_lock_timeout(mtx_t *mtx_ptr, int timeout) {
-				for (int i = 0; i < timeout; i++) {
-					int ret = mutex(mtx_ptr, MTX_TRYLOCK);
-					if (!ret) return (0);
-
-					if (ret != EBUSY) {
-						if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] locking mutex in fork\n");
-						return (ret);
-					}
-					
-					// Wait 1ms before next try
-					#ifdef _WIN32
-						Sleep(1);
-					#else
-						usleep(1000);
-					#endif
-				}
-
-				if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] timeout locking mutex in fork\n");
-				return (ETIMEDOUT);
-			}
-
-			static void prepare_fork() {
-				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Prepare fork\n");
-				
-				int ret = try_lock_timeout(&g_manager.mutex, 1000);
-				if (ret) return;
-				
-				t_arena *arena = &g_manager.arena;
-				while (arena) {
-					ret = try_lock_timeout(&arena->mutex, 1000);
-					if (ret) {
-						t_arena *arena_ptr = arena;
-						arena = &g_manager.arena;
-						while (arena && arena != arena_ptr) {
-							mutex(&arena->mutex, MTX_UNLOCK);
-							arena = arena->next;
-						}
-						mutex(&g_manager.mutex, MTX_UNLOCK);
-						return;
-					}
-					arena = arena->next;
-				}
-			}
-
-		#pragma endregion
-
-		#pragma region "Parent"
-
-			static void parent_fork() {
-				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Parent fork\n");
-
-				t_arena *arena = &g_manager.arena;
-				while (arena) {
-					mutex(&arena->mutex, MTX_UNLOCK);
-					arena = arena->next;
-				}
-				mutex(&g_manager.mutex, MTX_UNLOCK);
-			}
-
-		#pragma endregion
-
-		#pragma region "Child"
-
-			static void child_fork() {
-				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Child fork\n");
-
-				t_arena *arena = &g_manager.arena;
-				while (arena) {
-					mutex(&arena->mutex, MTX_UNLOCK);
-					arena = arena->next;
-				}
-				mutex(&g_manager.mutex, MTX_UNLOCK);
-			}
-
-		#pragma endregion
-
-	#pragma endregion
 
 #pragma endregion
 
@@ -168,6 +32,7 @@
 			mutex(&arena->mutex, MTX_INIT);
 			g_manager.arena_count++;
 
+			if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Library initialized\n");
 			return (0);
 		}
 
@@ -194,6 +59,8 @@
 
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 			mutex(&g_manager.mutex, MTX_DESTROY);
+
+			if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Library finalized\n");
 		}
 
 	#pragma endregion

@@ -6,14 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 18:49:53 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:17:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "malloc.h"
-	#include "utils.h"
+	#include "arena.h"
 
 #pragma endregion
 
@@ -31,7 +30,7 @@
 			arena = arena_get();
 			tcache = arena;
 			if (!arena) {
-				if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Error: No se pudo obtener arena\n");
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] Failed to assign arena\n");
 				return (NULL);
 			}
 		} else arena = tcache;

@@ -6,28 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 21:16:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:06:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
-	#include "utils.h"
-
-#pragma endregion
-
-#pragma region "PageSize"
-
-	size_t get_pagesize() {
-		#ifdef _WIN32
-			SYSTEM_INFO info;
-			GetSystemInfo(&info);
-			return (info.dwPageSize);
-		#else
-			return ((size_t)sysconf(_SC_PAGESIZE));
-		#endif
-	}
 
 #pragma endregion
 

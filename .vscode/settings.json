@@ -9,6 +9,8 @@
 		"options.h": "c",
 		"stdio.h": "c",
 		"initializer_list": "c",
-		"arena.h": "c"
+		"arena.h": "c",
+		"internal.h": "c",
+		"utils.h": "c"
 	}
 }

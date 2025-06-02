@@ -6,14 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 18:48:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:01:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "malloc.h"
-	#include "utils.h"
+	#include "arena.h"
 
 #pragma endregion
 

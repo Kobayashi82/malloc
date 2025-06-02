@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 18:49:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:13:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 
 	#pragma region "Defines"
 
-		#define TOP_CHUNK		0x4					// Bit 2  
+		#define TOP_CHUNK		0x4					// Bit 2
 		#define IS_MMAPPED		0x2					// Bit 1
 		#define PREV_INUSE		0x1					// Bit 0
 
@@ -74,8 +74,6 @@
 #pragma endregion
 
 #pragma region "Methods"
-
-	size_t	get_pagesize();
 
 	t_heap	*heap_find(void *ptr, t_arena *arena);
 	void	*heap_create(e_heaptype type, size_t size);

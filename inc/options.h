@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/05/31 20:34:39 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:13:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,16 @@
 
 #pragma region "Includes"
 
-	#include <stdbool.h>
 	#include <time.h>
 	#include <dlfcn.h>
-	
-	#define _GNU_SOURCE
-	#ifdef _WIN32
-		#include <windows.h>
-	#endif
+	#include <stdbool.h>
 
 #pragma endregion
 
 #pragma region "Variables"
 
 	#pragma region "Defines"
-
-		#define ARCHITECTURE				32 * ((sizeof(long) != 4) + 1)	// 32 or 64 bits
-		#define PAGE_SIZE					get_pagesize()					// 4096
-		#define ARENAS_MAX					2 * ARCHITECTURE				// 64 or 128
-		#define HEAPS_MAX					4 * ARCHITECTURE				// 128 or 256
-		#define INVALID_INDEX				~(unsigned char)0				// 255
-
+	
 		#ifndef SIZE_MAX
 			#define SIZE_MAX				~(size_t)0
 		#endif
@@ -52,8 +41,6 @@
 		#define M_DEBUG						 7			// (DEBUG) Enable debug mode
 		#define M_LOGGING					 8			// (DEBUG) Captura backtrace con backtrace() y lo guardas junto con cada allocación.
 		#define M_LOGFILE					 9			// (DEBUG) Con diferentes comportamientos según el valor:
-
-		#define FREELIST_SIZE	32						// MAX = INVALID_INDEX
 
 	#pragma endregion
 
@@ -78,8 +65,7 @@
 
 #pragma region "Methods"
 
-	size_t	get_pagesize();
-	int		mallopt(int param, int value);
 	void	options_initialize();
+	int		mallopt(int param, int value);
 
 #pragma endregion
