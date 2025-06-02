@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:12:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 15:04:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@
 
 		typedef struct s_manager {
 			bool		initialized;				// 
-			bool		first_alloc;				// 
 			int			arena_count;				// Current number of arenas created and active
 			t_options	options;					// 
 			t_arena		arena;						// Main arena

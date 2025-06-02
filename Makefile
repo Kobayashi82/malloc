@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/06/02 14:19:40 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/06/02 15:16:15 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -131,7 +131,9 @@ _show_title:
 		printf "\n\t$(WHITE)────────────────────────$(NC)"; \
 		$(MAKE) -s _progress; printf "\n" \
 		$(MAKE) -s _show_cursor; \
-	elif [ -f "$(LIB_DIR)$(LIB_NAME)" ] && [ -z "$$(find $(SRC_PATHS) -newer "$(LIB_DIR)$(LIB_NAME)" 2>/dev/null)" ]; then \
+	elif [ -f "$(LIB_DIR)$(LIB_NAME)" ] && \
+		[ -z "$$(find $(SRC_PATHS) -newer "$(LIB_DIR)$(LIB_NAME)" 2>/dev/null; find inc -name '*.h' -newer "$(LIB_DIR)$(LIB_NAME)" 2>/dev/null)" ] && \
+		[ $$(find $(OBJS) 2>/dev/null | wc -l) -eq $$(echo "$(OBJS)" | wc -w) ]; then \
         printf "\t$(GREEN)✓ $(YELLOW)malloc$(CYAN) is up to date$(NC)"; \
 		printf "\n\t$(WHITE)────────────────────────$(NC)"; \
 		$(MAKE) -s _progress; printf "\n" \

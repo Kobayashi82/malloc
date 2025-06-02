@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/01 18:45:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:58:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,7 @@
 		mallopt(M_ARENA_MAX, 0);		// 
 
 		heap_test();
+
 		realloc_test();
 
 		aprintf(1, "\n=== Threads ===\n\n");

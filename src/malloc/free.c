@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:01:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 14:54:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,11 +96,12 @@
 	__attribute__((visibility("default")))
 	void free(void *ptr) {
 		if (!ptr) return;
-
+		
 		t_arena	*arena = tcache;
 		t_arena	*arena_ptr = NULL;
 		t_heap	*heap_ptr = NULL;
 		
+		if (!arena) arena = &g_manager.arena;
 		if (arena) {
 			mutex(&arena->mutex, MTX_LOCK);
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:17:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 15:11:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@
 
 	__attribute__((visibility("default")))
 	void *malloc(size_t size) {
-		t_arena *arena;
-		void *ptr = NULL;
+		t_arena	*arena;
+		void	*ptr = NULL;
 
-		if (size == 0) return (NULL);
+		if (!size) size = 1;
 		// if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Solicitando %d bytes\n", size);
 
 		if (!tcache) {
@@ -36,16 +36,17 @@
 		} else arena = tcache;
 
 			// En la implementación real:
-			// 1. Determinar zona
-			// 2. Determinar y posicion donde crear la asignacion
+			// 1. Buscar en bins
+			// 2. Determinar zona
+			// 3. Crear asignacion en el top chunk
 
 			if (size > SMALL_SIZE) {
 				ptr = heap_create(LARGE, size);
 			} else {
 				ptr = heap_create(LARGE, size);
+				if		(!ptr && g_manager.options.DEBUG)	aprintf(1, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
+				else if (g_manager.options.DEBUG)			aprintf(1, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
 			}
-
-		if (g_manager.options.DEBUG) aprintf(1, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
 
 		return (ptr);
 	}

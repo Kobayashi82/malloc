@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:01:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 15:04:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,33 +20,38 @@
 
 	__attribute__((visibility("default")))
 	void *realloc(void *ptr, size_t size) {
-		void *new_ptr;
+		t_arena	*arena;
+		void	*new_ptr = NULL;
 
-		// ptr NULL equivale a malloc(size)
-		if (ptr == NULL) return malloc(size);
+		if (!ptr)	return malloc(size);				// ptr NULL equivale a malloc(size)
+		if (!size)	return (free(ptr), NULL);			// size es 0 equivale a free(ptr)
 
-		// size es 0 equivale a free(ptr)
-		if (size == 0) return (free(ptr), NULL);
-
-		// if (g_manager.options.DEBUG) aprintf(1, "%p\t[REALLOC] Reasignando memoria en %p a %d bytes\n", ptr, size);
+		if (!tcache) {
+			arena = arena_get();
+			tcache = arena;
+			if (!arena) {
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] Failed to assign arena\n");
+				return (NULL);
+			}
+		} else arena = tcache;
 
 		// En la implementación real:
-		// 1. Verificar si el bloque actual puede ser extendido
-		// 2. Si no, asignar un nuevo bloque y copiar los datos
+		// 1. Verificar si el chunk actual puede ser extendido
+		// 2. Buscar en bins
+		// 3. Determinar zona
+		// 4. Crear asignacion en el top chunk
+		// 5. Liberar antiguo chunk si es necesario (bins)
 
 		new_ptr = malloc(size);
-		if (!new_ptr) {
-			if (g_manager.options.DEBUG) aprintf(1, "\t\t[REALLOC] Error: No se pudo asignar memoria nueva\n");
-			return (NULL);
-		}
+		if (!new_ptr) return (NULL);
 
 		// Trying something
-		size_t copy_size = 64;
+		size_t copy_size = 64; 							// must be ptr size
 		if (size < copy_size) copy_size = size;
-		memcpy(new_ptr, ptr, copy_size);
+		ft_memcpy(new_ptr, ptr, copy_size);
 		free(ptr);
-
-		if (g_manager.options.DEBUG) aprintf(1, "%p\t[REALLOC] Memoria reasignada a %p (%d bytes)\n", ptr, new_ptr, size);
+		
+		if (g_manager.options.DEBUG) aprintf(1, "%p\t[REALLOC] Memory reassigned from %p with %d bytes\n", new_ptr, ptr, size);
 
 		return (new_ptr);
 	}

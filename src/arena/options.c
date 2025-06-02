@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:01:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 15:06:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,6 @@
 
 		int validate_mxfast(int value) {
 			int max = (80 * sizeof(size_t)) / 4;
-
-			if (g_manager.first_alloc) return (g_manager.options.MXFAST);
 
 			if (value < 0)		return (0);
 			if (value > max)	return (max);
@@ -184,6 +182,15 @@
 
 		__attribute__((visibility("default")))
 		int mallopt(int param, int value) {
+			mutex(&g_manager.mutex, MTX_LOCK);
+
+				if (g_manager.arena_count) {
+					if (g_manager.options.DEBUG) aprintf(1, "\t[MALLOPT] Changes are not allowed after the first allocation\n");
+					return (1);
+				}
+
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+
 			switch (param) {
 				case M_MXFAST:				g_manager.options.MXFAST			= validate_mxfast(value);				return (1);
 				case M_FRAG_PERCENT:		g_manager.options.FRAG_PERCENT		= validate_frag_percent(value);			return (1);
