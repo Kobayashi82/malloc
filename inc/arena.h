@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 15:04:56 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 20:30:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,26 +56,25 @@
 
 		typedef pthread_mutex_t	mtx_t;
 
-		typedef struct s_arena t_arena;
 		typedef struct s_arena {
-			int			id;
-			void		*fastbin[10];				// (16-160 bytes) incremento (sizeof(size_t) * 2))		Arrays de listas simples (LIFO)
-			void		*unsortedbin[10];			// ???
-			void		*smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
-			void		*largebin[10];				// ???
-			t_heap		*tiny;						// Linked list of TINY heaps
-			t_heap		*small;						// Linked list of SMALL heaps
-			t_heap		*large;						// Linked list of LARGE heaps (single chunk per heap)
-			t_arena		*next;          			// Pointer to the next arena
-			mtx_t		mutex;          			// Mutex for thread safety in the current arena
+			int				id;
+			void			*fastbin[10];				// (16-160 bytes) incremento (sizeof(size_t) * 2))		Arrays de listas simples (LIFO)
+			void			*unsortedbin[10];			// ???
+			void			*smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
+			void			*largebin[10];				// ???
+			t_heap			*tiny;						// Linked list of TINY heaps
+			t_heap			*small;						// Linked list of SMALL heaps
+			t_heap			*large;						// Linked list of LARGE heaps (single chunk per heap)
+			struct s_arena	*next;          			// Pointer to the next arena
+			mtx_t			mutex;          			// Mutex for thread safety in the current arena
 		} t_arena;
 
 		typedef struct s_manager {
-			bool		initialized;				// 
-			int			arena_count;				// Current number of arenas created and active
-			t_options	options;					// 
-			t_arena		arena;						// Main arena
-			mtx_t		mutex;						// Mutex for synchronizing access to the arenas
+			bool			initialized;				// 
+			int				arena_count;				// Current number of arenas created and active
+			t_options		options;					// 
+			t_arena			arena;						// Main arena
+			mtx_t			mutex;						// Mutex for synchronizing access to the arenas
 		} t_manager;
 
 	#pragma endregion

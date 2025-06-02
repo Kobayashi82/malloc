@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:13:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/02 20:32:19 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,21 +21,25 @@
 #pragma region "Variables"
 
 	#pragma region "Defines"
+	
+		typedef uint16_t t_chunk_int;				// Limited to 8191 or flags will be overwritten. If more is needed, switch to uint32_t or size_t
 
-		#define TOP_CHUNK		0x4					// Bit 2
-		#define IS_MMAPPED		0x2					// Bit 1
-		#define PREV_INUSE		0x1					// Bit 0
+		#define IS_MMAPPED		0x1					// Bit 0 (prev_size)
+		#define TOP_CHUNK		0x4					// Bit 2 (size)
+		#define HEAP_TYPE		0x2					// Bit 1 (size)
+		#define PREV_INUSE		0x1					// Bit 0 (size)
 
-		#define TINY_MAX		512
+		#define TINY_USER		512
+		#define TINY_HEADER		2 * sizeof(t_chunk_int)
 		#define TINY_BLOCKS		128
-		#define TINY_PAGES		(TINY_BLOCKS  * TINY_MAX) / PAGE_SIZE
-		#define TINY_SIZE		PAGE_SIZE * TINY_PAGES
-		#define BITMAP_WORDS	4
+		#define TINY_CHUNKS		(TINY_BLOCKS * (TINY_USER + TINY_HEADER))
+		#define TINY_SIZE		((TINY_CHUNKS + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
-		#define SMALL_MAX		4096
+		#define SMALL_USER		4096
+		#define SMALL_HEADER	2 * sizeof(t_chunk_int)
 		#define SMALL_BLOCKS	128
-		#define SMALL_PAGES		(SMALL_BLOCKS  * SMALL_MAX) / PAGE_SIZE
-		#define SMALL_SIZE		PAGE_SIZE * SMALL_PAGES
+		#define SMALL_CHUNKS	(SMALL_BLOCKS * (SMALL_USER + SMALL_HEADER))
+		#define SMALL_SIZE		((SMALL_CHUNKS + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 	#pragma endregion
 
@@ -50,23 +54,22 @@
 		typedef struct s_arena t_arena;
 
 		typedef struct s_chunk {
-			uint16_t	prev_size;					// Size of the previous chunk
-			uint16_t	size;						// Size of the chunk
+			t_chunk_int		prev_size;					// Size of the previous chunk
+			t_chunk_int		size;						// Size of the chunk
 		} t_chunk;
 
 		typedef struct s_lchunk {
-			size_t		prev_size;					// Size of the previous chunk
-			size_t		size;						// Size of the chunk
+			size_t			prev_size;					// Size of the previous chunk
+			size_t			size;						// Size of the chunk
 		} t_lchunk;
 
-		typedef struct s_heap t_heap;
 		typedef struct s_heap {
-			void		*ptr;						// Pointer to the heap
-			size_t		size;						// Size of the heap
-			size_t		free;						// Memory available for allocation in the heap
-			e_heaptype	type;						// Type of the heap
-			t_heap		*prev;						// Pointer to the previous heap
-			t_heap		*next;						// Pointer to the next heap
+			void			*ptr;						// Pointer to the heap
+			size_t			size;						// Size of the heap
+			size_t			free;						// Memory available for allocation in the heap
+			e_heaptype		type;						// Type of the heap
+			struct s_heap	*prev;						// Pointer to the previous heap
+			struct s_heap	*next;						// Pointer to the next heap
 		} t_heap;
 
 	#pragma endregion
