@@ -11,7 +11,7 @@ Malloc es un proyecto de la escuela 42 que implementa un sistema completo de ges
 ### 🔧 Funcionalidades Base
 - **Funciones Estándar**: `malloc()`, `free()`, `realloc()` compatibles con libc
 - **Visualización**: `show_alloc_mem()` para inspección del estado de memoria
-- **Thread Safety**: Soporte completo para aplicaciones multi-hilo
+- **Thread Safety**: Soporte completo para aplicaciones multi-hilo y forks
 - **Gestión de Zonas**: Sistema de zonas TINY, SMALL y LARGE optimizado
 
 ### 🚀 Características Avanzadas
@@ -26,33 +26,29 @@ Malloc es un proyecto de la escuela 42 que implementa un sistema completo de ges
 - **SmallBin**: Gestión eficiente de bloques pequeños (< 512 bytes)
 - **LargeBin**: Ordenamiento por tamaño para bloques grandes
 - **UnsortedBin**: Buffer temporal para optimizar reutilización
-- **TCache**: Caché thread-local para máximo rendimiento
 
 #### **Optimizaciones de Memoria**
-- **Bitmap**: Gestión ultra-eficiente para asignaciones ≤ 16 bytes
 - **Coalescing**: Fusión automática de bloques adyacentes libres
 - **Alineación**: Alineación óptima de memoria para rendimiento
 
 #### **Protección y Seguridad**
-- **Magic Numbers**: Detección de corrupción de memoria y overflow
-- **mprotect**: Protección de zonas y asignaciones grandes contra escritura accidental
-- **Detección de Overflow**: Identificación temprana de corrupción de memoria
 - **Validación de Punteros**: Verificación de integridad en operaciones free/realloc
 
 ## 🏗️ Arquitectura
 
 ### Estructura de Arenas
 ```
-Arena 1                Arena 2                Arena N
-├── FastBins          ├── FastBins          ├── FastBins
-├── SmallBins         ├── SmallBins         ├── SmallBins  
-├── LargeBins         ├── LargeBins         ├── LargeBins
-├── UnsortedBin       ├── UnsortedBin       ├── UnsortedBin
-├── TCache            ├── TCache            ├── TCache
-└── Zones             └── Zones             └── Zones
-    ├── TINY              ├── TINY              ├── TINY
-    ├── SMALL             ├── SMALL             ├── SMALL
-    └── LARGE             └── LARGE             └── LARGE
+Arena 1
+├── id					// 
+├── *fastbin[10]		// (16-160 bytes) Arrays de listas simples (LIFO)
+├── *unsortedbin[10]	// ???
+├── *smallbin[31]		// (176-512 bytes para TINY, 513-4096 para SMALL) Doblemente enlazadas
+├── *largebin[10]		// ???
+├── *tiny				// Linked list of TINY heaps
+├── *small				// Linked list of SMALL heaps
+├── *large				// Linked list of LARGE heaps (single chunk per heap)
+├── *next				// Pointer to the next arena
+└── mutex				// Mutex for thread safety in the current arena
 ```
 
 ### Gestión de Tamaños
@@ -123,9 +119,6 @@ gcc program.c -L./build/lib -lft_malloc -o program
 # Habilitar debug general
 export MALLOC_DEBUG=1
 
-# Mostrar estadísticas al finalizar
-export MALLOC_STATS=1
-
 # Detectar doble free
 export MALLOC_CHECK_=2
 
@@ -133,22 +126,15 @@ export MALLOC_CHECK_=2
 export MALLOC_PERTURB_=0x42
 
 # Registrar todas las operaciones
-export MALLOC_TRACE=malloc_log.txt
+export MALLOC_LOGFILE=malloc_log.txt
+...
 ```
 
 ### Variables Específicas de Malloc
 ```bash
 # Configurar número de arenas
-export MALLOC_ARENAS=8
+export MALLOC_ARENA_MAX=8
 
-# Habilitar protección mprotect
-export MALLOC_MPROTECT=1
-
-# Mostrar información detallada
-export MALLOC_VERBOSE=1
-
-# Configurar tamaño de TCache
-export MALLOC_TCACHE_SIZE=64
 ```
 
 ## 📚 Funciones Adicionales
@@ -167,10 +153,8 @@ ARENA 0 (Thread: 12345)
   FastBins [24]: 1 chunk  
   SmallBins [32-40]: 5 chunks
   LargeBins [1024+]: 2 chunks
-  TCache hits: 1,234 (89.2%)
 
 TINY Zones: 0x7F8A12000000
-  Bitmap: 0xFFE3 (12 allocated, 4 free)
   0x7F8A12000020 - 0x7F8A12000040: 32 bytes [ALLOC]
   0x7F8A12000040 - 0x7F8A12000050: 16 bytes [FREE]
 
@@ -192,19 +176,13 @@ Fragmentation: 19.6%
 
 // Configurar número máximo de arenas
 mallopt(M_ARENA_MAX, 4);
-
-// Configurar umbral para mmap
-mallopt(M_MMAP_THRESHOLD, 128*1024);
-
-// Habilitar/deshabilitar TCache
-mallopt(M_TCACHE_ENABLE, 1);
+...
 ```
 
 ## ⚡ Optimizaciones
 
 ### **Rendimiento**
 - **FastBins**: Acceso O(1) para tamaños comunes
-- **TCache**: Caché thread-local sin locks
 - **Bitmap**: Gestión ultra-rápida para bloques pequeños
 - **Coalescing**: Reducción de fragmentación automática
 
@@ -261,13 +239,11 @@ gcc -fsanitize=address programa.c -L. -lft_malloc
 
 ### **Gestión de Memoria**
 - ✅ **Sin Memory Leaks**: Liberación completa de recursos
-- ✅ **Detección de Corrupción**: Magic numbers y checksums
+- ✅ **Detección de Corrupción**: ...
 - ✅ **Alineación Óptima**: 8/16 bytes según arquitectura
-- ✅ **Protección de Páginas**: mprotect para zonas críticas
 
 ### **Thread Safety**
 - ✅ **Locks Granulares**: Un lock por arena para minimizar contención
-- ✅ **TCache Thread-Local**: Acceso sin locks para operaciones comunes
 - ✅ **Señales Seguras**: Manejo correcto de interrupciones
 
 ### **Compatibilidad**
