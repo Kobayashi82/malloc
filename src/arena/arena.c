@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:01:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 21:54:19 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 
 		int arena_initialize(t_arena *arena) {
 			arena->id = g_manager.arena_count + 1;
+			ft_memset(arena->fastbin, 0, sizeof(t_chunk_int) * 20);
 			// bins
 			arena->tiny = NULL;
 			arena->small = NULL;

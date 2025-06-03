@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/03 19:11:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 21:06:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,8 @@
 			if (size > SMALL_SIZE) {
 				ptr = heap_create(LARGE, size);
 			} else {
-				ptr = heap_create(LARGE, size);
+				ptr = find_in_bin(arena, size);
+				// if (ptr!) new_chunk(arena, size);		// Crea un nuevo chunk desde un top chunk
 				if		(!ptr && g_manager.options.DEBUG)	aprintf(1, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
 				else if (g_manager.options.DEBUG)			aprintf(1, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
 			}

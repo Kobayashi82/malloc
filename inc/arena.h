@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/03 18:40:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 21:52:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,9 @@
 		#define _GNU_SOURCE
 		#define ARCHITECTURE				32 * ((sizeof(long) != 4) + 1)	// 32 or 64 bits
 		#define PAGE_SIZE					get_pagesize()					// 4096
-		#define ARENAS_MAX					2 * ARCHITECTURE				// 64 or 128
-		#define HEAPS_MAX					4 * ARCHITECTURE				// 128 or 256
+		#define ALIGNMENT					8								// 8
+		#define ARENAS_MAX					ARCHITECTURE * 2				// 64 or 128
+		#define HEAPS_MAX					ARCHITECTURE * 4				// 128 or 256
 		#define INVALID_INDEX				~(unsigned char)0				// 255
 		#define FREELIST_SIZE	32											// MAX = INVALID_INDEX No se porque lo puse
 
@@ -59,8 +60,8 @@
 
 		typedef struct s_arena {
 			int				id;
-			void			*fastbin[10];				// (16-160 bytes) incremento (sizeof(size_t) * 2))		Arrays de listas simples (LIFO)
-			void			*unsortedbin[10];			// ???
+			void			*fastbin[20];				// (16-160 bytes) incremento (sizeof(size_t) * 2))		Arrays de listas simples (LIFO)
+			void			*unsortedbin;				// ???
 			void			*smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
 			void			*largebin[10];				// ???
 			t_heap			*tiny;						// Linked list of TINY heaps
@@ -97,11 +98,16 @@
 	int		arena_initialize(t_arena *arena);
 	void	arena_terminate();
 	t_arena *arena_get();
-	
+
+	// Bin
+	void	*find_in_bin(t_arena *arena, size_t size);
+
 	// Main
 	void	realfree(void *ptr);
 	void	free(void *ptr);
 	void	*malloc(size_t size);
 	void	*realloc(void *ptr, size_t size);
+
+	void	print_freelist_ranges();
 
 #pragma endregion

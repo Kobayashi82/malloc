@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 20:32:19 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 22:30:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,10 @@
 	#pragma region "Defines"
 	
 		typedef uint16_t t_chunk_int;				// Limited to 8191 or flags will be overwritten. If more is needed, switch to uint32_t or size_t
+
+		#define GET_FD(chunk)	*(void **)((char *)(chunk) + (sizeof(t_chunk_int) * 2))
+		#define GET_BK(chunk)	*(void **)((char *)(chunk) + (sizeof(t_chunk_int) * 2) + sizeof(void *))
+		#define GET_PTR(chunk)	(void *)((char *)(chunk) + (sizeof(t_chunk_int) * 2))
 
 		#define IS_MMAPPED		0x1					// Bit 0 (prev_size)
 		#define TOP_CHUNK		0x4					// Bit 2 (size)
