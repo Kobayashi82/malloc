@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:58:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 18:41:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@
 	#define MEDIUM_ALLOC				 570			// 
 	#define LARGE_ALLOC					 1024 * 1024	// 
 	
-	#define THREADS						 5				// 
+	#define THREADS						 15				// 
 	#define THREADS_ALLOC				 1				// 
 
 	static pthread_t	threads[THREADS];

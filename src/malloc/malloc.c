@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 15:11:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 19:11:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,9 @@
 			// 2. Determinar zona
 			// 3. Crear asignacion en el top chunk
 
+			// Test malloc fail
+			// ptr = &arena;
+			// return (ptr);
 			if (size > SMALL_SIZE) {
 				ptr = heap_create(LARGE, size);
 			} else {

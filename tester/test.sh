@@ -92,3 +92,6 @@ rm test
 
 # set environment LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
 # set environment LD_PRELOAD="libft_malloc.so"
+
+# export LD_LIBRARY_PATH="./build/lib:$LD_LIBRARY_PATH"
+# export LD_PRELOAD="libft_malloc.so"

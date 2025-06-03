@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 20:30:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 18:40:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 	#include "heap.h"
 
 	#include <pthread.h>
+	#include <dlfcn.h>
 
 	#include <unistd.h>
 	#include <stdio.h>

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 15:13:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 18:34:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #pragma region "Includes"
 
 	#include <time.h>
-	#include <dlfcn.h>
 	#include <stdbool.h>
 
 #pragma endregion

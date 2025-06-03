@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:54:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/03 19:13:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 			real_free_win(ptr);
 		#else
 			static void (*real_free_unix)(void*);
-			if (!real_free_unix) real_free_unix = dlsym(RTLD_NEXT, "free");
+			if (!real_free_unix) real_free_unix = dlsym(((void *) -1L), "free");
 			if (!ptr) return;
 
 			if (!real_free_unix) {
