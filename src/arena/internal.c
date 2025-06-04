@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 14:05:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 12:20:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,11 +163,17 @@
 
 #pragma region "Constructor"
 
-	__attribute__((constructor)) static void malloc_initialize() {
+	static pthread_once_t init_once = PTHREAD_ONCE_INIT;
+
+	static void do_init(void) {
 		mutex(&g_manager.mutex, MTX_INIT);
 		realfree(NULL);
 		options_initialize();
 		pthread_atfork(prepare_fork, parent_fork, child_fork);
+	}
+
+	void ensure_init() {
+		pthread_once(&init_once, do_init);
 	}
 
 	__attribute__((destructor)) static void malloc_terminate() {

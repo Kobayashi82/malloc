@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 11:39:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 12:49:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,16 +102,10 @@
 		#pragma region "Create"
 
 			void *heap_create(e_heaptype type, size_t size) {
-				if (!tcache || !size || type < 0 || type > 2) {
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] WTF\n");
-					return (NULL);
-				}
+				if (!tcache || !size || type < 0 || type > 2) return (NULL);
 
-				aprintf(1 ,"DEBUG: %d\n", g_manager.options.DEBUG);
 				t_arena *arena = tcache;
 				void	*ptr = NULL;
-
-				if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Creating heap\n");
 
 				mutex(&arena->mutex, MTX_LOCK);
 
@@ -132,12 +126,6 @@
 					}
 
 				mutex(&arena->mutex, MTX_UNLOCK);
-
-				if (!ptr) {
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Creating heap failed\n");
-				} else {
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Creating heap success\n");
-				}
 
 				return (ptr);
 			}

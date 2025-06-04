@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 11:29:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 12:49:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,13 @@ static t_chunk *split_top_chunk(t_heap *heap, t_chunk_int size) {
 	if (!heap || !size) return (NULL);
 
 	t_chunk *top_chunk = heap->top_chunk;
-	if (GET_SIZE(top_chunk) < size) return (NULL);
-	uint16_t top_chunk_available = GET_SIZE(top_chunk);
+
+    size_t heap_size = (heap->type == TINY) ? TINY_SIZE : SMALL_SIZE;
+    size_t used_space = (char *)top_chunk - (char *)heap;
+    size_t top_chunk_available = heap_size - used_space;
+
+	if (top_chunk_available < (size_t)size) return (NULL);
+
 	t_chunk_int type = top_chunk->size & HEAP_TYPE;
 	top_chunk->size = (top_chunk->size & (HEAP_TYPE | PREV_INUSE)) | size;
 	t_chunk *chunk = top_chunk;
@@ -116,12 +121,12 @@ static void *new_chunk(t_arena *arena, t_chunk_int size, e_heaptype type) {
 
 	void *ptr = NULL;
 
-	size_t	heap_size = type == TINY ? TINY_SIZE : SMALL_SIZE;
-	t_heap	*heap = type == TINY ? arena->tiny : arena->small;
+	size_t	heap_size = (type == TINY) ? TINY_SIZE : SMALL_SIZE;
+	t_heap	*heap = (type == TINY) ? arena->tiny : arena->small;
 	if (!heap) {
 		if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] No heap available. Creating one\n");
 		heap_create(type, heap_size);
-		heap = type == TINY ? arena->tiny : arena->small;
+		heap = (type == TINY) ? arena->tiny : arena->small;
 		if (!heap) {
 			if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Heap creation failed\n");
 			return (ptr);
@@ -150,7 +155,7 @@ static void *new_chunk(t_arena *arena, t_chunk_int size, e_heaptype type) {
 	if (!best_heap) {
 		if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] No heap available. Creating one\n");
 		heap_create(type, heap_size);
-		best_heap = type == TINY ? arena->tiny : arena->small;
+		best_heap = (type == TINY) ? arena->tiny : arena->small;
 		if (!best_heap) {
 			if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Heap creation failed\n");
 			return (ptr);
@@ -158,7 +163,6 @@ static void *new_chunk(t_arena *arena, t_chunk_int size, e_heaptype type) {
 	}
 
 	if (best_heap) {
-		if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Best heap found\n");
 		t_chunk	*chunk = split_top_chunk(best_heap, size + sizeof(t_chunk));
 		if (chunk) ptr = GET_PTR(chunk);
 	}
@@ -168,17 +172,14 @@ static void *new_chunk(t_arena *arena, t_chunk_int size, e_heaptype type) {
 void *find_in_bin(t_arena *arena, size_t size) {
 	if (!arena || !size) return (NULL);
 
-	// alinear size
+	size_t align_size = ALIGN(size);
 
 	void *ptr = NULL;
 
-	if (size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, size);
-	// if (!ptr) ptr = find_in_smallbin(arena, size);
+	if (align_size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, align_size);
+	// if (!ptr) ptr = find_in_smallbin(arena, align_size);
 
-	if (!ptr) {
-		if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] No chunk in bins\n");
-		ptr = new_chunk(arena, size, (t_chunk_int)size > TINY_USER ? SMALL : TINY);
-	}
+	if (!ptr) ptr = new_chunk(arena, align_size, (align_size > TINY_USER) ? SMALL : TINY);
 
 	return (ptr);
 }

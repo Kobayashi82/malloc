@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 11:40:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 12:30:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@
 
 	__attribute__((visibility("default")))
 	void *malloc(size_t size) {
+		ensure_init();
 		t_arena	*arena;
 		void	*ptr = NULL;
 
-		aprintf(1 ,"DEBUG: %d\n", g_manager.options.DEBUG);
 		if (!size) size = 1;
 		if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Solicitando %d bytes\n", size);
 
@@ -44,7 +44,8 @@
 			// Test malloc fail
 			// ptr = &arena;
 			// return (ptr);
-			if (size > SMALL_SIZE) {
+
+			if (size + sizeof(t_chunk) > SMALL_SIZE) {
 				ptr = heap_create(LARGE, size);
 			} else {
 				ptr = find_in_bin(arena, size);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 09:37:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 12:47:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 		#define GET_PTR(chunk)	(void *)((char *)(chunk) + sizeof(t_chunk))
 		#define GET_NEXT(chunk)	(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~7))
 		#define GET_SIZE(chunk) (size_t)((chunk)->size & ~7)
+		#define ALIGN(size)		(((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
 
 		#define TOP_CHUNK		0x4					// Bit 2 (size)
 		#define HEAP_TYPE		0x2					// Bit 1 (size)

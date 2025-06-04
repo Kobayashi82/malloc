@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/03 21:52:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 12:19:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@
 	void	*internal_alloc(size_t size);
 	int		internal_free(void *ptr, size_t size);
 	size_t	get_pagesize();
+	void	ensure_init();
 
 	// Arena
 	int		arena_initialize(t_arena *arena);
