@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/03 19:13:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 11:22:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,14 +74,14 @@
 			if (ptr == (void *)((char *)heap->ptr + sizeof(t_lchunk)))	heap_destroy(heap->ptr, heap->size, LARGE);
 			else if (g_manager.options.DEBUG)							aprintf(1, "%p\t   [FREE] Invalid pointer\n", ptr);
 		} else {
-			if (munmap(ptr, 8)) {
-				if (g_manager.options.DEBUG)
-					aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
-				return (1);
-			} else {
-				if (g_manager.options.DEBUG)
-					aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
-			}
+			// if (munmap(ptr, 8)) {
+			// 	if (g_manager.options.DEBUG)
+			// 		aprintf(1, "%p\t  [ERROR] Free Unable to unmap memory\n", ptr);
+			// 	return (1);
+			// } else {
+			// 	if (g_manager.options.DEBUG)
+			// 		aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
+			// }
 			// free chunk
 		}
 

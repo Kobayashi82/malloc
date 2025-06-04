@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 20:32:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 11:39:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@
 				t_heap *new_heap = internal_alloc(sizeof(t_heap));
 				if (!new_heap) {
 					if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] Failed to allocate heap structure\n");
-					if (munmap(ptr, size) && g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
+					if (munmap(ptr, size) && g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Heap 1Unable to unmap memory\n", ptr);
 					return (NULL);
 				}
 
@@ -74,6 +74,7 @@
 				new_heap->type = type;
 				new_heap->prev = NULL;
 				new_heap->next = NULL;
+				new_heap->top_chunk = ptr;
 				if ((*heap)) {
 					new_heap->next = (*heap);
 					(*heap)->prev = new_heap;
@@ -83,12 +84,12 @@
 				if (type == LARGE) {
 					t_lchunk *chunk = (t_lchunk *)ptr;
 					chunk->prev_size = 0;
-					chunk->size = (size - sizeof(t_lchunk)) | PREV_INUSE | (type == LARGE ? IS_MMAPPED : 0) | TOP_CHUNK;
+					chunk->size = (size - sizeof(t_lchunk)) | PREV_INUSE | TOP_CHUNK;
 					ptr = (void *)((char *)chunk + sizeof(t_lchunk));
 				} else {
 					t_chunk *chunk = (t_chunk *)ptr;
 					chunk->prev_size = 0;
-					chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | (type == LARGE ? IS_MMAPPED : 0) | TOP_CHUNK;
+					chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | (type == SMALL ? HEAP_TYPE : 0) | TOP_CHUNK;
 					ptr = (void *)((char *)chunk + sizeof(t_chunk));
 				}
 
@@ -101,10 +102,16 @@
 		#pragma region "Create"
 
 			void *heap_create(e_heaptype type, size_t size) {
-				if (!tcache || !size || type < 0 || type > 2) return (NULL);
+				if (!tcache || !size || type < 0 || type > 2) {
+					if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] WTF\n");
+					return (NULL);
+				}
 
+				aprintf(1 ,"DEBUG: %d\n", g_manager.options.DEBUG);
 				t_arena *arena = tcache;
 				void	*ptr = NULL;
+
+				if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Creating heap\n");
 
 				mutex(&arena->mutex, MTX_LOCK);
 
@@ -125,6 +132,12 @@
 					}
 
 				mutex(&arena->mutex, MTX_UNLOCK);
+
+				if (!ptr) {
+					if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Creating heap failed\n");
+				} else {
+					if (g_manager.options.DEBUG) aprintf(1, "\t\t   [WARN] Creating heap success\n");
+				}
 
 				return (ptr);
 			}
@@ -161,7 +174,7 @@
 					result = 1;
 					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
 					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Failed to free memory\n", ptr);
-					if		(g_manager.options.DEBUG)					aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);	
+					if		(g_manager.options.DEBUG)					aprintf(1, "%p\t  [ERROR] Heap 2 Unable to unmap memory\n", ptr);	
 				}
 
 				if (curr->prev) curr->prev->next = curr->next;

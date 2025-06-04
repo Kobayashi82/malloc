@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/03 21:06:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 11:40:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@
 		t_arena	*arena;
 		void	*ptr = NULL;
 
+		aprintf(1 ,"DEBUG: %d\n", g_manager.options.DEBUG);
 		if (!size) size = 1;
-		// if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Solicitando %d bytes\n", size);
+		if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Solicitando %d bytes\n", size);
 
 		if (!tcache) {
 			arena = arena_get();

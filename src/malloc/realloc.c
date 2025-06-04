@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 15:04:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 11:24:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 	void *realloc(void *ptr, size_t size) {
 		t_arena	*arena;
 		void	*new_ptr = NULL;
+
+		if (g_manager.options.DEBUG) aprintf(1, "\t\t[REALLOC] Solicitando %d bytes\n", size);
 
 		if (!ptr)	return malloc(size);				// ptr NULL equivale a malloc(size)
 		if (!size)	return (free(ptr), NULL);			// size es 0 equivale a free(ptr)

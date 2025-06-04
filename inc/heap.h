@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/03 22:30:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 09:37:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,12 @@
 	
 		typedef uint16_t t_chunk_int;				// Limited to 8191 or flags will be overwritten. If more is needed, switch to uint32_t or size_t
 
-		#define GET_FD(chunk)	*(void **)((char *)(chunk) + (sizeof(t_chunk_int) * 2))
-		#define GET_BK(chunk)	*(void **)((char *)(chunk) + (sizeof(t_chunk_int) * 2) + sizeof(void *))
-		#define GET_PTR(chunk)	(void *)((char *)(chunk) + (sizeof(t_chunk_int) * 2))
+		#define GET_FD(chunk)	*(void **)((char *)(chunk) + sizeof(t_chunk))
+		#define GET_BK(chunk)	*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *))
+		#define GET_PTR(chunk)	(void *)((char *)(chunk) + sizeof(t_chunk))
+		#define GET_NEXT(chunk)	(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~7))
+		#define GET_SIZE(chunk) (size_t)((chunk)->size & ~7)
 
-		#define IS_MMAPPED		0x1					// Bit 0 (prev_size)
 		#define TOP_CHUNK		0x4					// Bit 2 (size)
 		#define HEAP_TYPE		0x2					// Bit 1 (size)
 		#define PREV_INUSE		0x1					// Bit 0 (size)
@@ -72,6 +73,7 @@
 			size_t			size;						// Size of the heap
 			size_t			free;						// Memory available for allocation in the heap
 			e_heaptype		type;						// Type of the heap
+			t_chunk			*top_chunk;					// Pointer to the top chunk
 			struct s_heap	*prev;						// Pointer to the previous heap
 			struct s_heap	*next;						// Pointer to the next heap
 		} t_heap;
