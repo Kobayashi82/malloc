@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 12:30:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/04 16:10:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 		void	*ptr = NULL;
 
 		if (!size) size = 1;
-		if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Solicitando %d bytes\n", size);
+		// if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Solicitando %d bytes\n", size);
 
 		if (!tcache) {
 			arena = arena_get();
@@ -45,7 +45,7 @@
 			// ptr = &arena;
 			// return (ptr);
 
-			if (size + sizeof(t_chunk) > SMALL_SIZE) {
+			if (size + sizeof(t_chunk) > SMALL_USER) {
 				ptr = heap_create(LARGE, size);
 			} else {
 				ptr = find_in_bin(arena, size);
