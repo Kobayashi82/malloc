@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/03 21:15:11 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/05 12:58:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 	#include "arena.h"
 
-	#include <stdlib.h>
+ 	#include <stdlib.h>
 	#include <signal.h>
-	#include <unistd.h>
+ 	#include <unistd.h>
 	#include <stdio.h>
 	#include <pthread.h>
 	#include <sys/mman.h>
@@ -43,6 +43,7 @@
 #pragma endregion
 
 #pragma region "Main"
+
 
 	int main() {
 		// free(): double free detected in tcache 2

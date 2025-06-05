@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 12:19:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/05 11:00:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@
 	t_arena *arena_get();
 
 	// Bin
-	void	*find_in_bin(t_arena *arena, size_t size);
+	void	*find_memory(t_arena *arena, size_t size);
 
 	// Main
 	void	realfree(void *ptr);

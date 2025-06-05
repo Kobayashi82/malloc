@@ -85,12 +85,14 @@ rm test
 # -lft_malloc				= -l busca lib + ft_malloc + .so
 # -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
 
-# En terminal:
+# Terminal:
 # export LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
 # export LD_PRELOAD="libft_malloc.so"
+#
+# export LD_LIBRARY_PATH="/home/vzurera-/42/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
+#
 # ./test
 
+# gdb:
 # set environment LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
 # set environment LD_PRELOAD="libft_malloc.so"
-
-# export LD_LIBRARY_PATH="/home/vzurera-/42/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
