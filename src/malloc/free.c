@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 13:04:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/05 17:42:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,36 +57,39 @@
 		ensure_init();
 		if (!ptr ||!arena || !heap) return (0);
 
-		// Si el puntero no esta al inicio de un chunk
-		//		Invalid pointer
-		// Si el puntero ha sido liberado
-		//		Double free
-		// Si el puntero es parte del top chunk
-		//		Free to no allocated
-		// Si se libera correctamente (y DEBUG)
-		//		if (g_manager.options.DEBUG)
-		//			aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
-
-		// 1. Encontrar el bloque de memoria que contiene ptr
-		// 2. Marcar ese bloque como libre (bins, etc)
-		// Se usara munmap temporalmente
-
+		// LARGE
 		if (heap->type == LARGE) {
-			if (ptr == (void *)((char *)heap->ptr + sizeof(t_lchunk)))	heap_destroy(heap->ptr, heap->size, LARGE);
-			else if (g_manager.options.DEBUG)							aprintf(1, "%p\t   [FREE] Invalid pointer\n", ptr);
-		} else {
-			if (g_manager.options.DEBUG) aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
-			// if (munmap(ptr, 8)) {
-			// 	if (g_manager.options.DEBUG)
-			// 		aprintf(1, "%p\t  [ERROR] Free Unable to unmap memory\n", ptr);
-			// 	return (1);
-			// } else {
-			// 	if (g_manager.options.DEBUG)
-			// 		aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
-			// }
-			// free chunk
+			if ((void *)((char *)(ptr) - sizeof(t_lchunk)) == heap->ptr) heap_destroy(heap->ptr, heap->size, LARGE);
+			else if (g_manager.options.DEBUG)	aprintf(1, "Invalid pointer\n", ptr);	
+			return (0);
 		}
 
+		// In top chunk
+		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
+		if ((chunk->size & TOP_CHUNK)) {
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
+			else							aprintf(1, "Invalid pointer\n", ptr);
+			abort();
+		}
+
+		// Double free
+		// 
+		// magic number no sirve porque al coalescer pierdo el chunk
+		// Una lista de los ultimos ptr no sirve porque se puede coalescer y crear otros
+		// chunks que si se libera, esta en medio de otro chunk en uso o liberado
+		// Quizas lo mas facil es invalid pointer siempre. Ningun mensaje de double free
+
+		// In middle chunk
+		t_chunk *next_chunk = GET_NEXT(chunk);
+		if (!(next_chunk->size & PREV_INUSE)) {
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+			else							aprintf(1, "Invalid pointer\n", ptr);
+			abort();
+		}
+
+		next_chunk->size &= ~PREV_INUSE;
+		// Set chunk as free y toda la pesca
+		if (g_manager.options.DEBUG)	aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
 
 		return (0);
 	}

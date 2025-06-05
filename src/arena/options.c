@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/02 15:06:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/05 17:16:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,7 @@
 
 		__attribute__((visibility("default")))
 		int mallopt(int param, int value) {
+			ensure_init();
 			mutex(&g_manager.mutex, MTX_LOCK);
 
 				if (g_manager.arena_count) {

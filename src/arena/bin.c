@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/05 10:59:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/05 17:28:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,10 @@
 
 			t_chunk *chunk = top_chunk;
 			chunk->size = (top_chunk->size & (HEAP_TYPE | PREV_INUSE)) | size;
+			chunk->size &= ~TOP_CHUNK;
 
 			top_chunk = GET_NEXT(chunk);
-			top_chunk->size = 9999 | TOP_CHUNK | (heap->type == SMALL) ? HEAP_TYPE : 0 | PREV_INUSE;
+			top_chunk->size = 7777 | TOP_CHUNK | ((heap->type == SMALL) ? HEAP_TYPE : 0) | PREV_INUSE;
 			top_chunk->prev_size = size;
 			heap->top_chunk = top_chunk;
 

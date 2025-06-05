@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/05 12:58:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/05 17:32:11 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@
 
 
 	int main() {
+		mallopt(M_DEBUG, 1);
 		// free(): double free detected in tcache 2
 		// char popo[] = "hola";
 		// free(popo);
@@ -75,10 +76,14 @@
 		// printf("Zone: %u - index: %u\n", get_zonetype(4096), get_freelist_index(4096));
 		// printf("Zone: %u - index: %u\n\n", get_zonetype(5000), get_freelist_index(5000));
 
-		options_initialize();
-		printf("%s\n", g_manager.options.LOGFILE);
+		// options_initialize();
+		// printf("%s\n", g_manager.options.LOGFILE);
 
-		print_freelist_ranges();
+		char *popo = malloc(15);
+		// popo += 8;
+		free(popo);
+
+		// print_freelist_ranges();
 		//while(1);
 	}
 
