@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/05 17:42:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/06 17:49:47 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@
 		if (!(next_chunk->size & PREV_INUSE)) {
 			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
 			else							aprintf(1, "Invalid pointer\n", ptr);
-			abort();
+			// abort();
 		}
 
 		next_chunk->size &= ~PREV_INUSE;

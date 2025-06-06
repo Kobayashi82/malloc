@@ -90,6 +90,7 @@ rm test
 # export LD_PRELOAD="libft_malloc.so"
 #
 # export LD_LIBRARY_PATH="/home/vzurera-/42/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
+# export LD_LIBRARY_PATH="/mnt/d/Programas/Mis Programas/42/Active/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
 #
 # ./test
 
