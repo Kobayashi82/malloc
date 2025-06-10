@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 12:49:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/10 14:20:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,21 +50,20 @@
 
 			static void *heap_allocate(size_t size, e_heaptype type, t_heap **heap) {
 				if (!size || type < 0 || type > 2 || !heap) {
-					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "\t\t  [ERROR] Failed to create heap\n", size);
-					else if (g_manager.options.DEBUG)					aprintf(1, "\t\t  [ERROR] Failed to allocate %d bytes\n", size);
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to create heap\n", size);
 					return (NULL);
 				}
 
 				void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 				if (ptr == MAP_FAILED) {
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] Failed to allocate %d bytes\n", size);
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to create heap\n", size);
 					return (NULL);
 				}
 
 				t_heap *new_heap = internal_alloc(sizeof(t_heap));
 				if (!new_heap) {
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] Failed to allocate heap structure\n");
-					if (munmap(ptr, size) && g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Heap 1Unable to unmap memory\n", ptr);
+					if (g_manager.options.DEBUG)						aprintf(1, "\t\t  [ERROR] Failed to allocate heap structure\n");
+					if (munmap(ptr, size) && g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
 					return (NULL);
 				}
 
@@ -93,7 +92,7 @@
 					ptr = (void *)((char *)chunk + sizeof(t_chunk));
 				}
 
-				if (g_manager.options.DEBUG && type != LARGE) aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", new_heap->ptr, new_heap->size);
+				if (g_manager.options.DEBUG && type != LARGE)			aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", new_heap->ptr, new_heap->size);
 				return (ptr);
 			}
 
@@ -107,25 +106,16 @@
 				t_arena *arena = tcache;
 				void	*ptr = NULL;
 
-				mutex(&arena->mutex, MTX_LOCK);
-
-					switch (type) {
-						case TINY:	{
-							ptr = heap_allocate(TINY_SIZE, TINY, &arena->tiny);
-							break;
-						}
-						case SMALL:	{
-							ptr = heap_allocate(SMALL_SIZE, SMALL, &arena->small);
-							break;
-						}
-						case LARGE:	{
-							size_t total_size = (size + sizeof(t_lchunk) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-							ptr = heap_allocate(total_size, LARGE, &arena->large);
-							break;
-						}
+				switch (type) {
+					case TINY:	{ ptr = heap_allocate(TINY_SIZE, TINY, &arena->tiny);		break; }
+					case SMALL:	{ ptr = heap_allocate(SMALL_SIZE, SMALL, &arena->small);	break; }
+					case LARGE:	{
+						size_t total_size = (size + sizeof(t_lchunk) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+						ptr = heap_allocate(total_size, LARGE, &arena->large);
+						if (ptr) arena->alloc_count++;
+						break;
 					}
-
-				mutex(&arena->mutex, MTX_UNLOCK);
+				}
 
 				return (ptr);
 			}
@@ -140,8 +130,7 @@
 
 			int heap_free(void *ptr, size_t size, e_heaptype type, t_heap **heap) {
 				if (!ptr || !size || type < 0 || type > 2 || !heap || !*heap) {
-					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
-					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Failed to free memory\n", ptr);
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
 					return (1);
 				}
 
@@ -152,17 +141,14 @@
 				}
 
 				if (!curr) {
-					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
-					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Failed to free memory\n", ptr);
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
 					return (1);
 				}
 
 				int result = 0;
 				if (munmap(ptr, size)) {
 					result = 1;
-					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
-					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Failed to free memory\n", ptr);
-					if		(g_manager.options.DEBUG)					aprintf(1, "%p\t  [ERROR] Heap 2 Unable to unmap memory\n", ptr);	
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
 				}
 
 				if (curr->prev) curr->prev->next = curr->next;
@@ -173,10 +159,7 @@
 					if (g_manager.options.DEBUG)						aprintf(1, "\t\t  [ERROR] Failed to unmap heap structure\n");
 				}
 
-				if (!result) {
-					if		(g_manager.options.DEBUG && type != LARGE)	aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", ptr);
-					else if (g_manager.options.DEBUG)					aprintf(1, "%p\t   [FREE] Memory freed\n", (void *)((char *)ptr + sizeof(t_lchunk)));
-				}
+				if (!result && g_manager.options.DEBUG && type != LARGE) aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", ptr);
 
 				return (result);
 			}
@@ -191,15 +174,15 @@
 				t_arena *arena = tcache;
 				int		result = 0;
 
-				mutex(&arena->mutex, MTX_LOCK);
-
-					switch (type) {
-						case TINY:	{ result = heap_free(ptr, size, TINY, &arena->tiny);	break; }
-						case SMALL:	{ result = heap_free(ptr, size, SMALL, &arena->small);	break; }
-						case LARGE:	{ result = heap_free(ptr, size, LARGE, &arena->large);	break; }
+				switch (type) {
+					case TINY:	{ result = heap_free(ptr, size, TINY, &arena->tiny);	break; }
+					case SMALL:	{ result = heap_free(ptr, size, SMALL, &arena->small);	break; }
+					case LARGE:	{
+						result = heap_free(ptr, size, LARGE, &arena->large);
+						if (!result) arena->free_count++;
+						break;
 					}
-
-				mutex(&arena->mutex, MTX_UNLOCK);
+				}
 
 				return (result);
 			}

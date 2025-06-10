@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/06 17:49:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/10 14:30:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,21 +54,27 @@
 #pragma region "Free PTR"
 
 	static int free_ptr(void *ptr, t_arena *arena, t_heap *heap) {
-		ensure_init();
 		if (!ptr ||!arena || !heap) return (0);
 
 		// LARGE
 		if (heap->type == LARGE) {
-			if ((void *)((char *)(ptr) - sizeof(t_lchunk)) == heap->ptr) heap_destroy(heap->ptr, heap->size, LARGE);
-			else if (g_manager.options.DEBUG)	aprintf(1, "Invalid pointer\n", ptr);	
-			return (0);
+			if ((void *)((char *)(ptr) - sizeof(t_lchunk)) == heap->ptr) {
+				int result = heap_destroy(heap->ptr, heap->size, LARGE);
+				if (result && g_manager.options.DEBUG)	aprintf(1, "%p\t   [ERROR] Unable to unmap memory\n", ptr);
+				else if (g_manager.options.DEBUG)		aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
+				return (0);
+			}
+
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+			else							aprintf(1, "Invalid pointer\n");
+			abort();
 		}
 
 		// In top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK)) {
 			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
-			else							aprintf(1, "Invalid pointer\n", ptr);
+			else							aprintf(1, "Invalid pointer\n");
 			abort();
 		}
 
@@ -83,12 +89,33 @@
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
 			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-			else							aprintf(1, "Invalid pointer\n", ptr);
-			// abort();
+			else							aprintf(1, "Invalid pointer\n");
+			abort();
 		}
 
-		next_chunk->size &= ~PREV_INUSE;
-		// Set chunk as free y toda la pesca
+		heap->free += GET_SIZE(chunk) + sizeof(t_chunk);
+
+		// Add to bins
+		t_chunk_int chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
+		if (chunk_size <= (t_chunk_int)g_manager.options.MXFAST) {
+			aprintf(1, "Fastbin\n");
+			next_chunk->size &= ~PREV_INUSE;
+			int index = (chunk_size - 1) / 8;
+			GET_FD(chunk) = arena->fastbin[index];
+			arena->fastbin[index] = (void *)chunk;
+		} else {
+			chunk = coalescing(chunk, arena, heap);
+			if (!(chunk->size & TOP_CHUNK)) {
+				aprintf(1, "Unsortedbin\n");
+				// Add to unsortedbin
+			}
+		}
+
+		arena->free_count++;
+		if (heap->free == heap->size) {
+			// Mark for elimination
+		}
+
 		if (g_manager.options.DEBUG)	aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
 
 		return (0);
@@ -100,23 +127,22 @@
 
 	__attribute__((visibility("default")))
 	void free(void *ptr) {
+		ensure_init();
 		if (!ptr) return;
 		
 		t_arena	*arena = tcache;
-		t_arena	*arena_ptr = NULL;
 		t_heap	*heap_ptr = NULL;
 		
 		if (!arena) arena = &g_manager.arena;
 		if (arena) {
 			mutex(&arena->mutex, MTX_LOCK);
 
-				heap_ptr = heap_find(ptr, arena);
+				if ((heap_ptr = heap_find(ptr, arena))) free_ptr(ptr, arena, heap_ptr);
 				
 			mutex(&arena->mutex, MTX_UNLOCK);
-			if (heap_ptr) arena_ptr = arena;
 		}
 
-		if (!arena_ptr) {
+		if (!heap_ptr) {
 			mutex(&g_manager.mutex, MTX_LOCK);
 
 				t_arena *curr_arena = &g_manager.arena;
@@ -124,22 +150,17 @@
 					if (arena == curr_arena) { curr_arena = curr_arena->next; continue; }
 					mutex(&curr_arena->mutex, MTX_LOCK);
 
-						heap_ptr = heap_find(ptr, curr_arena);
+						if ((heap_ptr = heap_find(ptr, curr_arena))) free_ptr(ptr, curr_arena, heap_ptr);
 
 					mutex(&curr_arena->mutex, MTX_UNLOCK);
-					if (heap_ptr) { arena_ptr = curr_arena; break; }
+					if (heap_ptr) break;
 					curr_arena = curr_arena->next;
 				}
 
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 		}
 
-		if (arena_ptr && heap_ptr) {
-			free_ptr(ptr, arena_ptr, heap_ptr);
-			return;
-		}
-
-		realfree(ptr);
+		if (!heap_ptr) realfree(ptr);
 	}
 
 #pragma endregion

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/05 15:15:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/10 12:51:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,14 @@
 
 	#pragma region "Defines"
 	
-		typedef uint16_t t_chunk_int;				// Limited to 8191 or flags will be overwritten. If more is needed, switch to uint32_t or size_t
+		typedef uint32_t t_chunk_int;				// 536,870,912 - Limited to 8191 or flags will be overwritten. If more is needed, switch to uint32_t or size_t
 
 		#define GET_FD(chunk)	*(void **)((char *)(chunk) + sizeof(t_chunk))
 		#define GET_BK(chunk)	*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *))
 		#define GET_PTR(chunk)	(void *)((char *)(chunk) + sizeof(t_chunk))
 		#define GET_HEAD(chunk) (void *)((char *)(chunk) - sizeof(t_chunk))
 		#define GET_NEXT(chunk)	(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~7))
+		#define GET_PREV(chunk)	(t_chunk *)((char *)(chunk) - ((chunk)->prev_size + sizeof(t_chunk)))
 		#define GET_SIZE(chunk) (size_t)((chunk)->size & ~7)
 		#define ALIGN(size)		(((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
 

@@ -1,5 +1,8 @@
 # TODO
 
+Contador de frees para eliminar heap
+Fastbin[0] de 8 bytes es useless
+
 ## Allocation
 - mmap (if too large)
 - fastbin

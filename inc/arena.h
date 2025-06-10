@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/05 11:00:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/10 14:21:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@
 		#define ARENAS_MAX					ARCHITECTURE * 2				// 64 or 128
 		#define HEAPS_MAX					ARCHITECTURE * 4				// 128 or 256
 		#define INVALID_INDEX				~(unsigned char)0				// 255
-		#define FREELIST_SIZE	32											// MAX = INVALID_INDEX No se porque lo puse
 
 	#pragma endregion
 
@@ -60,9 +59,11 @@
 
 		typedef struct s_arena {
 			int				id;
-			void			*fastbin[20];				// (16-160 bytes) incremento (sizeof(size_t) * 2))		Arrays de listas simples (LIFO)
-			void			*unsortedbin;				// ???
+			int				alloc_count;				// Current number of allocations
+			int				free_count;					// Current number of frees
+			void			*fastbin[20];				// (8 - 160 bytes with 8 bytes increment (LIFO)
 			void			*smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
+			void			*unsortedbin;				// ???
 			void			*largebin[10];				// ???
 			t_heap			*tiny;						// Linked list of TINY heaps
 			t_heap			*small;						// Linked list of SMALL heaps
@@ -72,9 +73,8 @@
 		} t_arena;
 
 		typedef struct s_manager {
-			bool			initialized;				// 
-			int				arena_count;				// Current number of arenas created and active
-			t_options		options;					// 
+			int				arena_count;				// Current number of arenas
+			t_options		options;					// Options
 			t_arena			arena;						// Main arena
 			mtx_t			mutex;						// Mutex for synchronizing access to the arenas
 		} t_manager;
@@ -99,6 +99,9 @@
 	int		arena_initialize(t_arena *arena);
 	void	arena_terminate();
 	t_arena *arena_get();
+
+	// Coalescing
+	t_chunk	*coalescing(t_chunk *chunk, t_arena *arena, t_heap *heap);
 
 	// Bin
 	void	*find_memory(t_arena *arena, size_t size);

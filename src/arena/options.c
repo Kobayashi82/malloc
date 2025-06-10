@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/05 17:16:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/10 11:25:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 	#pragma region "MXFAST"
 
 		int validate_mxfast(int value) {
-			int max = (80 * sizeof(size_t)) / 4;
+			int max = 160;
 
 			if (value < 0)		return (0);
 			if (value > max)	return (max);
@@ -137,7 +137,7 @@
 
 			var = getenv("MALLOC_MXFAST_");
 			if (var && ft_isdigit_s(var))	g_manager.options.MXFAST = validate_mxfast(ft_atoi(var));
-			else							g_manager.options.MXFAST = (64 * sizeof(size_t)) / 4;
+			else							g_manager.options.MXFAST = 80;
 
 			var = getenv("MALLOC_FRAGMENTATION_");
 			if (var && ft_isdigit_s(var))	g_manager.options.FRAG_PERCENT = validate_frag_percent(ft_atoi(var));
