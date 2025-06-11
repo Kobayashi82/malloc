@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 12:20:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/11 12:41:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,6 @@
 
 	__attribute__((destructor)) static void malloc_terminate() {
 		arena_terminate();
-		mutex(&g_manager.mutex, MTX_DESTROY);
 	}
 
 #pragma endregion

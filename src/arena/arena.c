@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/10 11:41:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/11 13:09:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@
 
 	#pragma region "Terminate"
 
-		void arena_terminate() {
+		void arena_terminate2() {
 			t_arena *current, *next;
 
 			mutex(&g_manager.mutex, MTX_LOCK);
@@ -66,6 +66,62 @@
 			mutex(&g_manager.mutex, MTX_DESTROY);
 
 			if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Library finalized\n");
+		}
+
+		#include <fcntl.h>
+
+		void arena_terminate() {
+			t_arena	*arena, *next;
+			t_heap	*heap;
+
+			// if debug, print memoria status (free, not free, heaps, etc.)
+
+			mutex(&g_manager.mutex, MTX_LOCK);
+
+				arena = &g_manager.arena;
+				while (arena) {
+					mutex(&arena->mutex, MTX_LOCK);
+
+						heap = arena->tiny;
+						while (heap) {
+							if (heap_destroy(heap->ptr, heap->size, heap->type)) break;
+							heap = arena->tiny;
+						}
+
+						heap = arena->small;
+						while (heap) {
+							if (heap_destroy(heap->ptr, heap->size, heap->type)) break;
+							heap = arena->small;
+						}
+
+						heap = arena->large;
+						while (heap) {
+							if (heap_destroy(heap->ptr, heap->size, heap->type)) break;
+							heap = arena->large;
+						}
+
+						next = arena->next;
+					
+					mutex(&arena->mutex, MTX_UNLOCK);
+					mutex(&arena->mutex, MTX_DESTROY);
+
+					if (arena != &g_manager.arena) internal_free(arena, sizeof(t_arena));
+					arena = next;
+				}
+
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+			mutex(&g_manager.mutex, MTX_DESTROY);
+
+			// No funciona write en el destructor
+			//
+			// if (g_manager.options.DEBUG) {
+			// 	int fd = open("/tmp/malloc_debug.log", O_CREAT | O_WRONLY | O_APPEND, 0644);
+			// 	if (fd != -1) {
+			// 		aprintf(fd, "\t\t [SYSTEM] Library finalized\n");
+			// 		close(fd);
+			// 	}
+			// }
+
 		}
 
 	#pragma endregion

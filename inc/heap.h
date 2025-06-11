@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/10 12:51:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/11 12:49:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,36 +24,39 @@
 	
 		typedef uint32_t t_chunk_int;				// 536,870,912 - Limited to 8191 or flags will be overwritten. If more is needed, switch to uint32_t or size_t
 
-		#define GET_FD(chunk)	*(void **)((char *)(chunk) + sizeof(t_chunk))
-		#define GET_BK(chunk)	*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *))
-		#define GET_PTR(chunk)	(void *)((char *)(chunk) + sizeof(t_chunk))
-		#define GET_HEAD(chunk) (void *)((char *)(chunk) - sizeof(t_chunk))
-		#define GET_NEXT(chunk)	(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~7))
-		#define GET_PREV(chunk)	(t_chunk *)((char *)(chunk) - ((chunk)->prev_size + sizeof(t_chunk)))
-		#define GET_SIZE(chunk) (size_t)((chunk)->size & ~7)
-		#define ALIGN(size)		(((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
+		#define SET_FD(chunk, next_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk)) = (next_chunk))
+		#define SET_BK(chunk, prev_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *)) = (prev_chunk))
+		#define GET_FD(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk))
+		#define GET_BK(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *))
+		#define GET_PTR(chunk)				(void *)((char *)(chunk) + sizeof(t_chunk))
+		#define GET_HEAD(chunk) 			(void *)((char *)(chunk) - sizeof(t_chunk))
+		#define GET_NEXT(chunk)				(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~7))
+		#define GET_PREV(chunk)				(t_chunk *)((char *)(chunk) - ((chunk)->prev_size + sizeof(t_chunk)))
+		#define GET_SIZE(chunk) 			(size_t)((chunk)->size & ~7)
+		#define ALIGN(size)					(((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
 
-		#define TOP_CHUNK		0x4					// Bit 2 (size)
-		#define HEAP_TYPE		0x2					// Bit 1 (size)
-		#define PREV_INUSE		0x1					// Bit 0 (size)
+		#define TOP_CHUNK					0x4		// Bit 2 (size)
+		#define HEAP_TYPE					0x2		// Bit 1 (size)
+		#define PREV_INUSE					0x1		// Bit 0 (size)
 
-		#define TINY_USER		512
-		#define TINY_HEADER		2 * sizeof(t_chunk_int)
-		#define TINY_BLOCKS		128
-		#define TINY_CHUNKS		(TINY_BLOCKS * (TINY_USER + TINY_HEADER))
-		#define TINY_SIZE		((TINY_CHUNKS + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+		#define TINY_USER					512
+		#define TINY_HEADER					2 * sizeof(t_chunk_int)
+		#define TINY_BLOCKS					128
+		#define TINY_CHUNKS					(TINY_BLOCKS * (TINY_USER + TINY_HEADER))
+		#define TINY_SIZE					((TINY_CHUNKS + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
-		#define SMALL_USER		4096
-		#define SMALL_HEADER	2 * sizeof(t_chunk_int)
-		#define SMALL_BLOCKS	128
-		#define SMALL_CHUNKS	(SMALL_BLOCKS * (SMALL_USER + SMALL_HEADER))
-		#define SMALL_SIZE		((SMALL_CHUNKS + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+		#define SMALL_USER					4096
+		#define SMALL_HEADER				2 * sizeof(t_chunk_int)
+		#define SMALL_BLOCKS				128
+		#define SMALL_CHUNKS				(SMALL_BLOCKS * (SMALL_USER + SMALL_HEADER))
+		#define SMALL_SIZE					((SMALL_CHUNKS + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 	#pragma endregion
 
 	#pragma region "Enumerators"
 	
 		typedef enum se_heaptype { TINY, SMALL, LARGE } e_heaptype;
+		typedef enum se_bintype { FASTBIN, SMALLBIN, UNSORTEDBIN, LARGEBIN } e_bintype;
 
 	#pragma endregion
 

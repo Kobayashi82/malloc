@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/10 14:30:41 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/11 12:15:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,19 +96,16 @@
 		heap->free += GET_SIZE(chunk) + sizeof(t_chunk);
 
 		// Add to bins
+		next_chunk->size &= ~PREV_INUSE;
 		t_chunk_int chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
 		if (chunk_size <= (t_chunk_int)g_manager.options.MXFAST) {
-			aprintf(1, "Fastbin\n");
-			next_chunk->size &= ~PREV_INUSE;
-			int index = (chunk_size - 1) / 8;
-			GET_FD(chunk) = arena->fastbin[index];
-			arena->fastbin[index] = (void *)chunk;
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
+			link_chunk(chunk, chunk_size, FASTBIN, arena);
 		} else {
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
 			chunk = coalescing(chunk, arena, heap);
-			if (!(chunk->size & TOP_CHUNK)) {
-				aprintf(1, "Unsortedbin\n");
-				// Add to unsortedbin
-			}
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
+			link_chunk(chunk, chunk_size, UNSORTEDBIN, arena);
 		}
 
 		arena->free_count++;
@@ -116,7 +113,7 @@
 			// Mark for elimination
 		}
 
-		if (g_manager.options.DEBUG)	aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
+		if (g_manager.options.DEBUG)	aprintf(1, "%p\t   [FREE] Memory freed of size %d bytes\n", ptr, chunk_size);
 
 		return (0);
 	}

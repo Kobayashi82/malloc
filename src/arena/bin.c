@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/10 13:55:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/11 12:14:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@
 			void *ptr = NULL;
 
 			int index = (size - 1) / 8;
-			if (index >= M_MXFAST / 8) return (ptr);
+			if (index >= g_manager.options.MXFAST / 8) return (ptr);
 			if (arena->fastbin[index]) {
 				t_chunk *chunk = (t_chunk *)arena->fastbin[index];
 				arena->fastbin[index] = GET_FD(chunk);
@@ -119,7 +119,7 @@
 				next->size |= PREV_INUSE;
 
 				ptr = GET_PTR(chunk);
-				if (g_manager.options.DEBUG) aprintf(1, "%p\t [MALLOC] Fastbin match for size %d bytes", ptr, size);
+				if (g_manager.options.DEBUG) aprintf(1, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
 				return (ptr);
 			}
 
