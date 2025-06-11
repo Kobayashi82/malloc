@@ -3,6 +3,27 @@
 Contador de frees para eliminar heap
 Fastbin[0] de 8 bytes es useless
 
+WTF !!
+0x7875f44f4008     [FREE] Memory freed of size 16 bytes
+0x7875f44f4008   [SYSTEM] Fastbin match for size 16 bytes
+0x7875f44f4008   [MALLOC] Allocated 1 bytes
+0x7875f44d0000   [SYSTEM] Chunk added to FastBin
+0x7875f44d0008     [FREE] Memory freed of size 16 bytes
+0x7875f44d0008   [SYSTEM] Fastbin match for size 16 bytes
+0x7875f44d0008   [MALLOC] Allocated 1 bytes
+0x7875f0ddc008   [SYSTEM] Fastbin match for size 48 bytes
+0x7875f0ddc008   [MALLOC] Allocated 40 bytes
+0x7875efc8a000   [SYSTEM] Heap of size (69632) allocated
+0x7875efc8a008   [MALLOC] Allocated 40 bytes
+0x7875efc78000   [SYSTEM] Heap of size (69632) allocated
+0x7875efc78008   [MALLOC] Allocated 25 bytes
+0x7875efc66000   [SYSTEM] Heap of size (69632) allocated
+0x7875efc66008   [MALLOC] Allocated 19 bytes
+0x7875efc54000   [SYSTEM] Heap of size (69632) allocated
+0x7875efc54008   [MALLOC] Allocated 382 bytes
+0x7875efc42000   [SYSTEM] Heap of size (69632) allocated
+0x7875efc42008   [MALLOC] Allocated 25 bytes
+
 ## Allocation
 - mmap (if too large)
 - fastbin

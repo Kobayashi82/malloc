@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/11 12:14:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/12 00:08:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +110,8 @@
 				
 			void *ptr = NULL;
 
-			int index = (size - 1) / 8;
-			if (index >= g_manager.options.MXFAST / 8) return (ptr);
+			int index = (size - 1) / ALIGNMENT;
+			if (index >= g_manager.options.MXFAST / ALIGNMENT) return (ptr);
 			if (arena->fastbin[index]) {
 				t_chunk *chunk = (t_chunk *)arena->fastbin[index];
 				arena->fastbin[index] = GET_FD(chunk);
@@ -167,9 +167,9 @@
 
 #pragma region "Information"
 
-	// cantidad_fastbins = MXFAST / 8
-	// tamaño_del_chunk = (índice + 1) * 8
-	// tamaño_máximo_real = cantidad_fastbins * 8
+	// cantidad_fastbins = MXFAST / ALIGNMENT
+	// tamaño_del_chunk = (índice + 1) * ALIGNMENT
+	// tamaño_máximo_real = cantidad_fastbins * ALIGNMENT
 
 	// chunk->size |= PREV_INUSE;			// Activar bit
 	// chunk->size &= ~PREV_INUSE;			// Desactivar bit

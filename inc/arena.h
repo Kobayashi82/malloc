@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/11 11:53:19 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/12 00:10:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 		#define _GNU_SOURCE
 		#define ARCHITECTURE				32 * ((sizeof(long) != 4) + 1)	// 32 or 64 bits
 		#define PAGE_SIZE					get_pagesize()					// 4096
-		#define ALIGNMENT					8								// 8
+		#define ALIGNMENT					ARCHITECTURE / 4				// 8 or 16
 		#define ARENAS_MAX					ARCHITECTURE * 2				// 64 or 128
 		#define HEAPS_MAX					ARCHITECTURE * 4				// 128 or 256
 		#define INVALID_INDEX				~(unsigned char)0				// 255
@@ -61,7 +61,7 @@
 			int				id;
 			int				alloc_count;				// Current number of allocations
 			int				free_count;					// Current number of frees
-			void			*fastbin[20];				// (8 - 160 bytes with 8 bytes increment (LIFO)
+			void			*fastbin[20];				// (8 - 160) or (16 - 160) bytes with 8 bytes increment (LIFO)
 			void			*smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
 			void			*unsortedbin;				// ???
 			void			*largebin[10];				// ???

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/11 12:15:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/12 00:17:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,9 @@
 		// In middle chunk
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-			else							aprintf(1, "Invalid pointer\n");
-			abort();
+			// if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+			// else							aprintf(1, "Invalid pointer\n");
+			// abort();
 		}
 
 		heap->free += GET_SIZE(chunk) + sizeof(t_chunk);

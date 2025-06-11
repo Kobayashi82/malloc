@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/11 12:11:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/12 00:08:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ int link_chunk(t_chunk *chunk, t_chunk_int size, e_bintype type, t_arena *arena)
 
 	switch (type) {
 		case FASTBIN: {
-			int index = (size - 1) / 8;
-			if (index >= g_manager.options.MXFAST / 8) return (1);
+			int index = (size - 1) / ALIGNMENT;
+			if (index >= g_manager.options.MXFAST / ALIGNMENT) return (1);
 
 			SET_FD(chunk, arena->fastbin[index]);
 			arena->fastbin[index] = chunk;
@@ -44,8 +44,8 @@ int unlink_chunk(t_chunk *chunk, t_arena *arena) {
 
 	t_chunk_int chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
 	if (chunk_size <= (t_chunk_int)g_manager.options.MXFAST) {
-		int index = (chunk_size - 1) / 8;
-		if (index >= g_manager.options.MXFAST / 8) return (1);
+		int index = (chunk_size - 1) / ALIGNMENT;
+		if (index >= g_manager.options.MXFAST / ALIGNMENT) return (1);
 
 		void **curr = &arena->fastbin[index];
 		while (*curr) {
