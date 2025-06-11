@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/10 14:28:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/11 11:14:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ t_chunk *coalescing(t_chunk *chunk, t_arena *arena, t_heap *heap) {
 	t_chunk *chunk_next = NULL;
 	t_chunk *chunk_final = NULL;
 
-	// Coalescing Left
-	if (!(chunk->size & PREV_INUSE)) {
+	// Coalescing Left (If not USED and FASTBIN)
+	if (!(chunk->size & PREV_INUSE) && chunk->prev_size + sizeof(t_chunk) > (t_chunk_int)g_manager.options.MXFAST) {
 		chunk_prev = GET_PREV(chunk);
 		// unlink_chunk(chunk_prev);
 		chunk_prev->size = (chunk_prev->size & (HEAP_TYPE | PREV_INUSE)) | (chunk->prev_size + GET_SIZE(chunk) + sizeof(t_chunk));
@@ -37,12 +37,16 @@ t_chunk *coalescing(t_chunk *chunk, t_arena *arena, t_heap *heap) {
 	}
 	if (!chunk_final) chunk_final = chunk;
 
-	// Coalescing Right
+	// Coalescing Right (if not USED and FASTBIN)
 	chunk_next = GET_NEXT(chunk);
-	if (!(chunk_next->size & TOP_CHUNK)) {
+	if (chunk_next->size & TOP_CHUNK) {
 		// unlink_chunk(chunk_next);
+		chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | TOP_CHUNK | (GET_SIZE(chunk_next) + GET_SIZE(chunk_final) + sizeof(t_chunk));
+		heap->top_chunk = chunk_final;
+	} else {
 		t_chunk *chunk_next_next = GET_NEXT(chunk_next);
-		if (!(chunk_next_next->size & PREV_INUSE)) {
+		if (!(chunk_next_next->size & PREV_INUSE) && chunk_next_next->prev_size + sizeof(t_chunk) > (t_chunk_int)g_manager.options.MXFAST) {
+			// unlink_chunk(chunk_next);
 			chunk_next_next->prev_size = GET_SIZE(chunk_final) + GET_SIZE(chunk_next) + sizeof(t_chunk);
 			chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | chunk_next_next->prev_size;
 		}
