@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 01:16:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 01:41:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@
 
 	__attribute__((visibility("default")))
 	void *malloc(size_t size) {
-		if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Asking for %d bytes\n", size);
-
 		ensure_init();
 
 		// void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);

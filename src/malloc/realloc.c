@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 01:14:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 01:40:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,8 @@
 
 	__attribute__((visibility("default")))
 	void *realloc(void *ptr, size_t size) {
-		if (g_manager.options.DEBUG) aprintf(1, "\t\t[REALLOC] Solicitando %d bytes\n", size);
-
 		ensure_init();
+
 		t_arena	*arena;
 		void	*new_ptr = NULL;
 
