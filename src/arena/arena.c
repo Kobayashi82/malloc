@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 16:07:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 19:50:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@
 
 		void arena_terminate() {
 			t_arena	*arena, *next;
-			t_heap	*heap;
+			// t_heap	*heap;
 
 			// if debug, print memoria status (free, not free, heaps, etc.)
 
@@ -82,23 +82,30 @@
 				while (arena) {
 					mutex(&arena->mutex, MTX_LOCK);
 
-						heap = arena->tiny;
-						while (heap) {
-							if (heap_free(heap->ptr, heap->size, TINY, &arena->tiny)) break;
-							heap = arena->tiny;
-						}
+						// Clean heaps
 
-						heap = arena->small;
-						while (heap) {
-							if (heap_free(heap->ptr, heap->size, SMALL, &arena->small)) break;
-							heap = arena->small;
-						}
+						// if (internal_free(curr, sizeof(t_heap))) {
+						// 	result = 1;
+						// 	if (g_manager.options.DEBUG)						aprintf(1, "\t\t  [ERROR] Failed to unmap heap structure\n");
+						// }
 
-						heap = arena->large;
-						while (heap) {
-							if (heap_free(heap->ptr, heap->size, LARGE, &arena->large)) break;
-							heap = arena->large;
-						}
+						// heap = arena->tiny;
+						// while (heap) {
+						// 	if (heap_free(heap->ptr, heap->size, TINY, &arena->tiny)) break;
+						// 	heap = arena->tiny;
+						// }
+
+						// heap = arena->small;
+						// while (heap) {
+						// 	if (heap_free(heap->ptr, heap->size, SMALL, &arena->small)) break;
+						// 	heap = arena->small;
+						// }
+
+						// heap = arena->large;
+						// while (heap) {
+						// 	if (heap_free(heap->ptr, heap->size, LARGE, &arena->large)) break;
+						// 	heap = arena->large;
+						// }
 
 						next = arena->next;
 					

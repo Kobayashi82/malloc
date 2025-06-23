@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 16:20:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 22:29:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@
 			void			*ptr;						// Pointer to the heap
 			size_t			size;						// Size of the heap
 			size_t			free;						// Memory available for allocation in the heap
+			bool			active;						// Set to false when freed
 			e_heaptype		type;						// Type of the heap
 			t_chunk			*top_chunk;					// Pointer to the top chunk
 			struct s_heap	*prev;						// Pointer to the previous heap
@@ -95,8 +96,8 @@
 #pragma region "Methods"
 
 	t_heap	*heap_find(void *ptr, t_arena *arena);
-	void	*heap_create(e_heaptype type, size_t size);
+	t_heap	*heap_create(e_heaptype type, size_t size);
 	int		heap_destroy(void *ptr, size_t size, e_heaptype type);
-	int		heap_free(void *ptr, size_t size, e_heaptype type, t_heap **heap);
+	int		heap_free(void *ptr, size_t size, e_heaptype type, t_heap *heap);
 
 #pragma endregion

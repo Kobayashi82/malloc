@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 16:09:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 23:38:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@
 
 		#pragma region "Allocate"
 
-			static void *heap_allocate(size_t size, e_heaptype type, t_heap **heap) {
+			static t_heap *heap_allocate(size_t size, e_heaptype type, t_heap **heap) {
 				if (!size || type < 0 || type > 2 || !heap) {
 					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to create heap\n", size);
 					return (NULL);
@@ -71,6 +71,7 @@
 				new_heap->size = size;
 				new_heap->free = size - ((type == LARGE) ? sizeof(t_lchunk) : sizeof(t_chunk));
 				new_heap->type = type;
+				new_heap->active = true;
 				new_heap->prev = NULL;
 				new_heap->next = NULL;
 				new_heap->top_chunk = ptr;
@@ -93,31 +94,38 @@
 				}
 
 				if (g_manager.options.DEBUG && type != LARGE)			aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", new_heap->ptr, new_heap->size);
-				return (ptr);
+
+				return (new_heap);
 			}
 
 		#pragma endregion
 
 		#pragma region "Create"
 
-			void *heap_create(e_heaptype type, size_t size) {
+			t_heap *heap_create(e_heaptype type, size_t size) {
 				if (!tcache || !size || type < 0 || type > 2) return (NULL);
 
 				t_arena *arena = tcache;
-				void	*ptr = NULL;
+				t_heap	*heap = NULL;
 
 				switch (type) {
-					case TINY:	{ ptr = heap_allocate(TINY_SIZE, TINY, &arena->tiny);		break; }
-					case SMALL:	{ ptr = heap_allocate(SMALL_SIZE, SMALL, &arena->small);	break; }
+					case TINY:	{ heap = heap_allocate(TINY_SIZE, TINY, &arena->tiny);		break; }
+					case SMALL:	{ heap = heap_allocate(SMALL_SIZE, SMALL, &arena->small);	break; }
 					case LARGE:	{
 						size_t total_size = (size + sizeof(t_lchunk) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-						ptr = heap_allocate(total_size, LARGE, &arena->large);
-						if (ptr) arena->alloc_count++;
+						heap = heap_allocate(total_size, LARGE, &arena->large);
+						if (heap) {
+							heap = (void *)((char *)heap->ptr + sizeof(t_lchunk));
+							arena->alloc_count++;
+						}
 						break;
 					}
 				}
+			
+				// static int p = 0;
+				// aprintf(1, "%p heap %d - %d\n", arena, p++, size);
 
-				return (ptr);
+				return (heap);
 			}
 		
 		#pragma endregion
@@ -128,15 +136,15 @@
 
 		#pragma region "Free"
 
-			int heap_free(void *ptr, size_t size, e_heaptype type, t_heap **heap) {
-				if (!ptr || !size || type < 0 || type > 2 || !heap || !*heap) {
+			int heap_free(void *ptr, size_t size, e_heaptype type, t_heap *heap) {
+				if (!ptr || !size || type < 0 || type > 2 || !heap) {
 					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
 					return (1);
 				}
 
-				t_heap *curr = *heap;
+				t_heap *curr = heap;
 				while (curr) {
-					if (curr->ptr == ptr) break;
+					if (curr->active && curr->ptr == ptr) break;
 					curr = curr->next;
 				}
 
@@ -151,13 +159,7 @@
 					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
 				}
 
-				if (curr->prev) curr->prev->next = curr->next;
-				if (curr->next) curr->next->prev = curr->prev;
-				if (curr == *heap) *heap = curr->next;
-				if (internal_free(curr, sizeof(t_heap))) {
-					result = 1;
-					if (g_manager.options.DEBUG)						aprintf(1, "\t\t  [ERROR] Failed to unmap heap structure\n");
-				}
+				curr->active = false;
 
 				if (!result && g_manager.options.DEBUG && type != LARGE) aprintf(1, "%p\t [SYSTEM] Heap of size (%d) freed\n", ptr, size);
 
@@ -175,10 +177,10 @@
 				int		result = 0;
 
 				switch (type) {
-					case TINY:	{ result = heap_free(ptr, size, TINY, &arena->tiny);	break; }
-					case SMALL:	{ result = heap_free(ptr, size, SMALL, &arena->small);	break; }
+					case TINY:	{ result = heap_free(ptr, size, TINY, arena->tiny);		break; }
+					case SMALL:	{ result = heap_free(ptr, size, SMALL, arena->small);	break; }
 					case LARGE:	{
-						result = heap_free(ptr, size, LARGE, &arena->large);
+						result = heap_free(ptr, size, LARGE, arena->large);
 						if (!result) arena->free_count++;
 						break;
 					}

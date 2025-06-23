@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 16:25:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 21:15:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,6 +207,7 @@
 				exit(0);
 			}
 
+			waitpid(pid, NULL, 0);
 			return (pid);
 		}
 
@@ -229,11 +230,11 @@
 
 		threads_create();
 
-		int pid = fork_test();			// Fork with threads
+		// fork_test();					// Fork with threads
 
 		threads_join();
 
-		waitpid(pid, NULL, 0);
+		fork_test();
 
 		aprintf(1, "\n");
 		return (0);

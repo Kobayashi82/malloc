@@ -45,8 +45,8 @@ debug_test() {
 }
 
 leaks_test() {
-	echo -e "${RED}valgrind fuerza el uso del allocator native${NC}\n"
-	exit 1
+	# echo -e "${RED}valgrind fuerza el uso del allocator native${NC}\n"
+	# exit 1
 	if ! command -v valgrind &> /dev/null; then
 		echo -e "${RED}valgrind no está instalado${NC}\n"
 		exit 1

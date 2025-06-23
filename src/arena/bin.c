@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 15:54:49 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 23:40:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,16 @@
 
 			t_chunk *top_chunk = heap->top_chunk;
 			if (!top_chunk) return (NULL);
-
+			
 			size_t top_chunk_available = GET_SIZE(top_chunk);
 			if (top_chunk_available < (size_t)size) return (NULL);
-
+			
 			t_chunk *chunk = top_chunk;
 			chunk->size = (top_chunk->size & (HEAP_TYPE | PREV_INUSE)) | (size - sizeof(t_chunk));
 			chunk->size &= ~TOP_CHUNK;
+
+			// static int p = 0;
+			// aprintf(1, "split %d\n", p++);
 
 			top_chunk = GET_NEXT(chunk);
 			top_chunk->size = (top_chunk_available - size) | TOP_CHUNK | ((heap->type == SMALL) ? HEAP_TYPE : 0) | PREV_INUSE;
@@ -50,42 +53,50 @@
 
 			void	*ptr = NULL;
 			bool	created = false;
+			t_heap	*best_heap = NULL;
+			float	best_usage = -1000;
 
 			// Find first heap
 			size_t	heap_size = (type == TINY) ? TINY_SIZE : SMALL_SIZE;
 			t_heap	*heap = (type == TINY) ? arena->tiny : arena->small;
 			if (!heap) {
 				created = true;
-				heap_create(type, heap_size);
-				heap = (type == TINY) ? arena->tiny : arena->small;
+				// aprintf(1, "%p\t Create A %s\n", arena, type == TINY ? "Tiny" : "Small");
+
+				heap = heap_create(type, heap_size);
 				if (!heap) return (ptr);
+				best_heap = heap;
 			}
+
 			// Find best heap
-			t_heap	*best_heap = NULL;
-			float	best_usage = -1000;
-			
-			while (heap) {
-				bool	available = heap->free >= size;
-				int		usage = ((heap_size - heap->free) * 100) / heap_size;
-
-				if (available && usage > 10) { best_heap = heap; break; }
-				if (available && usage > best_usage) { best_usage = usage; best_heap = heap; }
-				heap = heap->next;
-			}
-
-			// Create heap (no best heap found)
 			if (!best_heap) {
-				created = true;
-				heap_create(type, heap_size);
-				best_heap = (type == TINY) ? arena->tiny : arena->small;
-				if (!best_heap) return (ptr);
+				while (heap) {
+					if (heap->active) {
+						size_t	free_size = GET_SIZE(heap->top_chunk);
+						bool	available = free_size >= size;
+						int		usage = ((heap_size - free_size) * 100) / heap_size;
+
+						if (available && usage > 10) { best_heap = heap; break; }
+						if (available && usage > best_usage) { best_usage = usage; best_heap = heap; }
+					}
+					heap = heap->next;
+				}
+
+				// Create heap (no best heap found)
+				if (!best_heap) {
+					created = true;
+					best_heap = heap_create(type, heap_size);
+					// aprintf(1, "%p\t Create B %s: %d\n", arena, type == TINY ? "Tiny" : "Small", ((heap_size - best_heap->free) * 100) / heap_size);
+					if (!best_heap) return (ptr);
+				}
 			}
 
 			// Split top chunk
 			t_chunk	*chunk = split_top_chunk(best_heap, size);
 			if (!chunk && !created) {
-				heap_create(type, heap_size);
-				best_heap = (type == TINY) ? arena->tiny : arena->small;
+				if (!created) aprintf(1, "%p\t Create C %s\n", arena, type == TINY ? "Tiny" : "Small");
+				// aprintf(1, "%p\t Create C %s\n", arena, type == TINY ? "Tiny" : "Small");
+				best_heap = heap_create(type, heap_size);
 				if (!best_heap) return (ptr);
 				chunk = split_top_chunk(best_heap, size);
 				if (!chunk) return (ptr);
@@ -148,7 +159,8 @@
 		if (!arena || !size) return (NULL);
 
 		void	*ptr = NULL;
-		size_t	align_size = ALIGN(size + sizeof(t_chunk) + sizeof(uint8_t));
+		size_t	align_size = ALIGN(size + sizeof(t_chunk));
+		if (align_size < CHUNK_MIN) align_size = CHUNK_MIN;
 
 		if (align_size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, align_size);
 		// if (!ptr && align_size <= MAX_SIZE_BIN) ptr = find_in_smallbin(arena, align_size);

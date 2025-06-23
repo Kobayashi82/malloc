@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 16:20:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 22:43:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@
 
 			if (!size) size = 1;
 
+			// cambiar uint8_t para que sea solo cuando es menor de 24
 			if (ALIGN(size + sizeof(t_chunk) + sizeof(uint8_t)) > SMALL_USER)	ptr = heap_create(LARGE, size);
 			else																ptr = find_memory(arena, size);
 

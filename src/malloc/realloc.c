@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/04 12:19:32 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 00:07:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,28 @@
 	#include "arena.h"
 
 #pragma endregion
+
+__attribute__((visibility("default")))
+void *calloc(size_t nmemb, size_t size)
+{
+    size_t total;
+    void *ptr;
+
+    // Si alguno es 0, delegar a malloc(0)
+    if (nmemb == 0 || size == 0)
+        return (malloc(0));
+    
+    // Verificar overflow en la multiplicación
+    if (nmemb > SIZE_MAX / size)
+        return (NULL);
+    
+    total = nmemb * size;
+    ptr = malloc(total);
+    if (ptr)
+        ft_memset(ptr, 0, total);
+    
+    return (ptr);
+}
 
 #pragma region "Realloc"
 
@@ -48,8 +70,11 @@
 		new_ptr = malloc(size);
 		if (!new_ptr) return (NULL);
 
+
 		// Trying something
-		size_t copy_size = 64; 							// must be ptr size
+		
+		t_chunk *chunk = GET_HEAD(ptr);
+		size_t copy_size = GET_SIZE(chunk); 							// must be ptr size
 		if (size < copy_size) copy_size = size;
 		ft_memcpy(new_ptr, ptr, copy_size);
 		free(ptr);

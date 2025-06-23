@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 16:20:38 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 00:00:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@
 		#define CLEAN_BYTE					0x00							// 1 byte
 		#define ARENAS_MAX					ARCHITECTURE * 2				// 64 or 128
 		#define HEAPS_MAX					ARCHITECTURE * 4				// 128 or 256
+		#define CHUNK_MIN					24								// 24
 		#define INVALID_INDEX				~(unsigned char)0				// 255
 
 	#pragma endregion
@@ -115,6 +116,7 @@
 	void	free(void *ptr);
 	void	*malloc(size_t size);
 	void	*realloc(void *ptr, size_t size);
+	void	*calloc(size_t nmemb, size_t size);
 
 	void	print_freelist_ranges();
 
