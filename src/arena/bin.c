@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/12 00:08:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 15:54:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@
 		if (!arena || !size) return (NULL);
 
 		void	*ptr = NULL;
-		size_t	align_size = ALIGN(size + sizeof(t_chunk));
+		size_t	align_size = ALIGN(size + sizeof(t_chunk) + sizeof(uint8_t));
 
 		if (align_size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, align_size);
 		// if (!ptr && align_size <= MAX_SIZE_BIN) ptr = find_in_smallbin(arena, align_size);

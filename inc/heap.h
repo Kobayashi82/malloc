@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/11 12:49:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:20:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,16 @@
 
 	#pragma region "Defines"
 	
-		typedef uint32_t t_chunk_int;				// 536,870,912 - Limited to 8191 or flags will be overwritten. If more is needed, switch to uint32_t or size_t
+		typedef uint32_t t_chunk_int;				// Limited to 536,870,912 or flags will be overwritten. If more is needed, switch to size_t
 
-		#define SET_FD(chunk, next_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk)) = (next_chunk))
-		#define SET_BK(chunk, prev_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *)) = (prev_chunk))
-		#define GET_FD(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk))
-		#define GET_BK(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *))
+		#define HAS_POISON(ptr)				(*(uint8_t *)ptr == POISON_BYTE)
+		#define SET_POISON(ptr)				(*(uint8_t *)ptr = POISON_BYTE)
+		#define CLEAN_POISON(ptr)			(*(uint8_t *)ptr = CLEAN_BYTE)
+		#define IS_ALIGNED(ptr)				(((uintptr_t)GET_HEAD(ptr) & (ALIGNMENT - 1)) == 0)
+		#define SET_FD(chunk, next_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint8_t)) = (next_chunk))
+		#define SET_BK(chunk, prev_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint8_t) + sizeof(void *)) = (prev_chunk))
+		#define GET_FD(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint8_t))
+		#define GET_BK(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint8_t) + sizeof(void *))
 		#define GET_PTR(chunk)				(void *)((char *)(chunk) + sizeof(t_chunk))
 		#define GET_HEAD(chunk) 			(void *)((char *)(chunk) - sizeof(t_chunk))
 		#define GET_NEXT(chunk)				(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~7))
@@ -93,5 +97,6 @@
 	t_heap	*heap_find(void *ptr, t_arena *arena);
 	void	*heap_create(e_heaptype type, size_t size);
 	int		heap_destroy(void *ptr, size_t size, e_heaptype type);
+	int		heap_free(void *ptr, size_t size, e_heaptype type, t_heap **heap);
 
 #pragma endregion

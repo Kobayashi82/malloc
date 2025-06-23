@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/11 13:09:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:07:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,19 +84,19 @@
 
 						heap = arena->tiny;
 						while (heap) {
-							if (heap_destroy(heap->ptr, heap->size, heap->type)) break;
+							if (heap_free(heap->ptr, heap->size, TINY, &arena->tiny)) break;
 							heap = arena->tiny;
 						}
 
 						heap = arena->small;
 						while (heap) {
-							if (heap_destroy(heap->ptr, heap->size, heap->type)) break;
+							if (heap_free(heap->ptr, heap->size, SMALL, &arena->small)) break;
 							heap = arena->small;
 						}
 
 						heap = arena->large;
 						while (heap) {
-							if (heap_destroy(heap->ptr, heap->size, heap->type)) break;
+							if (heap_free(heap->ptr, heap->size, LARGE, &arena->large)) break;
 							heap = arena->large;
 						}
 

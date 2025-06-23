@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/11 12:49:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:09:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@
 
 		#pragma region "Free"
 
-			static int heap_free(void *ptr, size_t size, e_heaptype type, t_heap **heap) {
+			int heap_free(void *ptr, size_t size, e_heaptype type, t_heap **heap) {
 				if (!ptr || !size || type < 0 || type > 2 || !heap || !*heap) {
 					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
 					return (1);
@@ -159,7 +159,7 @@
 					if (g_manager.options.DEBUG)						aprintf(1, "\t\t  [ERROR] Failed to unmap heap structure\n");
 				}
 
-				if (!result && g_manager.options.DEBUG && type != LARGE) aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", ptr);
+				if (!result && g_manager.options.DEBUG && type != LARGE) aprintf(1, "%p\t [SYSTEM] Heap of size (%d) freed\n", ptr, size);
 
 				return (result);
 			}

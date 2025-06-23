@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/12 00:17:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:16:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,20 @@
 			abort();
 		}
 
+		// Not aligned
+		if (!IS_ALIGNED(ptr)) {
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
+			else							aprintf(1, "Invalid pointer\n");
+			abort();
+		}
+
+		// Double free
+		if (HAS_POISON(ptr)) {
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Double free\n", ptr);
+			else							aprintf(1, "Double free\n");
+			abort();
+		}
+
 		// In top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK)) {
@@ -78,21 +92,15 @@
 			abort();
 		}
 
-		// Double free
-		// 
-		// magic number no sirve porque al coalescer pierdo el chunk
-		// Una lista de los ultimos ptr no sirve porque se puede coalescer y crear otros
-		// chunks que si se libera, esta en medio de otro chunk en uso o liberado
-		// Quizas lo mas facil es invalid pointer siempre. Ningun mensaje de double free
-
 		// In middle chunk
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
-			// if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-			// else							aprintf(1, "Invalid pointer\n");
-			// abort();
+			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+			else							aprintf(1, "Invalid pointer\n");
+			abort();
 		}
 
+		SET_POISON(ptr);
 		heap->free += GET_SIZE(chunk) + sizeof(t_chunk);
 
 		// Add to bins
