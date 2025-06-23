@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 01:05:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 01:32:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@
 		#define ARCHITECTURE				32 * ((sizeof(long) != 4) + 1)	// 32 or 64 bits
 		#define PAGE_SIZE					get_pagesize()					// 4096 bytes
 		#define ALIGNMENT					16								// 16 bytes
-		#define POISON_BYTE					0xDE							// 1 byte
-		#define CLEAN_BYTE					0x00							// 1 byte
+		#define POISON_BYTE					0xDEADBEEF						// 4 bytes
+		#define CLEAN_BYTE					0x00000000						// 4 bytes
 		#define ARENAS_MAX					ARCHITECTURE * 2				// 64 or 128
 		#define HEAPS_MAX					ARCHITECTURE * 4				// 128 or 256
 		#define CHUNK_MIN					24								// 24

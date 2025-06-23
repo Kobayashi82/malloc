@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 00:57:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 01:32:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@
 	
 		typedef size_t t_chunk_int;				// Limited to 536,870,912 or flags will be overwritten. If more is needed, switch to size_t
 
-		#define HAS_POISON(ptr)				(*(uint8_t *)ptr == POISON_BYTE)
-		#define SET_POISON(ptr)				(*(uint8_t *)ptr = POISON_BYTE)
-		#define CLEAN_POISON(ptr)			(*(uint8_t *)ptr = CLEAN_BYTE)
+		#define HAS_POISON(ptr)				(*(uint32_t *)ptr == POISON_BYTE)
+		#define SET_POISON(ptr)				(*(uint32_t *)ptr = POISON_BYTE)
+		#define CLEAN_POISON(ptr)			(*(uint32_t *)ptr = CLEAN_BYTE)
 		#define IS_ALIGNED(ptr)				(((uintptr_t)GET_HEAD(ptr) & (ALIGNMENT - 1)) == 0)
-		#define SET_FD(chunk, next_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint8_t)) = (next_chunk))
-		#define SET_BK(chunk, prev_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint8_t) + sizeof(void *)) = (prev_chunk))
-		#define GET_FD(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint8_t))
-		#define GET_BK(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint8_t) + sizeof(void *))
+		#define SET_FD(chunk, next_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint32_t)) = (next_chunk))
+		#define SET_BK(chunk, prev_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint32_t) + sizeof(void *)) = (prev_chunk))
+		#define GET_FD(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint32_t))
+		#define GET_BK(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(uint32_t) + sizeof(void *))
 		#define GET_PTR(chunk)				(void *)((char *)(chunk) + sizeof(t_chunk))
 		#define GET_HEAD(chunk) 			(void *)((char *)(chunk) - sizeof(t_chunk))
 		#define GET_NEXT(chunk)				(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~7))
