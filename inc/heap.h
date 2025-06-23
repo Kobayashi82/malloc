@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 22:29:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 00:57:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 
 	#pragma region "Defines"
 	
-		typedef uint32_t t_chunk_int;				// Limited to 536,870,912 or flags will be overwritten. If more is needed, switch to size_t
+		typedef size_t t_chunk_int;				// Limited to 536,870,912 or flags will be overwritten. If more is needed, switch to size_t
 
 		#define HAS_POISON(ptr)				(*(uint8_t *)ptr == POISON_BYTE)
 		#define SET_POISON(ptr)				(*(uint8_t *)ptr = POISON_BYTE)

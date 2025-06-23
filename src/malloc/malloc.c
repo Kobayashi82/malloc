@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 22:43:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 00:30:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 
 	__attribute__((visibility("default")))
 	void *malloc(size_t size) {
+		if (g_manager.options.DEBUG) aprintf(1, "\t\t [MALLOC] Asking for %d bytes\n", size);
+
 		ensure_init();
 
 		t_arena	*arena;

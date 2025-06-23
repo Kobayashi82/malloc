@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 00:07:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 01:05:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,37 +16,61 @@
 
 #pragma endregion
 
-__attribute__((visibility("default")))
-void *calloc(size_t nmemb, size_t size)
-{
-    size_t total;
-    void *ptr;
+	__attribute__((visibility("default")))
+	void *calloc(size_t nmemb, size_t size) {
+		void	*ptr = NULL;
+		size_t	total = 0;
 
-    // Si alguno es 0, delegar a malloc(0)
-    if (nmemb == 0 || size == 0)
-        return (malloc(0));
-    
-    // Verificar overflow en la multiplicación
-    if (nmemb > SIZE_MAX / size)
-        return (NULL);
-    
-    total = nmemb * size;
-    ptr = malloc(total);
-    if (ptr)
-        ft_memset(ptr, 0, total);
-    
-    return (ptr);
-}
+		if (!nmemb || !size)			return (malloc(0));
+		if (nmemb > SIZE_MAX / size)	return (NULL);
+
+		total = nmemb * size;
+		if (g_manager.options.DEBUG) aprintf(1, "\t\t [CALLOC] Asking for %d bytes\n", size);
+		if ((ptr = malloc(total))) ft_memset(ptr, 0, total);
+
+		return (ptr);
+	}
+
+	void *realrealloc(void *ptr, size_t size) {
+		#ifdef _WIN32
+			static void* (__cdecl *real_realloc_win)(void*, size_t);
+			if (!real_realloc_win) {
+				HMODULE m = GetModuleHandleA("msvcrt.dll");
+				if (m) real_realloc_win = (void*(__cdecl*)(void*, size_t))GetProcAddress(m, "realloc");
+			}
+
+			if (!real_realloc_win) {
+				if (g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Failed to delegate realloc to native allocator\n", ptr);
+				return (NULL);
+			}
+
+			void *result = real_realloc_win(ptr, size);
+			if (g_manager.options.DEBUG) aprintf(1, "%p->%p\t[REALLOC] Delegated to native allocator (size: %d)\n", ptr, result, size);
+			return (result);
+		#else
+			static void* (*real_realloc_unix)(void*, size_t);
+			if (!real_realloc_unix) real_realloc_unix = dlsym(((void *) -1L), "realloc");
+
+			if (!real_realloc_unix) {
+				if (g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Failed to delegate realloc to native allocator\n", ptr);
+				return (NULL);
+			}
+
+			void *result = real_realloc_unix(ptr, size);
+			if (g_manager.options.DEBUG) aprintf(1, "%p->%p\t[REALLOC] Delegated to native allocator (size: %d)\n", ptr, result, size);
+			return (result);
+		#endif
+	}
 
 #pragma region "Realloc"
 
 	__attribute__((visibility("default")))
 	void *realloc(void *ptr, size_t size) {
+		if (g_manager.options.DEBUG) aprintf(1, "\t\t[REALLOC] Solicitando %d bytes\n", size);
+
 		ensure_init();
 		t_arena	*arena;
 		void	*new_ptr = NULL;
-
-		if (g_manager.options.DEBUG) aprintf(1, "\t\t[REALLOC] Solicitando %d bytes\n", size);
 
 		if (!ptr)	return malloc(size);				// ptr NULL equivale a malloc(size)
 		if (!size)	return (free(ptr), NULL);			// size es 0 equivale a free(ptr)
@@ -67,12 +91,16 @@ void *calloc(size_t nmemb, size_t size)
 		// 4. Crear asignacion en el top chunk
 		// 5. Liberar antiguo chunk si es necesario (bins)
 
+		t_heap	*heap_ptr = NULL;
+		if (!(heap_ptr = heap_find(ptr, arena))) {
+			return (realrealloc(ptr, size));
+		}
+
 		new_ptr = malloc(size);
 		if (!new_ptr) return (NULL);
 
 
 		// Trying something
-		
 		t_chunk *chunk = GET_HEAD(ptr);
 		size_t copy_size = GET_SIZE(chunk); 							// must be ptr size
 		if (size < copy_size) copy_size = size;

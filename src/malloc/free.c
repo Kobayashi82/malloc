@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 00:00:15 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 00:30:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,9 +170,12 @@
 
 	__attribute__((visibility("default")))
 	void free(void *ptr) {
+		if (g_manager.options.DEBUG) aprintf(1, "%p\t   [FREE] Asking for free\n", ptr);
+
 		ensure_init();
+
 		if (!ptr) return;
-		
+
 		t_arena	*arena = tcache;
 		t_heap	*heap_ptr = NULL;
 		
