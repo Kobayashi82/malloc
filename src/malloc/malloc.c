@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 01:41:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 12:24:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,10 @@
 	__attribute__((visibility("default")))
 	void *malloc(size_t size) {
 		ensure_init();
-
-		// void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-		// if (ptr == MAP_FAILED) return NULL;
 		
-		// fprintf(stderr, "[MALLOC] mmap success: %p for %zu bytes\n", ptr, size);
-		// return ptr;
-
 		t_arena	*arena;
 		void	*ptr = NULL;
-
+		
 		if (!tcache) {
 			arena = arena_get();
 			tcache = arena;
@@ -44,16 +38,15 @@
 
 			if (!size) size = 1;
 
-			// cambiar uint8_t para que sea solo cuando es menor de 24
-			if (ALIGN(size + sizeof(t_chunk) + sizeof(uint8_t)) > SMALL_USER)	ptr = heap_create(LARGE, size);
-			else																ptr = find_memory(arena, size);
+			if (ALIGN(size + sizeof(t_chunk)) > SMALL_USER)	ptr = heap_create(LARGE, size);
+			else											ptr = find_memory(arena, size);
 
 			if (ptr && g_manager.options.DEBUG)	aprintf(1, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
 			else if (g_manager.options.DEBUG)	aprintf(1, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
 
 		mutex(&arena->mutex, MTX_UNLOCK);
 
-		CLEAN_POISON(ptr);
+		if (ptr) CLEAN_POISON(ptr);
 		return (ptr);
 	}
 

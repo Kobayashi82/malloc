@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 23:40:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 11:56:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,10 @@
 	#pragma region "Split"
 
 		static t_chunk *split_top_chunk(t_heap *heap, t_chunk_int size) {
-			if (!heap || !size) return (NULL);
+			if (!heap || !heap->active || !heap->top_chunk || !size) return (NULL);
 
-			t_chunk *top_chunk = heap->top_chunk;
-			if (!top_chunk) return (NULL);
-			
-			size_t top_chunk_available = GET_SIZE(top_chunk);
+			t_chunk	*top_chunk = heap->top_chunk;	
+			size_t	top_chunk_available = GET_SIZE(top_chunk);
 			if (top_chunk_available < (size_t)size) return (NULL);
 			
 			t_chunk *chunk = top_chunk;
@@ -116,7 +114,7 @@
 
 	#pragma region "FastBin"
 
-		static void *find_in_fastbin(t_arena *arena, size_t size) {
+		void *find_in_fastbin(t_arena *arena, size_t size) {
 			if (!arena || !size) return (NULL);
 				
 			void *ptr = NULL;
@@ -160,9 +158,10 @@
 
 		void	*ptr = NULL;
 		size_t	align_size = ALIGN(size + sizeof(t_chunk));
-		if (align_size < CHUNK_MIN) align_size = CHUNK_MIN;
+		// if (align_size < CHUNK_MIN) align_size = CHUNK_MIN;
 
-		if (align_size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, align_size);
+		// if (align_size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, align_size);
+
 		// if (!ptr && align_size <= MAX_SIZE_BIN) ptr = find_in_smallbin(arena, align_size);
 		// if (!ptr) ptr = find_in_unsortedbin(arena, align_size);
 		// if (!ptr) ptr = find_in_largebin(arena, align_size);

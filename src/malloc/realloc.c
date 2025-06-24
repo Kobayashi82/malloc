@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 01:40:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 11:34:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 
 	__attribute__((visibility("default")))
 	void *calloc(size_t nmemb, size_t size) {
+		ensure_init();
+
 		void	*ptr = NULL;
 		size_t	total = 0;
 

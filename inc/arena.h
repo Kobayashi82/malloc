@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 01:32:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/24 11:22:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@
 		#define CLEAN_BYTE					0x00000000						// 4 bytes
 		#define ARENAS_MAX					ARCHITECTURE * 2				// 64 or 128
 		#define HEAPS_MAX					ARCHITECTURE * 4				// 128 or 256
-		#define CHUNK_MIN					24								// 24
+		#define CHUNK_MIN					32								// 32
 		#define INVALID_INDEX				~(unsigned char)0				// 255
 
 	#pragma endregion
