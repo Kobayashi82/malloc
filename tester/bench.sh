@@ -285,3 +285,7 @@ if [ "$DIFF_MEMORY" != "N/A" ] && [ -n "$DIFF_MEMORY" ]; then
 fi
 
 echo
+
+# ssh koba@127.0.0.1 -p 2222
+# scp -P 2222 -r D:\malloc koba@127.0.0.1:~/
+# koba.a26*
