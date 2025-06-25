@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 01:40:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/25 13:32:37 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,34 +19,36 @@
 #pragma region "Real Free"
 
 	void realfree(void *ptr) {
+		if (!ptr) return;
+
+		if (g_manager.options.DEBUG)			aprintf(2, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
+
 		#ifdef _WIN32
 			static void (__cdecl *real_free_win)(void*);
 			if (!real_free_win) {
 				HMODULE m = GetModuleHandleA("msvcrt.dll");
 				if (m) real_free_win = (void(__cdecl*)(void*))GetProcAddress(m, "free");
 			}
-			if (!ptr) return;
 
 			if (!real_free_win) {
-				if (g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Failed to delegate free to native allocator\n", ptr);	
+				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Native free failed\n", ptr);
 				return;
 			}
 
-			if (g_manager.options.DEBUG) aprintf(1, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
 			real_free_win(ptr);
 		#else
 			static void (*real_free_unix)(void*);
 			if (!real_free_unix) real_free_unix = dlsym(((void *) -1L), "free");
-			if (!ptr) return;
 
 			if (!real_free_unix) {
-				if (g_manager.options.DEBUG) aprintf(1, "%p\t  [ERROR] Failed to delegate free to native allocator\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Native free failed\n", ptr);
 				return;
 			}
 
-			if (g_manager.options.DEBUG) aprintf(1, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
 			real_free_unix(ptr);
 		#endif
+
+		if (g_manager.options.DEBUG)			aprintf(2, "%p\t   [FREE] Memory freed\n", ptr);
 	}
 
 #pragma endregion
@@ -58,8 +60,8 @@
 		
 		// Not aligned
 		if (!IS_ALIGNED(ptr)) {
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
-			else							aprintf(1, "Invalid pointer\n");
+			if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
+			else							aprintf(2, "Invalid pointer\n");
 			abort();
 		}
 
@@ -67,15 +69,15 @@
 		if (!heap->active) {
 			if (heap->type == LARGE) {
 				if ((void *)((char *)heap->ptr + sizeof(t_lchunk)) == ptr) {
-					if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Double free\n", ptr);
-					else							aprintf(1, "Double free\n");
+					if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Double free\n", ptr);
+					else							aprintf(2, "Double free\n");
 				} else {
-					if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-					else							aprintf(1, "Invalid pointer\n");			
+					if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+					else							aprintf(2, "Invalid pointer\n");			
 				}
 			} else {
-				if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-				else							aprintf(1, "Invalid pointer\n");
+				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				else							aprintf(2, "Invalid pointer\n");
 			}
 			abort();
 		}
@@ -84,36 +86,36 @@
 		if (heap->type == LARGE) {
 			if ((void *)((char *)(ptr) - sizeof(t_lchunk)) == heap->ptr) {
 				int result = heap_destroy(heap->ptr, heap->size, LARGE);
-				if (result && g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
-				else if (g_manager.options.DEBUG)		aprintf(1, "%p\t   [FREE] Memory freed\n", ptr);
+				if (result && g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
+				else if (g_manager.options.DEBUG)		aprintf(2, "%p\t   [FREE] Memory freed\n", ptr);
 				return (0);
 			}
 
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-			else							aprintf(1, "Invalid pointer\n");
+			if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+			else							aprintf(2, "Invalid pointer\n");
 			abort();
 		}
 
 		// Double free
 		if (HAS_POISON(ptr)) {
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Double free\n", ptr);
-			else							aprintf(1, "Double free\n");
+			if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Double free\n", ptr);
+			else							aprintf(2, "Double free\n");
 			abort();
 		}
 
 		// In top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK)) {
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
-			else							aprintf(1, "Invalid pointer\n");
+			if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
+			else							aprintf(2, "Invalid pointer\n");
 			abort();
 		}
 
 		// In middle chunk
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-			else							aprintf(1, "Invalid pointer\n");
+			if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+			else							aprintf(2, "Invalid pointer\n");
 			abort();
 		}
 
@@ -124,12 +126,12 @@
 		next_chunk->size &= ~PREV_INUSE;
 		t_chunk_int chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
 		if (chunk_size <= (t_chunk_int)g_manager.options.MXFAST) {
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
+			if (g_manager.options.DEBUG)	aprintf(2, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
 			link_chunk(chunk, chunk_size, FASTBIN, arena);
 		} else {
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
+			if (g_manager.options.DEBUG)	aprintf(2, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
 			chunk = coalescing(chunk, arena, heap);
-			if (g_manager.options.DEBUG)	aprintf(1, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
+			if (g_manager.options.DEBUG)	aprintf(2, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
 			link_chunk(chunk, chunk_size, UNSORTEDBIN, arena);
 		}
 
@@ -138,7 +140,7 @@
 			// Mark for elimination
 		}
 
-		if (g_manager.options.DEBUG)	aprintf(1, "%p\t   [FREE] Memory freed of size %d bytes\n", ptr, chunk_size);
+		if (g_manager.options.DEBUG)	aprintf(2, "%p\t   [FREE] Memory freed of size %d bytes\n", ptr, chunk_size);
 
 		return (0);
 	}
@@ -203,8 +205,8 @@
 
 		if (!heap_ptr) {
 			if (!check_digit(&g_manager.arena, ptr))	realfree(ptr);
-			else if (g_manager.options.DEBUG)			aprintf(1, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
-			else										aprintf(1, "Invalid pointer\n");
+			// else if (g_manager.options.DEBUG)			aprintf(2, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
+			// else										aprintf(2, "Invalid pointer\n");
 		}
 	}
 

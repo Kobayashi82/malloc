@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 21:15:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/25 13:19:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,11 @@
 					str = malloc(SMALL_ALLOC);
 					if (str) {
 						str[0] = 'a';
-						if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d) for thread #%d\t\t(%p)\n", SMALL_ALLOC, thread_num, str);
+						if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d) for thread #%d\t\t(%p)\n", SMALL_ALLOC, thread_num, str);
 						free(str);
-						if (str && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
+						if (str && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
 					} else {
-						if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
+						if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
 					}
 				}
 
@@ -83,11 +83,11 @@
 				str = malloc(LARGE_ALLOC);
 				if (str) {
 					str[0] = 'a';
-					if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d) for thread #%d\t(%p)\n", LARGE_ALLOC, thread_num, str);
+					if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d) for thread #%d\t(%p)\n", LARGE_ALLOC, thread_num, str);
 					free(str);
-					if (str && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
+					if (str && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
 				} else {
-					if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
+					if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
 				}
 
 				return (NULL);
@@ -105,7 +105,7 @@
 
 				for (int i = 0; i < THREADS; i++) {
 					if (pthread_create(&threads[i], NULL, thread_test, &thread_args[i]) != 0) {
-						aprintf(1, "[ERROR]\tThread creation failed for thread %d\n", i + 1);
+						aprintf(2, "[ERROR]\tThread creation failed for thread %d\n", i + 1);
 						break;
 					}
 					n_threads++;
@@ -119,7 +119,7 @@
 			static void threads_join() {
 				for (int i = 0; i < n_threads; i++) {
 					if (pthread_join(threads[i], NULL) != 0)
-						aprintf(1, "[ERROR]\tThread join failed for thread %d\n", i + 1);
+						aprintf(2, "[ERROR]\tThread join failed for thread %d\n", i + 1);
 				}
 			}
 
@@ -130,26 +130,26 @@
 	#pragma region "Realloc"
 
 		static void realloc_test() {
-			aprintf(1, "\n=== Realloc ===\n\n");
+			aprintf(2, "\n=== Realloc ===\n\n");
 
 			// SMALL allocation
 			char *ptr = malloc(TINY_ALLOC);
 			if (ptr) {
 				strcpy(ptr, "TINY");
-				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, ptr);
+				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, ptr);
 
 				// SMALL re-allocation
 				ptr = realloc(ptr, SMALL_ALLOC);
 				if (ptr) {
 					strcpy(ptr, "SMALL");
-					if (!DEBUG_MODE) aprintf(1, "[REALLOC]\tExtended (%d)\t\t\t\t(%p)\n", SMALL_ALLOC, ptr);
+					if (!DEBUG_MODE) aprintf(2, "[REALLOC]\tExtended (%d)\t\t\t\t(%p)\n", SMALL_ALLOC, ptr);
 				} else {
-					if (!DEBUG_MODE) aprintf(1, "[ERROR]\tRealloc failed\n");
+					if (!DEBUG_MODE) aprintf(2, "[ERROR]\tRealloc failed\n");
 				}
 				free(ptr);
-				if (ptr && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", ptr);
+				if (ptr && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", ptr);
 			} else {
-				if (!DEBUG_MODE) aprintf(1, "[ERROR]\tRealloc failed\n");
+				if (!DEBUG_MODE) aprintf(2, "[ERROR]\tRealloc failed\n");
 			}
 		}
 
@@ -158,34 +158,34 @@
 	#pragma region "Heap"
 
 		static void heap_test() {
-			aprintf(1, "\n=== Heap ===\n\n");
+			aprintf(2, "\n=== Heap ===\n\n");
 
 			// TINY allocation
 			char *small = (char *)malloc(TINY_ALLOC);
 			if (small) {
 				strcpy(small, "TINY");
-				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, small);
-			} else if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, small);
+			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
 			free(small);
-			if (small && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", small);
+			if (small && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", small);
 
 			// MEDIUM allocation
 			char *medium = (char *)malloc(MEDIUM_ALLOC);
 			if (medium) {
 				strcpy(medium, "MEDIUM");
-				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, medium);
-			} else if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, medium);
+			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
 			free(medium);
-			if (medium && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", medium);
+			if (medium && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", medium);
 
 			// LARGE allocation
 			char *large = (char *)malloc(LARGE_ALLOC);
 			if (large) {
 				strcpy(large, "LARGE");
-				if (!DEBUG_MODE) aprintf(1, "[MALLOC]\tAllocated (%d)\t\t\t(%p)\n", LARGE_ALLOC, large);
-			} else if (!DEBUG_MODE) aprintf(1, "[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t(%p)\n", LARGE_ALLOC, large);
+			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
 			free(large);
-			if (large && !DEBUG_MODE) aprintf(1, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", large);
+			if (large && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", large);
 		}
 
 	#pragma endregion
@@ -195,11 +195,11 @@
 		static int fork_test() {
 			int pid = fork();
 
-			if (pid == -1)			{ aprintf(1, "[ERROR]\tFork failed\n");		exit(1); }
+			if (pid == -1)			{ aprintf(2, "[ERROR]\tFork failed\n");		exit(1); }
 			else if (pid == 0) {
 				int pid2 = fork();
 
-				if (pid2 == -1)		{ aprintf(1, "[ERROR]\tFork 2 failed\n");	exit(1); }
+				if (pid2 == -1)		{ aprintf(2, "[ERROR]\tFork 2 failed\n");	exit(1); }
 				else if (pid2 == 0)	{ heap_test();								exit(0); }
 
 				heap_test();
@@ -226,7 +226,7 @@
 
 		realloc_test();
 
-		aprintf(1, "\n=== Threads ===\n\n");
+		aprintf(2, "\n=== Threads ===\n\n");
 
 		threads_create();
 
@@ -236,7 +236,7 @@
 
 		fork_test();
 
-		aprintf(1, "\n");
+		aprintf(2, "\n");
 		return (0);
 	}
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/23 19:50:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/25 13:19:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 			mutex(&arena->mutex, MTX_INIT);
 			g_manager.arena_count++;
 
-			if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Library initialized\n");
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Library initialized\n");
 			return (0);
 		}
 
@@ -65,7 +65,7 @@
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 			mutex(&g_manager.mutex, MTX_DESTROY);
 
-			if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Library finalized\n");
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Library finalized\n");
 		}
 
 		#include <fcntl.h>
@@ -86,7 +86,7 @@
 
 						// if (internal_free(curr, sizeof(t_heap))) {
 						// 	result = 1;
-						// 	if (g_manager.options.DEBUG)						aprintf(1, "\t\t  [ERROR] Failed to unmap heap structure\n");
+						// 	if (g_manager.options.DEBUG)						aprintf(2, "\t\t  [ERROR] Failed to unmap heap structure\n");
 						// }
 
 						// heap = arena->tiny;
@@ -186,7 +186,7 @@
 				while (current->next) current = current->next;
 				current->next = new_arena;
 
-				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d created\n", new_arena->id);
+				if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d created\n", new_arena->id);
 
 				return (new_arena);
 			}
@@ -208,7 +208,7 @@
 					// return (NULL);	// Force arena creation
 					break;
 				} else {
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d locked\n", current->id);
+					if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d locked\n", current->id);
 				}
 				current = current->next;
 			}
@@ -230,13 +230,13 @@
 					initialized = true;
 					if (arena_initialize(&g_manager.arena)) abort();
 					arena = &g_manager.arena;
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
+					if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
 				}
 				if (!arena) arena = arena_reuse();
 				if (!arena) arena = arena_create();
 				if (!arena) arena = &g_manager.arena;
 
-				if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Arena #%d assigned\n", arena->id);
+				if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d assigned\n", arena->id);
 
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 

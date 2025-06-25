@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 00:48:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/25 15:49:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,20 +50,20 @@
 
 			static t_heap *heap_allocate(size_t size, e_heaptype type, t_heap **heap) {
 				if (!size || type < 0 || type > 2 || !heap) {
-					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to create heap\n", size);
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to create heap\n", size);
 					return (NULL);
 				}
 
 				void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 				if (ptr == MAP_FAILED) {
-					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to create heap\n", size);
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to create heap\n", size);
 					return (NULL);
 				}
 
 				t_heap *new_heap = internal_alloc(sizeof(t_heap));
 				if (!new_heap) {
-					if (g_manager.options.DEBUG)						aprintf(1, "\t\t  [ERROR] Failed to allocate heap structure\n");
-					if (munmap(ptr, size) && g_manager.options.DEBUG)	aprintf(1, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
+					if (g_manager.options.DEBUG)						aprintf(2, "\t\t  [ERROR] Failed to allocate heap structure\n");
+					if (munmap(ptr, size) && g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
 					return (NULL);
 				}
 
@@ -93,7 +93,7 @@
 					ptr = (void *)((char *)chunk + sizeof(t_chunk));
 				}
 
-				if (g_manager.options.DEBUG && type != LARGE)			aprintf(1, "%p\t [SYSTEM] Heap of size (%d) allocated\n", new_heap->ptr, new_heap->size);
+				if (g_manager.options.DEBUG && type != LARGE)			aprintf(2, "%p\t [SYSTEM] Heap of size (%d) allocated\n", new_heap->ptr, new_heap->size);
 
 				return (new_heap);
 			}
@@ -138,7 +138,7 @@
 
 			int heap_free(void *ptr, size_t size, e_heaptype type, t_heap *heap) {
 				if (!ptr || !size || type < 0 || type > 2 || !heap) {
-					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to detroy heap\n");
 					return (1);
 				}
 
@@ -149,19 +149,19 @@
 				}
 
 				if (!curr) {
-					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to detroy heap\n");
 					return (1);
 				}
 
 				int result = 0;
 				if (munmap(ptr, size)) {
 					result = 1;
-					if (g_manager.options.DEBUG && type != LARGE)		aprintf(1, "\t\t  [ERROR] Failed to detroy heap\n");
+					if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to detroy heap\n");
 				}
 
 				curr->active = false;
 
-				if (!result && g_manager.options.DEBUG && type != LARGE) aprintf(1, "%p\t [SYSTEM] Heap of size (%d) freed\n", ptr, size);
+				if (!result && g_manager.options.DEBUG && type != LARGE) aprintf(2, "%p\t [SYSTEM] Heap of size (%d) freed\n", ptr, size);
 
 				return (result);
 			}

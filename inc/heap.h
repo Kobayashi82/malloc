@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 11:39:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/25 14:55:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,17 +43,13 @@
 		#define HEAP_TYPE					0x2		// Bit 1 (size)
 		#define PREV_INUSE					0x1		// Bit 0 (size)
 
-		#define TINY_USER					512
-		#define TINY_HEADER					2 * sizeof(t_chunk_int)
+		#define TINY_CHUNK					512
 		#define TINY_BLOCKS					128
-		#define TINY_CHUNKS					(TINY_BLOCKS * (TINY_USER + TINY_HEADER))
-		#define TINY_SIZE					((TINY_CHUNKS + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+		#define TINY_SIZE					(((TINY_BLOCKS * TINY_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
-		#define SMALL_USER					4096
-		#define SMALL_HEADER				2 * sizeof(t_chunk_int)
+		#define SMALL_CHUNK					4096
 		#define SMALL_BLOCKS				128
-		#define SMALL_CHUNKS				(SMALL_BLOCKS * (SMALL_USER + SMALL_HEADER))
-		#define SMALL_SIZE					((SMALL_CHUNKS + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+		#define SMALL_SIZE					(((SMALL_BLOCKS * SMALL_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 	#pragma endregion
 

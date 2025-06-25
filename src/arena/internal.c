@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/11 12:41:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/25 13:19:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@
 				if (!ret) return (0);
 
 				if (ret != EBUSY) {
-					if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] locking mutex in fork\n");
+					if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] locking mutex in fork\n");
 					return (ret);
 				}
 				
@@ -64,12 +64,12 @@
 				#endif
 			}
 
-			if (g_manager.options.DEBUG) aprintf(1, "\t\t  [ERROR] timeout locking mutex in fork\n");
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] timeout locking mutex in fork\n");
 			return (ETIMEDOUT);
 		}
 
 		static void prepare_fork() {
-			if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Prepare fork\n");
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Prepare fork\n");
 			
 			int ret = try_lock_timeout(&g_manager.mutex, 1000);
 			if (ret) return;
@@ -96,7 +96,7 @@
 	#pragma region "Parent"
 
 		static void parent_fork() {
-			if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Parent fork\n");
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Parent fork\n");
 
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
@@ -111,7 +111,7 @@
 	#pragma region "Child"
 
 		static void child_fork() {
-			if (g_manager.options.DEBUG) aprintf(1, "\t\t [SYSTEM] Child fork\n");
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Child fork\n");
 
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
