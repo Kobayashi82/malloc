@@ -1,6 +1,8 @@
 *
 !.vscode
 !.vscode/**
+.vscode/launch.json
+.vscode/settings.json
 !doc
 !doc/**
 doc/malloc\ 6.2.pdf
