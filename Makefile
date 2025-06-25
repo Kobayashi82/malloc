@@ -38,7 +38,20 @@ COUNTER 			= 0
 # ─────────── #
 
 CC			= clang
-FLAGS		= -Wall -Wextra -Werror -fPIC # -fvisibility=hidden
+
+# Detect OS for different compilation flags
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	# macOS flags
+	FLAGS		= -Wall -Wextra -Werror -fPIC
+	SHARED_FLAG	= -dynamiclib
+	LIB_EXT		= .dylib
+else
+	# Linux flags
+	FLAGS		= -Wall -Wextra -Werror -fPIC # -fvisibility=hidden
+	SHARED_FLAG	= -shared
+	LIB_EXT		= .so
+endif
 
 # ────────── #
 # ── NAME ── #
@@ -51,7 +64,7 @@ else ifeq ($(HOSTTYPE), $(shell uname -m))
 endif
 
 NAME		= malloc
-LIB_NAME	= libft_$(NAME)_$(HOSTTYPE).so
+LIB_NAME	= libft_$(NAME)_$(HOSTTYPE)$(LIB_EXT)
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -90,11 +103,11 @@ $(LIB_DIR)/$(LIB_NAME): $(OBJS)
 
 #	Compile library
 	@printf "\r%50s\r\t$(CYAN)Compiling... $(YELLOW)$(NAME)$(NC)"
-	@$(CC) -shared -o $(LIB_DIR)$(LIB_NAME) $(OBJS)
+	@$(CC) $(SHARED_FLAG) -o $(LIB_DIR)$(LIB_NAME) $(OBJS)
 	@printf "\r%50s\r\t$(CYAN)Compiled    $(GREEN)✓ $(YELLOW)$(NAME)$(NC)\n"
 
 #   Symbolic link
-	@cd $(LIB_DIR) && ln -sf $(LIB_NAME) libft_$(NAME).so
+	@cd $(LIB_DIR) && ln -sf $(LIB_NAME) libft_$(NAME)$(LIB_EXT)
 
 	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
@@ -165,9 +178,9 @@ re:
 
 #	Delete objects and library
 	@$(MAKE) -s _delete_objects
-	@if [ -f $(LIB_NAME) ]; then \
+	@if [ -f $(LIB_DIR)$(LIB_NAME) ]; then \
 		printf "\t$(CYAN)Deleting... $(YELLOW)library$(NC)"; \
-		rm -f $(LIB_NAME); \
+		rm -f $(LIB_DIR)$(LIB_NAME); \
 	fi
 	@printf "\r%50s\r\t$(CYAN)Deleted     $(GREEN)✓ $(YELLOW)library$(NC)\n"
 	@$(MAKE) -s _progress; printf "\n"
@@ -204,7 +217,7 @@ fclean:
 	@if [ -f $(LIB_DIR)$(LIB_NAME) ]; then \
 		printf "\t$(CYAN)Deleting... $(YELLOW)library$(NC)"; \
 		rm -f $(LIB_DIR)$(LIB_NAME); \
-		rm -f $(LIB_DIR)libft_malloc.so; \
+		rm -f $(LIB_DIR)libft_malloc$(LIB_EXT); \
 	fi
 	@printf "\r%50s\r\t$(CYAN)Deleted     $(GREEN)✓ $(YELLOW)library$(NC)\n"
 	@find $(BLD_DIR) -type d -empty -delete >/dev/null 2>&1 || true

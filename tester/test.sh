@@ -102,3 +102,10 @@ rm test
 # gdb:
 # set environment LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
 # set environment LD_PRELOAD="libft_malloc.so"
+
+
+
+# En mac:
+
+# export DYLD_LIBRARY_PATH="/[project_path]/build/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/[project_path]/build/lib/libft_malloc.dylib"
+# export DYLD_LIBRARY_PATH="/home/kobay/malloc/build/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/home/kobay/malloc/build/lib/libft_malloc.dylib"
