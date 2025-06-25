@@ -90,22 +90,13 @@ rm test
 # export LD_PRELOAD="libft_malloc.so"
 #
 # export LD_LIBRARY_PATH="/home/vzurera-/42/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
-
-# export LD_LIBRARY_PATH="/mnt/d/Programas/Mis Programas/42/Active/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
-
 # export LD_LIBRARY_PATH="/home/kobay/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
-
-# export MALLOC_DEBUG=1
 #
-# ./test
+# export MALLOC_DEBUG=1
 
 # gdb:
 # set environment LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
 # set environment LD_PRELOAD="libft_malloc.so"
 
-
-
-# En mac:
-
-# export DYLD_LIBRARY_PATH="/[project_path]/build/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/[project_path]/build/lib/libft_malloc.dylib"
-# export DYLD_LIBRARY_PATH="/home/kobay/malloc/build/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/home/kobay/malloc/build/lib/libft_malloc.dylib"
+# Mac:
+# export DYLD_LIBRARY_PATH="/[project_path]/build/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/[project_path]/build/lib/libft_malloc.so"

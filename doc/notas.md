@@ -27,6 +27,7 @@ La fragmentación se mide típicamente como la diferencia entre el espacio libre
 - Estructura compartida entre hilos que contiene HEAPs y BINs
 
 ### Heap
+
 - Region de memoria contigua que se divide en CHUNKs
 
 ### Chunk
@@ -44,63 +45,3 @@ La fragmentación se mide típicamente como la diferencia entre el espacio libre
 ### Bin
 
 - Listas enlazadas con informacion a CHUNKs libres. Se usa para la reutilizacion de espacios de memoria
-
-### TCache
-
-- Array de listas enlazadas con informacion a CHUNKs libres. Se usa para para la reutilizacion de espacios de memoria, pero cada hilo tiene su propio TCACHE
-
-## RESUMEN DE DISEÑO
-
-### Mapeo global de arenas
-
-- Array fijo t_range[255] por arena
-- Cada t_range tiene start[255] y end[255] para zonas
-- Mutex global para acceder a estructura de mapeo
-
-### Optimización tcache por hilo
-
-- Thread-local cache con rangos de zonas del hilo actual
-- free() busca primero en tcache (sin mutex)
-- Si no encuentra → búsqueda global (con mutex)
-
-### Gestión cross-thread
-
-- Free en arena ajena: usa mutex de esa arena
-- Si zona queda vacía tras free cross-thread → marca flag "revisar zona"
-- Solo el hilo propietario limpia su tcache y libera zonas
-
-### Estrategia de coalescing
-
-- Al liberar: sin coalescing inmediato (free rápido)
-- Cuando malloc no encuentra en bins:
-
-### Evaluar fragmentación
-
-- Si fragmentación alta → coalescing completo + retry bins
-- Si fragmentación baja → crear nueva zona directamente
-
-### Limpieza de zonas vacías
-
-- Durante coalescing: detectar y liberar zonas completamente vacías
-- Actualizar bins tras coalescing
-- Limpiar referencias del tcache propio
-
-### OTROS
-
-- mcheck(3), mtrace(3)
-
-- alineacion
-- #define ALIGNMENT 16
-- #define ALIGN(size) (((size) + ALIGNMENT - 1) & ~(ALIGNMENT - 1))
-- arenas
-- magic number
-- zonas
-- bitmap
-- freelist
-- tcache
-- free: double free
-- free: invalid pointer
-- fusion de bloques
-- liberacion de zonas
-- lazy coalescing (or not)
-- best fit vs first fit

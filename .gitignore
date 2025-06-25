@@ -3,7 +3,7 @@
 !.vscode/**
 !doc
 !doc/**
-doc/subject.pdf
+doc/malloc\ 6.2.pdf
 !inc
 !inc/**
 !src
