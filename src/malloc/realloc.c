@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 13:19:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/25 22:44:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@
 	void *realrealloc(void *ptr, size_t size) {
 		if (!ptr || !size) return (NULL);
 
-		if (g_manager.options.DEBUG)			aprintf(2, "%p\t[REALLOC] Delegated to native allocator\n", ptr);
-
 		#ifdef _WIN32
 			static void *(__cdecl *real_realloc_win)(void *, size_t);
 			if (!real_realloc_win) {
@@ -31,7 +29,7 @@
 			}
 
 			if (!real_realloc_win) {
-				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Native realloc failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
 				return (NULL);
 			}
 
@@ -41,14 +39,14 @@
 			if (!real_realloc_unix) real_realloc_unix = dlsym(((void *) -1L), "realloc");
 
 			if (!real_realloc_unix) {
-				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Native realloc failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
 				return (NULL);
 			}
 
 			void *new_ptr = real_realloc_unix(ptr, size);
 		#endif
 
-		if (g_manager.options.DEBUG)			aprintf(2, "%p\t[REALLOC] Memory reassigned from %p with %d bytes\n", new_ptr, ptr, size);
+		if (g_manager.options.DEBUG)			aprintf(2, "%p\t[REALLOC] Delegated to the native realloc from %p with %d bytes\n", new_ptr, ptr, size);
 		return (new_ptr);
 	}
 

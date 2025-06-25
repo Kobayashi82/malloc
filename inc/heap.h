@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 09:12:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 14:55:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 00:02:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,21 +69,20 @@
 			t_chunk_int		size;						// Size of the chunk
 		} t_chunk;
 
-		typedef struct s_lchunk {
-			size_t			prev_size;					// Size of the previous chunk
-			size_t			size;						// Size of the chunk
-		} t_lchunk;
+		typedef struct s_hiheap {
+			uint8_t 		total;						// 60 or 50
+			uint8_t 		used;
+			void			*next;
+		} t_hiheap;
 
-		typedef struct s_heap {
+		typedef struct s_iheap {
 			void			*ptr;						// Pointer to the heap
 			size_t			size;						// Size of the heap
 			size_t			free;						// Memory available for allocation in the heap
 			bool			active;						// Set to false when freed
 			e_heaptype		type;						// Type of the heap
 			t_chunk			*top_chunk;					// Pointer to the top chunk
-			struct s_heap	*prev;						// Pointer to the previous heap
-			struct s_heap	*next;						// Pointer to the next heap
-		} t_heap;
+		} t_iheap;
 
 	#pragma endregion
 
@@ -91,9 +90,9 @@
 
 #pragma region "Methods"
 
-	t_heap	*heap_find(void *ptr, t_arena *arena);
-	t_heap	*heap_create(e_heaptype type, size_t size);
+	t_iheap	*heap_find(void *ptr, t_arena *arena);
+	void	*heap_create(t_arena *arena, e_heaptype type, size_t size);
 	int		heap_destroy(void *ptr, size_t size, e_heaptype type);
-	int		heap_free(void *ptr, size_t size, e_heaptype type, t_heap *heap);
+	int		heap_free(void *ptr, size_t size, e_heaptype type, t_iheap *heap);
 
 #pragma endregion

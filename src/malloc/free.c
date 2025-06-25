@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 13:32:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 00:21:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@
 	void realfree(void *ptr) {
 		if (!ptr) return;
 
-		if (g_manager.options.DEBUG)			aprintf(2, "%p\t   [FREE] Delegated to the native allocator\n", ptr);
-
 		#ifdef _WIN32
 			static void (__cdecl *real_free_win)(void*);
 			if (!real_free_win) {
@@ -31,7 +29,7 @@
 			}
 
 			if (!real_free_win) {
-				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Native free failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
 				return;
 			}
 
@@ -41,21 +39,21 @@
 			if (!real_free_unix) real_free_unix = dlsym(((void *) -1L), "free");
 
 			if (!real_free_unix) {
-				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Native free failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
 				return;
 			}
 
 			real_free_unix(ptr);
 		#endif
 
-		if (g_manager.options.DEBUG)			aprintf(2, "%p\t   [FREE] Memory freed\n", ptr);
+		if (g_manager.options.DEBUG)			aprintf(2, "%p\t   [FREE] Delegated to the native free\n", ptr);
 	}
 
 #pragma endregion
 
 #pragma region "Free PTR"
 
-	static int free_ptr(void *ptr, t_arena *arena, t_heap *heap) {
+	static int free_ptr(void *ptr, t_arena *arena, t_iheap *heap) {
 		if (!ptr ||!arena || !heap) return (0);
 		
 		// Not aligned
@@ -68,7 +66,7 @@
 		// Heap freed
 		if (!heap->active) {
 			if (heap->type == LARGE) {
-				if ((void *)((char *)heap->ptr + sizeof(t_lchunk)) == ptr) {
+				if ((void *)((char *)heap->ptr + sizeof(t_chunk)) == ptr) {
 					if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Double free\n", ptr);
 					else							aprintf(2, "Double free\n");
 				} else {
@@ -84,7 +82,7 @@
 
 		// LARGE
 		if (heap->type == LARGE) {
-			if ((void *)((char *)(ptr) - sizeof(t_lchunk)) == heap->ptr) {
+			if ((void *)((char *)(ptr) - sizeof(t_chunk)) == heap->ptr) {
 				int result = heap_destroy(heap->ptr, heap->size, LARGE);
 				if (result && g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
 				else if (g_manager.options.DEBUG)		aprintf(2, "%p\t   [FREE] Memory freed\n", ptr);
@@ -147,23 +145,23 @@
 	
 #pragma endregion
 
-	int	first_digit(void *ptr) {
-		uintptr_t val = (uintptr_t)ptr;
+	// int	first_digit(void *ptr) {
+	// 	uintptr_t val = (uintptr_t)ptr;
 
-		while (val >= 0x10) val /= 0x10;
-		return ((int)(val & 0xF));
-	}
+	// 	while (val >= 0x10) val /= 0x10;
+	// 	return ((int)(val & 0xF));
+	// }
 
-	int	check_digit(t_arena *arena, void *ptr1) {
-		int	target_digit = first_digit(ptr1);
-		int	base_digit = 0;
+	// int	check_digit(t_arena *arena, void *ptr1) {
+	// 	int	target_digit = first_digit(ptr1);
+	// 	int	base_digit = 0;
 
-		if		(arena->tiny) base_digit = first_digit(arena->tiny);
-		else if (arena->tiny) base_digit = first_digit(arena->small);
-		else if (arena->tiny) base_digit = first_digit(arena->large);
+	// 	if		(arena->tiny) base_digit = first_digit(arena->tiny);
+	// 	else if (arena->tiny) base_digit = first_digit(arena->small);
+	// 	else if (arena->tiny) base_digit = first_digit(arena->large);
 
-		return (base_digit && target_digit == base_digit);
-	}
+	// 	return (base_digit && target_digit == base_digit);
+	// }
 
 #pragma region "Free"
 
@@ -174,7 +172,7 @@
 		if (!ptr) return;
 
 		t_arena	*arena = tcache;
-		t_heap	*heap_ptr = NULL;
+		t_iheap	*heap_ptr = NULL;
 		
 		if (!arena) arena = &g_manager.arena;
 		if (arena) {
@@ -204,7 +202,7 @@
 		}
 
 		if (!heap_ptr) {
-			if (!check_digit(&g_manager.arena, ptr))	realfree(ptr);
+			// if (!check_digit(&g_manager.arena, ptr))	realfree(ptr);
 			// else if (g_manager.options.DEBUG)			aprintf(2, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
 			// else										aprintf(2, "Invalid pointer\n");
 		}

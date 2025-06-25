@@ -1,5 +1,6 @@
 # TODO
 
+- [✗] Cambiar heaps y arenas a un modo single page
 - [✗] Contador de frees para eliminar heap (quizas mejor cuando se haga coalescing se limpia zonas vacias. Por investigar)
 - [✗] Fastbin[0-1] de 8 y 16 bytes es useless
 

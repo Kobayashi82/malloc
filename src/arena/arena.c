@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 13:19:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 00:18:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,11 @@
 
 #pragma endregion
 
-#pragma endregion
-
 #pragma region "Arena"
 
 	#pragma region "Initialize"
 
-		int arena_initialize(t_arena *arena) {
+		void arena_initialize(t_arena *arena) {
 			arena->id = g_manager.arena_count + 1;
 			arena->alloc_count = 0;
 			arena->free_count = 0;
@@ -30,15 +28,10 @@
 			ft_memset(arena->smallbin, 0, 31 * sizeof(void *));
 			ft_memset(arena->largebin, 0, 10 * sizeof(void *));
 			arena->unsortedbin = NULL;
-			arena->tiny = NULL;
-			arena->small = NULL;
-			arena->large = NULL;
+			arena->hiheap = NULL;
 			arena->next = NULL;
 			mutex(&arena->mutex, MTX_INIT);
 			g_manager.arena_count++;
-
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Library initialized\n");
-			return (0);
 		}
 
 	#pragma endregion
@@ -170,17 +163,10 @@
 		#pragma region "Create"
 
 			t_arena *arena_create() {
-				t_arena *new_arena;
-
 				if (!arena_can_create()) return (NULL);
 
-				new_arena = internal_alloc(sizeof(t_arena));
-				if (!new_arena) return (NULL);
-
-				if (arena_initialize(new_arena)) {
-					internal_free(new_arena, sizeof(t_arena));
-					return (NULL);
-				}
+				t_arena *new_arena = internal_alloc(PAGE_SIZE);
+				arena_initialize((t_arena *)new_arena);
 
 				t_arena *current = &g_manager.arena;
 				while (current->next) current = current->next;
@@ -228,7 +214,7 @@
 
 				if (!initialized) {
 					initialized = true;
-					if (arena_initialize(&g_manager.arena)) abort();
+					arena_initialize(&g_manager.arena);
 					arena = &g_manager.arena;
 					if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
 				}

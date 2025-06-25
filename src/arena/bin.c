@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 15:50:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 00:20:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,91 +20,91 @@
 
 	#pragma region "Split"
 
-		static t_chunk *split_top_chunk(t_heap *heap, t_chunk_int size) {
-			if (!heap || !heap->active || !heap->top_chunk || !size) return (NULL);
+		// static t_chunk *split_top_chunk(t_heap *heap, t_chunk_int size) {
+		// 	if (!heap || !heap->active || !heap->top_chunk || !size) return (NULL);
 
-			t_chunk	*top_chunk = heap->top_chunk;	
-			size_t	top_chunk_available = GET_SIZE(top_chunk);
-			if (top_chunk_available < (size_t)size) return (NULL);
+		// 	t_chunk	*top_chunk = heap->top_chunk;	
+		// 	size_t	top_chunk_available = GET_SIZE(top_chunk);
+		// 	if (top_chunk_available < (size_t)size) return (NULL);
 			
-			t_chunk *chunk = top_chunk;
-			chunk->size = (top_chunk->size & (HEAP_TYPE | PREV_INUSE)) | (size - sizeof(t_chunk));
-			chunk->size &= ~TOP_CHUNK;
+		// 	t_chunk *chunk = top_chunk;
+		// 	chunk->size = (top_chunk->size & (HEAP_TYPE | PREV_INUSE)) | (size - sizeof(t_chunk));
+		// 	chunk->size &= ~TOP_CHUNK;
 
-			// static int p = 0;
-			// aprintf(2, "split %d\n", p++);
+		// 	// static int p = 0;
+		// 	// aprintf(2, "split %d\n", p++);
 
-			top_chunk = GET_NEXT(chunk);
-			top_chunk->size = (top_chunk_available - size) | TOP_CHUNK | ((heap->type == SMALL) ? HEAP_TYPE : 0) | PREV_INUSE;
-			top_chunk->prev_size = size - sizeof(t_chunk);
-			heap->top_chunk = top_chunk;
+		// 	top_chunk = GET_NEXT(chunk);
+		// 	top_chunk->size = (top_chunk_available - size) | TOP_CHUNK | ((heap->type == SMALL) ? HEAP_TYPE : 0) | PREV_INUSE;
+		// 	top_chunk->prev_size = size - sizeof(t_chunk);
+		// 	heap->top_chunk = top_chunk;
 
-			return (chunk);
-		}
+		// 	return (chunk);
+		// }
 
 	#pragma endregion
 
 	#pragma region "New Chunk"
 
-		static void *new_chunk(t_arena *arena, t_chunk_int size, e_heaptype type) {
-			if (!arena || !size || type < TINY || type > SMALL) return (NULL);
+		// static void *new_chunk(t_arena *arena, t_chunk_int size, e_heaptype type) {
+		// 	if (!arena || !size || type < TINY || type > SMALL) return (NULL);
 
-			void	*ptr = NULL;
-			bool	created = false;
-			t_heap	*best_heap = NULL;
-			float	best_usage = -1000;
+		// 	void	*ptr = NULL;
+		// 	bool	created = false;
+		// 	t_heap	*best_heap = NULL;
+		// 	float	best_usage = -1000;
 
-			// Find first heap
-			size_t	heap_size = (type == TINY) ? TINY_SIZE : SMALL_SIZE;
-			t_heap	*heap = (type == TINY) ? arena->tiny : arena->small;
-			if (!heap) {
-				created = true;
-				// aprintf(2, "%p\t Create A %s\n", arena, type == TINY ? "Tiny" : "Small");
+		// 	// Find first heap
+		// 	size_t	heap_size = (type == TINY) ? TINY_SIZE : SMALL_SIZE;
+		// 	t_heap	*heap = arena->iheap;
+		// 	if (!heap) {
+		// 		created = true;
+		// 		// aprintf(2, "%p\t Create A %s\n", arena, type == TINY ? "Tiny" : "Small");
 
-				heap = heap_create(type, heap_size);
-				if (!heap) return (ptr);
-				best_heap = heap;
-			}
+		// 		heap = heap_create(type, heap_size);
+		// 		if (!heap) return (ptr);
+		// 		best_heap = heap;
+		// 	}
 
-			// Find best heap
-			if (!best_heap) {
-				while (heap) {
-					if (heap->active) {
-						size_t	free_size = GET_SIZE(heap->top_chunk);
-						bool	available = free_size >= size;
-						int		usage = ((heap_size - free_size) * 100) / heap_size;
+		// 	// Find best heap
+		// 	if (!best_heap) {
+		// 		while (heap) {
+		// 			if (heap->active) {
+		// 				size_t	free_size = GET_SIZE(heap->top_chunk);
+		// 				bool	available = free_size >= size;
+		// 				int		usage = ((heap_size - free_size) * 100) / heap_size;
 
-						if (available && usage > 10) { best_heap = heap; break; }
-						if (available && usage > best_usage) { best_usage = usage; best_heap = heap; }
-					}
-					heap = heap->next;
-				}
+		// 				if (available && usage > 10) { best_heap = heap; break; }
+		// 				if (available && usage > best_usage) { best_usage = usage; best_heap = heap; }
+		// 			}
+		// 			heap = heap->next;
+		// 		}
 
-				// Create heap (no best heap found)
-				if (!best_heap) {
-					created = true;
-					best_heap = heap_create(type, heap_size);
-					// aprintf(2, "%p\t Create B %s: %d\n", arena, type == TINY ? "Tiny" : "Small", ((heap_size - best_heap->free) * 100) / heap_size);
-					if (!best_heap) return (ptr);
-				}
-			}
+		// 		// Create heap (no best heap found)
+		// 		if (!best_heap) {
+		// 			created = true;
+		// 			best_heap = heap_create(type, heap_size);
+		// 			// aprintf(2, "%p\t Create B %s: %d\n", arena, type == TINY ? "Tiny" : "Small", ((heap_size - best_heap->free) * 100) / heap_size);
+		// 			if (!best_heap) return (ptr);
+		// 		}
+		// 	}
 
-			// Split top chunk
-			t_chunk	*chunk = split_top_chunk(best_heap, size);
-			if (!chunk && !created) {
-				if (!created) aprintf(2, "%p\t Create C %s\n", arena, type == TINY ? "Tiny" : "Small");
-				// aprintf(2, "%p\t Create C %s\n", arena, type == TINY ? "Tiny" : "Small");
-				best_heap = heap_create(type, heap_size);
-				if (!best_heap) return (ptr);
-				chunk = split_top_chunk(best_heap, size);
-				if (!chunk) return (ptr);
-			}
+		// 	// Split top chunk
+		// 	t_chunk	*chunk = split_top_chunk(best_heap, size);
+		// 	if (!chunk && !created) {
+		// 		if (!created) aprintf(2, "%p\t Create C %s\n", arena, type == TINY ? "Tiny" : "Small");
+		// 		// aprintf(2, "%p\t Create C %s\n", arena, type == TINY ? "Tiny" : "Small");
+		// 		best_heap = heap_create(type, heap_size);
+		// 		if (!best_heap) return (ptr);
+		// 		chunk = split_top_chunk(best_heap, size);
+		// 		if (!chunk) return (ptr);
+		// 	}
 
-			best_heap->free -= size;
-			ptr = (GET_PTR(chunk));
+		// 	best_heap->free -= size;
+		// 	ptr = (GET_PTR(chunk));
 
-			return (ptr);
-		}
+		// 	return (ptr);
+		// }
 
 	#pragma endregion
 
@@ -168,7 +168,7 @@
 		// if (!ptr && fastbin no vacio, repite
 		// if (!ptr) ptr = find_in_largebin(arena, align_size);
 
-		if (!ptr) ptr = new_chunk(arena, align_size, (align_size > TINY_CHUNK) ? SMALL : TINY);
+		// if (!ptr) ptr = new_chunk(arena, align_size, (align_size > TINY_CHUNK) ? SMALL : TINY);
 
 		if (ptr) arena->alloc_count++;
 

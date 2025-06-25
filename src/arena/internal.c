@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 13:19:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/25 23:41:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,13 +139,17 @@
 
 #pragma endregion
 
-#pragma region "Allocation"
+#pragma region "Internal"
 
 	#pragma region "Alloc"
 
 		void *internal_alloc(size_t size) {
 			void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			return (ptr == MAP_FAILED ? NULL : ptr);
+			if (ptr == MAP_FAILED) {
+				if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
+				abort();
+			}
+			return (ptr);
 		}
 
 	#pragma endregion
@@ -153,7 +157,13 @@
 	#pragma region "Free"
 
 		int internal_free(void *ptr, size_t size) {
-			if (ptr && size > 0) return (munmap(ptr, size));
+			if (!ptr || !size) return (0);
+
+			if (munmap(ptr, size)) {
+				if (g_manager.options.DEBUG) aprintf(2, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
+				return (1);
+			}
+
 			return (0);
 		}
 
@@ -167,9 +177,9 @@
 
 	static void do_init(void) {
 		mutex(&g_manager.mutex, MTX_INIT);
-		realfree(NULL);
 		options_initialize();
 		pthread_atfork(prepare_fork, parent_fork, child_fork);
+		if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Library initialized\n");
 	}
 
 	void ensure_init() {

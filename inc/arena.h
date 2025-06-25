@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/24 11:22:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 00:18:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,7 @@
 			void			*smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL)		Doblemente enlazadas. Tamaños fijos (FIFO)
 			void			*unsortedbin;				// ???
 			void			*largebin[10];				// ???
-			t_heap			*tiny;						// Linked list of TINY heaps
-			t_heap			*small;						// Linked list of SMALL heaps
-			t_heap			*large;						// Linked list of LARGE heaps (single chunk per heap)
+			t_hiheap		*hiheap;
 			struct s_arena	*next;          			// Pointer to the next arena
 			mtx_t			mutex;          			// Mutex for thread safety in the current arena
 		} t_arena;
@@ -95,24 +93,25 @@
 	int		mutex(mtx_t *ptr_mutex, e_mutex action);
 	void	*internal_alloc(size_t size);
 	int		internal_free(void *ptr, size_t size);
+	void	*iheap_create();
 	size_t	get_pagesize();
 	void	ensure_init();
 
 	// Arena
-	int		arena_initialize(t_arena *arena);
 	void	arena_terminate();
 	t_arena *arena_get();
 
 	// Coalescing
 	int		link_chunk(t_chunk *chunk, t_chunk_int size, e_bintype type, t_arena *arena);
 	int		unlink_chunk(t_chunk *chunk, t_arena *arena);
-	t_chunk	*coalescing(t_chunk *chunk, t_arena *arena, t_heap *heap);
+	t_chunk	*coalescing(t_chunk *chunk, t_arena *arena, t_iheap *heap);
 
 	// Bin
 	void	*find_memory(t_arena *arena, size_t size);
 
 	// Main
 	void	realfree(void *ptr);
+	void	*realrealloc(void *ptr, size_t size);
 	void	free(void *ptr);
 	void	*malloc(size_t size);
 	void	*realloc(void *ptr, size_t size);

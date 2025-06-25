@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/12 00:08:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 00:21:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ int unlink_chunk(t_chunk *chunk, t_arena *arena) {
 	return (1);
 }
 
-t_chunk *coalescing(t_chunk *chunk, t_arena *arena, t_heap *heap) {
+t_chunk *coalescing(t_chunk *chunk, t_arena *arena, t_iheap *heap) {
 	if (!chunk || !arena || !heap) return (chunk);
 
 	t_chunk *chunk_prev = NULL;
