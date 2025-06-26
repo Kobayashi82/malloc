@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 14:28:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 23:56:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,11 +151,15 @@
 	#pragma region "Alloc"
 
 		void *internal_alloc(size_t size) {
-			void *ptr = mmap(NULL, ALIGN(size), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			if (!size) return (NULL);
+
+			size_t total_size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+			void *ptr = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 			if (ptr == MAP_FAILED) {
 				if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
 				abort();
 			}
+
 			return (ptr);
 		}
 
@@ -207,7 +211,6 @@
 
 	void arena_terminate() {
 		t_arena	*arena, *next;
-		// t_heap	*heap;
 
 		// if debug, print memoria status (free, not free, heaps, etc.)
 
@@ -217,37 +220,26 @@
 			while (arena) {
 				mutex(&arena->mutex, MTX_LOCK);
 
-					// Clean heaps
+					t_heap_header *heap_header = arena->heap_header;
+					while (heap_header) {
+						t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 
-					// if (internal_free(curr, sizeof(t_heap))) {
-					// 	result = 1;
-					// 	if (g_manager.options.DEBUG)						aprintf(2, "\t\t  [ERROR] Failed to unmap heap structure\n");
-					// }
+						for (int i = 0; i < heap_header->used; i++) {
+							if (heap->active) heap_destroy(arena, heap->ptr, heap->type, heap->size);
+							heap++;
+						}
 
-					// heap = arena->tiny;
-					// while (heap) {
-					// 	if (heap_free(heap->ptr, heap->size, TINY, &arena->tiny)) break;
-					// 	heap = arena->tiny;
-					// }
+						heap_header = heap_header->next;
+					}
 
-					// heap = arena->small;
-					// while (heap) {
-					// 	if (heap_free(heap->ptr, heap->size, SMALL, &arena->small)) break;
-					// 	heap = arena->small;
-					// }
-
-					// heap = arena->large;
-					// while (heap) {
-					// 	if (heap_free(heap->ptr, heap->size, LARGE, &arena->large)) break;
-					// 	heap = arena->large;
-					// }
+					// clean info pages
 
 					next = arena->next;
 				
 				mutex(&arena->mutex, MTX_UNLOCK);
 				mutex(&arena->mutex, MTX_DESTROY);
 
-				if (arena != &g_manager.arena) internal_free(arena, sizeof(t_arena));
+				// if (arena != &g_manager.arena) internal_free(arena, sizeof(t_arena));
 				arena = next;
 			}
 

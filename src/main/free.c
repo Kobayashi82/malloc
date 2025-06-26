@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 14:29:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 23:45:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@
 
 #pragma region "Free PTR"
 
-	static int free_ptr(void *ptr, t_arena *arena, t_iheap *heap) {
+	static int free_ptr(t_arena *arena, void *ptr, t_heap *heap) {
 		if (!ptr ||!arena || !heap) return (0);
-		
+
 		// Not aligned
 		if (!IS_ALIGNED(ptr)) {
 			if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
@@ -83,7 +83,7 @@
 		// LARGE
 		if (heap->type == LARGE) {
 			if ((void *)((char *)(ptr) - sizeof(t_chunk)) == heap->ptr) {
-				int result = heap_destroy(heap->ptr, heap->size, LARGE);
+				int result = heap_destroy(arena, heap->ptr, LARGE, heap->size);
 				if (result && g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
 				else if (g_manager.options.DEBUG)		aprintf(2, "%p\t   [FREE] Memory freed\n", ptr);
 				return (0);
@@ -123,6 +123,7 @@
 		// Add to bins
 		next_chunk->size &= ~PREV_INUSE;
 		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
+		SET_PREV_SIZE(next_chunk, GET_SIZE(chunk));
 		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
 			if (g_manager.options.DEBUG)	aprintf(2, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
 			link_chunk(chunk, chunk_size, FASTBIN, arena);
@@ -145,23 +146,21 @@
 	
 #pragma endregion
 
-	// int	first_digit(void *ptr) {
-	// 	uintptr_t val = (uintptr_t)ptr;
+	int	first_digit(void *ptr) {
+		uintptr_t val = (uintptr_t)ptr;
 
-	// 	while (val >= 0x10) val /= 0x10;
-	// 	return ((int)(val & 0xF));
-	// }
+		while (val >= 0x10) val /= 0x10;
+		return ((int)(val & 0xF));
+	}
 
-	// int	check_digit(t_arena *arena, void *ptr1) {
-	// 	int	target_digit = first_digit(ptr1);
-	// 	int	base_digit = 0;
+	int	check_digit(t_arena *arena, void *ptr1) {
+		int	target_digit = first_digit(ptr1);
+		int	base_digit = 0;
 
-	// 	if		(arena->tiny) base_digit = first_digit(arena->tiny);
-	// 	else if (arena->tiny) base_digit = first_digit(arena->small);
-	// 	else if (arena->tiny) base_digit = first_digit(arena->large);
+		if (arena->heap_header) base_digit = first_digit(arena->heap_header);
 
-	// 	return (base_digit && target_digit == base_digit);
-	// }
+		return (base_digit && target_digit == base_digit);
+	}
 
 #pragma region "Free"
 
@@ -172,13 +171,13 @@
 		if (!ptr) return;
 
 		t_arena	*arena = tcache;
-		t_iheap	*heap_ptr = NULL;
+		t_heap	*heap_ptr = NULL;
 		
 		if (!arena) arena = &g_manager.arena;
 		if (arena) {
 			mutex(&arena->mutex, MTX_LOCK);
 
-				if ((heap_ptr = heap_find(ptr, arena))) free_ptr(ptr, arena, heap_ptr);
+				if ((heap_ptr = heap_find(arena, ptr))) free_ptr(arena, ptr, heap_ptr);
 				
 			mutex(&arena->mutex, MTX_UNLOCK);
 		}
@@ -191,7 +190,7 @@
 					if (arena == curr_arena) { curr_arena = curr_arena->next; continue; }
 					mutex(&curr_arena->mutex, MTX_LOCK);
 
-						if ((heap_ptr = heap_find(ptr, curr_arena))) free_ptr(ptr, curr_arena, heap_ptr);
+						if ((heap_ptr = heap_find(curr_arena, ptr))) free_ptr(curr_arena, ptr, heap_ptr);
 
 					mutex(&curr_arena->mutex, MTX_UNLOCK);
 					if (heap_ptr) break;

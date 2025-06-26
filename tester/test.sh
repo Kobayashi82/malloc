@@ -101,3 +101,6 @@ rm test
 
 # Mac:
 # export DYLD_LIBRARY_PATH="/[project_path]/build/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/[project_path]/build/lib/libft_malloc.so"
+
+
+# export LD_LIBRARY_PATH="/home/kobay/pollon/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"

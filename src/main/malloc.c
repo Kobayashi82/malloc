@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 14:29:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 22:06:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,16 @@
 
 			if (!size) size = 1;
 
-			ptr = internal_alloc(size);
-			// if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK)	ptr = heap_create(arena, LARGE, size);
-			// else												ptr = find_memory(arena, size);
+			// ptr = heap_create(arena, LARGE, size);
+			if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK)	ptr = heap_create(arena, LARGE, size);
+			else												ptr = find_memory(arena, size);
 
 			if (ptr && g_manager.options.DEBUG)	aprintf(2, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
 			else if (g_manager.options.DEBUG)	aprintf(2, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
 
 		mutex(&arena->mutex, MTX_UNLOCK);
 
-		// if (ptr) SET_MAGIC(ptr);
+		if (ptr) SET_MAGIC(ptr);
 		return (ptr);
 	}
 

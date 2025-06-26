@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 13:54:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 22:52:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,20 +74,24 @@
 	// CHUNK
 	#define GET_PTR(chunk)				(void *)((char *)(chunk) + sizeof(t_chunk))
 	#define GET_HEAD(chunk) 			(void *)((char *)(chunk) - sizeof(t_chunk))
-	#define GET_NEXT(chunk)				(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~7))
-	#define GET_PREV(chunk)				(t_chunk *)((char *)(chunk) - ((chunk)->prev_size + sizeof(t_chunk)))
-	#define GET_SIZE(chunk) 			(size_t)((chunk)->size & ~7)
+	#define GET_NEXT(chunk)				(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~15))
+	#define GET_PREV(chunk)				(t_chunk *)((char *)(chunk) - (*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)) + sizeof(t_chunk)))
+
+	#define GET_PREV_SIZE(chunk)		(*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)))
+	#define SET_PREV_SIZE(chunk, size)	(*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)) = (size))
+	#define GET_SIZE(chunk) 			(size_t)((chunk)->size & ~15)
 
 	// ALIGMENTS
 	#define PAGE_SIZE					get_pagesize()					// 4096 bytes
-	#define ALIGNMENT					(uint8_t)(ARCHITECTURE / 4)			// 8 or 16 bytes
+	#define ALIGNMENT					(uint8_t)(ARCHITECTURE / 4)		// 8 or 16 bytes
 	#define IS_ALIGNED(ptr)				(((uintptr_t)GET_HEAD(ptr) & (ALIGNMENT - 1)) == 0)
 	#define ALIGN(size)					(((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
 
 	// HEAPS
-	#define TOP_CHUNK					0x4								// Bit 2 (size)
-	#define HEAP_TYPE					0x2								// Bit 1 (size)
-	#define PREV_INUSE					0x1								// Bit 0 (size)
+	#define MMAP_CHUNK    				0x8								// Bit 3
+	#define TOP_CHUNK					0x4								// Bit 2
+	#define HEAP_TYPE					0x2								// Bit 1
+	#define PREV_INUSE					0x1								// Bit 0
 
 	#define TINY_CHUNK					512
 	#define TINY_BLOCKS					128
@@ -116,20 +120,20 @@
 		size_t			magic;						// Magic or poison (depends on chunk status)
 	} t_chunk;
 
-	typedef struct s_hiheap {
-		uint8_t 		total;						// 60 or 50
-		uint8_t 		used;
-		void			*next;
-	} t_hiheap;
+	typedef struct s_heap_header {
+		uint8_t 		total;						// 50 or 60 heaps (depends if there is arena data)
+		uint8_t 		used;						// 
+		void			*next;						// Pointer to next heap header
+	} t_heap_header;
 
-	typedef struct s_iheap {
+	typedef struct s_heap {
 		void			*ptr;						// Pointer to the heap
 		size_t			size;						// Size of the heap
 		size_t			free;						// Memory available for allocation in the heap
 		bool			active;						// Set to false when freed
 		int				type;						// Type of the heap
 		t_chunk			*top_chunk;					// Pointer to the top chunk
-	} t_iheap;
+	} t_heap;
 
 	typedef struct s_arena {
 		int				id;
@@ -139,7 +143,7 @@
 		void			*smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL) Doblemente enlazadas. Tamaños fijos (FIFO)
 		void			*unsortedbin;				// ???
 		void			*largebin[10];				// ???
-		t_hiheap		*hiheap;
+		t_heap_header	*heap_header;				// 
 		struct s_arena	*next;          			// Pointer to the next arena
 		mtx_t			mutex;          			// Mutex for thread safety in the current arena
 	} t_arena;
@@ -161,7 +165,7 @@
 		int				arena_count;				// Current number of arenas
 		t_options		options;					// Options
 		t_arena			arena;						// Main arena
-		mtx_t			mutex;						// Mutex for synchronizing access to the arenas
+		mtx_t			mutex;						// Mutex for global synchronization
 	} t_manager;
 
 #pragma endregion
