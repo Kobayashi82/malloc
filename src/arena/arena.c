@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 00:18:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:40:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,112 +36,28 @@
 
 	#pragma endregion
 
-	#pragma region "Terminate"
-
-		void arena_terminate2() {
-			t_arena *current, *next;
-
-			mutex(&g_manager.mutex, MTX_LOCK);
-
-				mutex(&g_manager.arena.mutex, MTX_DESTROY);
-				current = g_manager.arena.next;
-				while (current) {
-					mutex(&current->mutex, MTX_DESTROY);
-
-					// liberar zonas
-
-					next = current->next;
-					internal_free(current, sizeof(t_arena));
-					current = next;
-				}
-
-			mutex(&g_manager.mutex, MTX_UNLOCK);
-			mutex(&g_manager.mutex, MTX_DESTROY);
-
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Library finalized\n");
-		}
-
-		#include <fcntl.h>
-
-		void arena_terminate() {
-			t_arena	*arena, *next;
-			// t_heap	*heap;
-
-			// if debug, print memoria status (free, not free, heaps, etc.)
-
-			mutex(&g_manager.mutex, MTX_LOCK);
-
-				arena = &g_manager.arena;
-				while (arena) {
-					mutex(&arena->mutex, MTX_LOCK);
-
-						// Clean heaps
-
-						// if (internal_free(curr, sizeof(t_heap))) {
-						// 	result = 1;
-						// 	if (g_manager.options.DEBUG)						aprintf(2, "\t\t  [ERROR] Failed to unmap heap structure\n");
-						// }
-
-						// heap = arena->tiny;
-						// while (heap) {
-						// 	if (heap_free(heap->ptr, heap->size, TINY, &arena->tiny)) break;
-						// 	heap = arena->tiny;
-						// }
-
-						// heap = arena->small;
-						// while (heap) {
-						// 	if (heap_free(heap->ptr, heap->size, SMALL, &arena->small)) break;
-						// 	heap = arena->small;
-						// }
-
-						// heap = arena->large;
-						// while (heap) {
-						// 	if (heap_free(heap->ptr, heap->size, LARGE, &arena->large)) break;
-						// 	heap = arena->large;
-						// }
-
-						next = arena->next;
-					
-					mutex(&arena->mutex, MTX_UNLOCK);
-					mutex(&arena->mutex, MTX_DESTROY);
-
-					if (arena != &g_manager.arena) internal_free(arena, sizeof(t_arena));
-					arena = next;
-				}
-
-			mutex(&g_manager.mutex, MTX_UNLOCK);
-			mutex(&g_manager.mutex, MTX_DESTROY);
-
-			// No funciona write en el destructor
-			//
-			// if (g_manager.options.DEBUG) {
-			// 	int fd = open("/tmp/malloc_debug.log", O_CREAT | O_WRONLY | O_APPEND, 0644);
-			// 	if (fd != -1) {
-			// 		aprintf(fd, "\t\t [SYSTEM] Library finalized\n");
-			// 		close(fd);
-			// 	}
-			// }
-
-		}
-
-	#pragma endregion
-
 	#pragma region "Create"
 
 		#pragma region "Get CPUs"
 
 			int get_CPUs() {
-				int CPUs = 1;
+				static int CPUs = 0;
 
-				#ifdef _WIN32
-					SYSTEM_INFO sysinfo;
-					GetSystemInfo(&sysinfo);
-					CPUs = sysinfo.dwNumberOfProcessors;
-				#else
-					CPUs = sysconf(_SC_NPROCESSORS_ONLN);
-				#endif
+				if (!CPUs) {
+					int cores = 1;
 
-				return (CPUs <= 0 ? 1 : CPUs);
+					#ifdef _WIN32
+						SYSTEM_INFO sysinfo;
+						GetSystemInfo(&sysinfo);
+						cores = (int)sysinfo.dwNumberOfProcessors;
+					#else
+						cores = (int)sysconf(_SC_NPROCESSORS_ONLN);
+					#endif
+
+					CPUs = (cores <= 0 ? 1 : cores);
+				}
+
+				return (CPUs);
 			}
 
 		#pragma endregion
@@ -151,7 +67,7 @@
 			static int arena_can_create() {
 				if (!g_manager.options.ARENA_MAX) {
 					if (g_manager.arena_count >= g_manager.options.ARENA_TEST) {
-						g_manager.options.ARENA_MAX = ft_min(get_CPUs() * 2, ARENAS_MAX);
+						g_manager.options.ARENA_MAX = ft_min(get_CPUs() * 2, ARCHITECTURE * 2);
 						return (g_manager.arena_count < g_manager.options.ARENA_MAX);
 					} else return (1);
 				}

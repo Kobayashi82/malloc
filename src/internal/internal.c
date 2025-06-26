@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 23:41:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 14:28:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 #pragma region "Mutex"
 
-	int mutex(mtx_t *ptr_mutex, e_mutex action) {
+	int mutex(mtx_t *ptr_mutex, int action) {
 		int result = 0;
 
 		switch (action) {
@@ -70,10 +70,10 @@
 
 		static void prepare_fork() {
 			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Prepare fork\n");
-			
+
 			int ret = try_lock_timeout(&g_manager.mutex, 1000);
 			if (ret) return;
-			
+
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
 				ret = try_lock_timeout(&arena->mutex, 1000);
@@ -128,13 +128,20 @@
 #pragma region "Page Size"
 
 	size_t get_pagesize() {
-		#ifdef _WIN32
-			SYSTEM_INFO info;
-			GetSystemInfo(&info);
-			return (info.dwPageSize);
-		#else
-			return ((size_t)sysconf(_SC_PAGESIZE));
-		#endif
+		static size_t pagesize = 0;
+
+		if (!pagesize) {
+			#ifdef _WIN32
+				SYSTEM_INFO info;
+				GetSystemInfo(&info);
+				pagesize = (size_t)info.dwPageSize;
+			#else
+				pagesize = (size_t)sysconf(_SC_PAGESIZE);
+			#endif
+		}
+
+		if (!pagesize) pagesize = 4096;
+		return (pagesize);
 	}
 
 #pragma endregion
@@ -144,7 +151,7 @@
 	#pragma region "Alloc"
 
 		void *internal_alloc(size_t size) {
-			void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			void *ptr = mmap(NULL, ALIGN(size), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 			if (ptr == MAP_FAILED) {
 				if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
 				abort();
@@ -168,6 +175,96 @@
 		}
 
 	#pragma endregion
+
+#pragma endregion
+
+#pragma region "Terminate"
+
+	void arena_terminate2() {
+		t_arena *current, *next;
+
+		mutex(&g_manager.mutex, MTX_LOCK);
+
+			mutex(&g_manager.arena.mutex, MTX_DESTROY);
+			current = g_manager.arena.next;
+			while (current) {
+				mutex(&current->mutex, MTX_DESTROY);
+
+				// liberar zonas
+
+				next = current->next;
+				internal_free(current, sizeof(t_arena));
+				current = next;
+			}
+
+		mutex(&g_manager.mutex, MTX_UNLOCK);
+		mutex(&g_manager.mutex, MTX_DESTROY);
+
+		if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Library finalized\n");
+	}
+
+	#include <fcntl.h>
+
+	void arena_terminate() {
+		t_arena	*arena, *next;
+		// t_heap	*heap;
+
+		// if debug, print memoria status (free, not free, heaps, etc.)
+
+		mutex(&g_manager.mutex, MTX_LOCK);
+
+			arena = &g_manager.arena;
+			while (arena) {
+				mutex(&arena->mutex, MTX_LOCK);
+
+					// Clean heaps
+
+					// if (internal_free(curr, sizeof(t_heap))) {
+					// 	result = 1;
+					// 	if (g_manager.options.DEBUG)						aprintf(2, "\t\t  [ERROR] Failed to unmap heap structure\n");
+					// }
+
+					// heap = arena->tiny;
+					// while (heap) {
+					// 	if (heap_free(heap->ptr, heap->size, TINY, &arena->tiny)) break;
+					// 	heap = arena->tiny;
+					// }
+
+					// heap = arena->small;
+					// while (heap) {
+					// 	if (heap_free(heap->ptr, heap->size, SMALL, &arena->small)) break;
+					// 	heap = arena->small;
+					// }
+
+					// heap = arena->large;
+					// while (heap) {
+					// 	if (heap_free(heap->ptr, heap->size, LARGE, &arena->large)) break;
+					// 	heap = arena->large;
+					// }
+
+					next = arena->next;
+				
+				mutex(&arena->mutex, MTX_UNLOCK);
+				mutex(&arena->mutex, MTX_DESTROY);
+
+				if (arena != &g_manager.arena) internal_free(arena, sizeof(t_arena));
+				arena = next;
+			}
+
+		mutex(&g_manager.mutex, MTX_UNLOCK);
+		mutex(&g_manager.mutex, MTX_DESTROY);
+
+		// No funciona write en el destructor
+		//
+		// if (g_manager.options.DEBUG) {
+		// 	int fd = open("/tmp/malloc_debug.log", O_CREAT | O_WRONLY | O_APPEND, 0644);
+		// 	if (fd != -1) {
+		// 		aprintf(fd, "\t\t [SYSTEM] Library finalized\n");
+		// 		close(fd);
+		// 	}
+		// }
+
+	}
 
 #pragma endregion
 

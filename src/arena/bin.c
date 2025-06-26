@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 00:20:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:54:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 	#pragma region "Split"
 
-		// static t_chunk *split_top_chunk(t_heap *heap, t_chunk_int size) {
+		// static t_chunk *split_top_chunk(t_heap *heap, size_t size) {
 		// 	if (!heap || !heap->active || !heap->top_chunk || !size) return (NULL);
 
 		// 	t_chunk	*top_chunk = heap->top_chunk;	
@@ -46,7 +46,7 @@
 
 	#pragma region "New Chunk"
 
-		// static void *new_chunk(t_arena *arena, t_chunk_int size, e_heaptype type) {
+		// static void *new_chunk(t_arena *arena, size_t size, int type) {
 		// 	if (!arena || !size || type < TINY || type > SMALL) return (NULL);
 
 		// 	void	*ptr = NULL;

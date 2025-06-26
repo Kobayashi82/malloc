@@ -6,13 +6,15 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 13:19:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:39:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "arena.h"
+	#include "internal.h"
+
+	#include <time.h>
 
 #pragma endregion
 
@@ -82,7 +84,7 @@
 	#pragma region "ARENA_MAX"
 
 		int validate_arena_max(int value) {
-			int max = ARENAS_MAX;
+			int max = ARCHITECTURE * 2;
 
 			if ((value <= 0 || value > max) && g_manager.options.ARENA_MAX) return (g_manager.options.ARENA_MAX);
 			if (value < 0)		return (0);

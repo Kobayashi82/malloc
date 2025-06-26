@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 00:21:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 14:29:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,8 +122,8 @@
 
 		// Add to bins
 		next_chunk->size &= ~PREV_INUSE;
-		t_chunk_int chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
-		if (chunk_size <= (t_chunk_int)g_manager.options.MXFAST) {
+		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
+		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
 			if (g_manager.options.DEBUG)	aprintf(2, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
 			link_chunk(chunk, chunk_size, FASTBIN, arena);
 		} else {

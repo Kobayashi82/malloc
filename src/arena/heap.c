@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 00:24:45 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:54:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 
 		#pragma region "Allocate"
 
-			static t_iheap *heap_allocate(t_arena *arena, size_t size, e_heaptype type) {
+			static t_iheap *heap_allocate(t_arena *arena, size_t size, int type) {
 				if (!size || type < 0 || type > 2) {
 					if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to create heap\n", size);
 					return (NULL);
@@ -118,12 +118,12 @@
 
 				if (type == LARGE) {
 					t_chunk *chunk = (t_chunk *)ptr;
-					chunk->prev_size = 0;
+					// chunk->prev_size = 0;
 					chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | TOP_CHUNK;
 					ptr = (void *)((char *)chunk + sizeof(t_chunk));
 				} else {
 					t_chunk *chunk = (t_chunk *)ptr;
-					chunk->prev_size = 0;
+					// chunk->prev_size = 0;
 					chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | (type == SMALL ? HEAP_TYPE : 0) | TOP_CHUNK;
 					ptr = (void *)((char *)chunk + sizeof(t_chunk));
 				}
@@ -137,7 +137,7 @@
 
 		#pragma region "Create"
 
-			void *heap_create(t_arena *arena, e_heaptype type, size_t size) {
+			void *heap_create(t_arena *arena, int type, size_t size) {
 				if (!tcache || !size || type < 0 || type > 2) return (NULL);
 
 				t_iheap	*iheap = NULL;
@@ -170,7 +170,7 @@
 
 		#pragma region "Free"
 
-			// int heap_free(void *ptr, size_t size, e_heaptype type, t_heap *heap) {
+			// int heap_free(void *ptr, size_t size, int type, t_heap *heap) {
 			// 	if (!ptr || !size || type < 0 || type > 2 || !heap) {
 			// 		if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to detroy heap\n");
 			// 		return (1);
@@ -204,7 +204,7 @@
 
 		#pragma region "Destroy"
 
-			// int heap_destroy(void *ptr, size_t size, e_heaptype type) {
+			// int heap_destroy(void *ptr, size_t size, int type) {
 			// 	if (!tcache || !ptr || !size || type < 0 || type > 2) return (1);
 
 			// 	t_arena *arena = tcache;

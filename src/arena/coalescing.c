@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 00:21:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 13:55:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 #pragma endregion
 
-int link_chunk(t_chunk *chunk, t_chunk_int size, e_bintype type, t_arena *arena) {
+int link_chunk(t_chunk *chunk, size_t size, int type, t_arena *arena) {
 	if (!chunk || !size || !arena || chunk->size & TOP_CHUNK) return (1);
 
 	switch (type) {
@@ -42,8 +42,8 @@ int link_chunk(t_chunk *chunk, t_chunk_int size, e_bintype type, t_arena *arena)
 int unlink_chunk(t_chunk *chunk, t_arena *arena) {
 	if (!chunk || !arena) return (1);
 
-	t_chunk_int chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
-	if (chunk_size <= (t_chunk_int)g_manager.options.MXFAST) {
+	size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
+	if (chunk_size <= (size_t)g_manager.options.MXFAST) {
 		int index = (chunk_size - 1) / ALIGNMENT;
 		if (index >= g_manager.options.MXFAST / ALIGNMENT) return (1);
 
@@ -55,7 +55,7 @@ int unlink_chunk(t_chunk *chunk, t_arena *arena) {
 			}
 			curr = &(GET_FD(*curr));
 		}
-	} else if (chunk_size <= (t_chunk_int)g_manager.options.MXFAST) { // Limite de smallbin
+	} else if (chunk_size <= (size_t)g_manager.options.MXFAST) { // Limite de smallbin
 
 	} else { // buscar en unsortedbin y en largebin
 
@@ -66,41 +66,41 @@ int unlink_chunk(t_chunk *chunk, t_arena *arena) {
 	return (1);
 }
 
-t_chunk *coalescing(t_chunk *chunk, t_arena *arena, t_iheap *heap) {
-	if (!chunk || !arena || !heap) return (chunk);
+// t_chunk *coalescing(t_chunk *chunk, t_arena *arena, t_iheap *heap) {
+// 	if (!chunk || !arena || !heap) return (chunk);
 
-	t_chunk *chunk_prev = NULL;
-	t_chunk *chunk_next = NULL;
-	t_chunk *chunk_final = NULL;
+// 	t_chunk *chunk_prev = NULL;
+// 	t_chunk *chunk_next = NULL;
+// 	t_chunk *chunk_final = NULL;
 
-	// Coalescing Left (If not USED and FASTBIN)
-	if (!(chunk->size & PREV_INUSE) && chunk->prev_size + sizeof(t_chunk) > (t_chunk_int)g_manager.options.MXFAST) {
-		chunk_prev = GET_PREV(chunk);
-		unlink_chunk(chunk_prev, arena);
-		chunk_prev->size = (chunk_prev->size & (HEAP_TYPE | PREV_INUSE)) | (chunk->prev_size + GET_SIZE(chunk) + sizeof(t_chunk));
-		chunk_next = GET_NEXT(chunk_prev);
-		chunk_next->prev_size = GET_SIZE(chunk_prev);
-		chunk_final = chunk_prev;
-	}
-	if (!chunk_final) chunk_final = chunk;
+// 	// Coalescing Left (If not USED and FASTBIN)
+// 	if (!(chunk->size & PREV_INUSE) && chunk->prev_size + sizeof(t_chunk) > (size_t)g_manager.options.MXFAST) {
+// 		chunk_prev = GET_PREV(chunk);
+// 		unlink_chunk(chunk_prev, arena);
+// 		chunk_prev->size = (chunk_prev->size & (HEAP_TYPE | PREV_INUSE)) | (chunk->prev_size + GET_SIZE(chunk) + sizeof(t_chunk));
+// 		chunk_next = GET_NEXT(chunk_prev);
+// 		chunk_next->prev_size = GET_SIZE(chunk_prev);
+// 		chunk_final = chunk_prev;
+// 	}
+// 	if (!chunk_final) chunk_final = chunk;
 
-	// Coalescing Right (if not USED and FASTBIN)
-	chunk_next = GET_NEXT(chunk);
-	if (chunk_next->size & TOP_CHUNK) {
-		unlink_chunk(chunk_next, arena);
-		chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | TOP_CHUNK | (GET_SIZE(chunk_next) + GET_SIZE(chunk_final) + sizeof(t_chunk));
-		heap->top_chunk = chunk_final;
-	} else {
-		t_chunk *chunk_next_next = GET_NEXT(chunk_next);
-		if (!(chunk_next_next->size & PREV_INUSE) && chunk_next_next->prev_size + sizeof(t_chunk) > (t_chunk_int)g_manager.options.MXFAST) {
-			unlink_chunk(chunk_next, arena);
-			chunk_next_next->prev_size = GET_SIZE(chunk_final) + GET_SIZE(chunk_next) + sizeof(t_chunk);
-			chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | chunk_next_next->prev_size;
-		}
-	}
+// 	// Coalescing Right (if not USED and FASTBIN)
+// 	chunk_next = GET_NEXT(chunk);
+// 	if (chunk_next->size & TOP_CHUNK) {
+// 		unlink_chunk(chunk_next, arena);
+// 		chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | TOP_CHUNK | (GET_SIZE(chunk_next) + GET_SIZE(chunk_final) + sizeof(t_chunk));
+// 		heap->top_chunk = chunk_final;
+// 	} else {
+// 		t_chunk *chunk_next_next = GET_NEXT(chunk_next);
+// 		if (!(chunk_next_next->size & PREV_INUSE) && chunk_next_next->prev_size + sizeof(t_chunk) > (size_t)g_manager.options.MXFAST) {
+// 			unlink_chunk(chunk_next, arena);
+// 			chunk_next_next->prev_size = GET_SIZE(chunk_final) + GET_SIZE(chunk_next) + sizeof(t_chunk);
+// 			chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | chunk_next_next->prev_size;
+// 		}
+// 	}
 
-	return (chunk_final);
-}
+// 	return (chunk_final);
+// }
 
 // MINSIZE = 32 bits = 16 y 64 bits = 24
 

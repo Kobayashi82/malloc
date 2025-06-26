@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 22:44:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/26 14:29:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@
 		} else arena = tcache;
 
 		// If ptr is not allocated by us, delegate to native realloc
-		if (!heap_find(ptr, arena)) return (realrealloc(ptr, size));
+		// if (!heap_find(ptr, arena)) return (realrealloc(ptr, size));
 
 		// Extend chunk or malloc(size)
 		// Free old chunk if apply
