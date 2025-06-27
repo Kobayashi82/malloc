@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 14:53:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 22:36:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,11 +230,11 @@
 
 		threads_create();
 
-		// fork_test();					// Fork with threads
+		fork_test();					// Fork with threads
 
 		threads_join();
 
-		// fork_test();
+		fork_test();
 
 		aprintf(2, "\n");
 		return (0);

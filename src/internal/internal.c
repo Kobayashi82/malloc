@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 16:59:45 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 22:40:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,98 @@
 
 #pragma endregion
 
+#pragma region "Fork"
+
+	#pragma region "Prepare"
+
+		static int try_lock_timeout(pthread_mutex_t *mtx_ptr, int timeout) {
+			for (int i = 0; i < timeout; i++) {
+				int ret = mutex(mtx_ptr, MTX_TRYLOCK);
+				if (!ret) return (0);
+
+				if (ret != EBUSY) {
+					if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] locking mutex in fork\n");
+					return (ret);
+				}
+				
+				// Wait 1ms before next try
+				#ifdef _WIN32
+					Sleep(1);
+				#else
+					usleep(1000);
+				#endif
+			}
+
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] timeout locking mutex in fork\n");
+			return (ETIMEDOUT);
+		}
+
+		static void prepare_fork() {
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Prepare fork\n");
+
+			int ret = try_lock_timeout(&g_manager.mutex, 1000);
+			if (ret) return;
+
+			t_arena *arena = &g_manager.arena;
+			while (arena) {
+				ret = try_lock_timeout(&arena->mutex, 1000);
+				if (ret) {
+					t_arena *arena_ptr = arena;
+					arena = &g_manager.arena;
+					while (arena && arena != arena_ptr) {
+						mutex(&arena->mutex, MTX_UNLOCK);
+						arena = arena->next;
+					}
+					mutex(&g_manager.mutex, MTX_UNLOCK);
+					return;
+				}
+				arena = arena->next;
+			}
+		}
+
+	#pragma endregion
+
+	#pragma region "Parent"
+
+		static void parent_fork() {
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Parent fork\n");
+
+			t_arena *arena = &g_manager.arena;
+			while (arena) {
+				mutex(&arena->mutex, MTX_UNLOCK);
+				arena = arena->next;
+			}
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+		}
+
+	#pragma endregion
+
+	#pragma region "Child"
+
+		static void child_fork() {
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Child fork\n");
+
+			t_arena *arena = &g_manager.arena;
+			while (arena) {
+				mutex(&arena->mutex, MTX_UNLOCK);
+				arena = arena->next;
+			}
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+		}
+
+	#pragma endregion
+
+	static void do_init(void) {
+		pthread_atfork(prepare_fork, parent_fork, child_fork);
+	}
+
+	void forksafe_init() {
+		static pthread_once_t init_once = PTHREAD_ONCE_INIT;
+		pthread_once(&init_once, do_init);
+	}
+
+#pragma endregion
+
 #pragma region "Alloc"
 
 	void *internal_alloc(size_t size) {
@@ -95,13 +187,13 @@
 
 #pragma endregion
 
-#pragma region "Constructor"
+#pragma region "Initialize"
 
 	void ensure_init() {
-		static int initialized = 0;
+		static bool initialized;
 
 		if (!initialized) {
-			initialized = 1;
+			initialized = true;
 			mutex(&g_manager.mutex, MTX_INIT);
 			get_pagesize();
 			options_initialize();

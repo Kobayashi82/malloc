@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 16:55:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 22:34:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,7 @@
 	int		mutex(pthread_mutex_t *ptr_mutex, int action);
 	void	*internal_alloc(size_t size);
 	int		internal_free(void *ptr, size_t size);
+	void	forksafe_init();
 	void	ensure_init();
 	size_t	get_pagesize();
 

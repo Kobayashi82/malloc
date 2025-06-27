@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 14:51:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 22:35:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,10 +119,15 @@
 #pragma region "Get"
 
 	t_arena *arena_get() {
-		static bool initialized;
+		static bool initialized, forksafe;
 		t_arena *arena = NULL;
 
 		mutex(&g_manager.mutex, MTX_LOCK);
+
+			if (initialized && !forksafe) {
+				forksafe = true;
+				forksafe_init();
+			}
 
 			if (!initialized) {
 				initialized = true;
