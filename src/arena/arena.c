@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 22:35:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 00:50:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,13 +80,14 @@
 			if (!arena_can_create()) return (NULL);
 
 			t_arena *new_arena = internal_alloc(PAGE_SIZE);
+			if (!new_arena) return (NULL);
 			arena_initialize((t_arena *)new_arena);
 
 			t_arena *current = &g_manager.arena;
 			while (current->next) current = current->next;
 			current->next = new_arena;
 
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d created\n", new_arena->id);
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t [SYSTEM] Arena #%d created\n", new_arena->id);
 
 			return (new_arena);
 		}
@@ -119,27 +120,22 @@
 #pragma region "Get"
 
 	t_arena *arena_get() {
-		static bool initialized, forksafe;
+		static bool initialized;
 		t_arena *arena = NULL;
 
 		mutex(&g_manager.mutex, MTX_LOCK);
-
-			if (initialized && !forksafe) {
-				forksafe = true;
-				forksafe_init();
-			}
 
 			if (!initialized) {
 				initialized = true;
 				arena_initialize(&g_manager.arena);
 				arena = &g_manager.arena;
-				if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
 			}
 			if (!arena) arena = arena_reuse();
 			if (!arena) arena = arena_create();
 			if (!arena) arena = &g_manager.arena;
 
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d assigned\n", arena->id);
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t [SYSTEM] Arena #%d assigned\n", arena->id);
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 

@@ -1,0 +1,115 @@
+		 [SYSTEM] Arena #0 created
+		 [SYSTEM] Arena #1 created
+		 [SYSTEM] Arena #1 assigned
+0x75d92f75e000	 [SYSTEM] Heap of size TINY (65536) allocated
+0x75d92f75e010	 [MALLOC] Allocated 16 bytes
+0x75d92f75e000	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e010	   [FREE] Memory freed of size 32 bytes
+0x75d92f75e010	  [ERROR] Double free
+0x75d92f6de000	 [SYSTEM] Heap of size SMALL (524288) allocated
+0x75d92f6de010	 [MALLOC] Allocated 570 bytes
+0x75d92f6de000	 [SYSTEM] Coalescing adjacent chunks
+0x75d92f6de000	 [SYSTEM] Chunk added to UnsortedBin
+0x75d92f6de010	   [FREE] Memory freed of size 592 bytes
+0x75d92f2ff010	 [MALLOC] Allocated 1048576 bytes
+0x75d92f2ff010	   [FREE] Memory freed
+0x75d92f75e010	 [SYSTEM] Fastbin match for size 32 bytes
+0x75d92f75e010	 [MALLOC] Allocated 16 bytes
+0x75d92f75e030	[REALLOC] Memory reassigned from 0x75d92f75e010 with 64 bytes
+0x75d92f75e000	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e010	   [FREE] Memory freed of size 32 bytes
+0x75d92f75e020	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e030	   [FREE] Memory freed of size 80 bytes
+0x75d92f75e080	 [CALLOC] Allocated 16 bytes
+0x75d92f75e1b0	 [CALLOC] Allocated 16 bytes
+		 [SYSTEM] Arena #1 assigned
+0x75d92f75e030	 [SYSTEM] Fastbin match for size 80 bytes
+0x75d92f75e030	 [MALLOC] Allocated 64 bytes
+0x75d92f75e020	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e030	   [FREE] Memory freed of size 80 bytes
+0x75d92f75e2e0	 [CALLOC] Allocated 16 bytes
+		 [SYSTEM] Arena #1 assigned
+0x75d92dafc010	 [MALLOC] Allocated 1048576 bytes
+0x75d92f75e030	 [SYSTEM] Fastbin match for size 80 bytes
+0x75d92f75e030	 [MALLOC] Allocated 64 bytes
+0x75d92dafc010	   [FREE] Memory freed
+		 [SYSTEM] Arena #2 created
+		 [SYSTEM] Arena #2 assigned
+0x75d92f6ce000	 [SYSTEM] Heap of size TINY (65536) allocated
+0x75d92f6ce010	 [MALLOC] Allocated 64 bytes
+0x75d92f75e410	 [CALLOC] Allocated 16 bytes
+0x75d92f6ce000	 [SYSTEM] Chunk added to FastBin
+0x75d92f6ce010	   [FREE] Memory freed of size 80 bytes
+0x75d92f75e020	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e030	   [FREE] Memory freed of size 80 bytes
+0x75d92dafc010	 [MALLOC] Allocated 1048576 bytes
+		 [SYSTEM] Prepare fork
+0x75d92dafc010	   [FREE] Memory freed
+0x75d92d1fa010	 [MALLOC] Allocated 1048576 bytes
+0x75d92d1fa010	   [FREE] Memory freed
+		 [SYSTEM] Parent fork
+		 [SYSTEM] Child fork
+		 [SYSTEM] Prepare fork
+		 [SYSTEM] Arena #1 assigned
+0x75d92f75e030	 [SYSTEM] Fastbin match for size 80 bytes
+0x75d92f75e030	 [MALLOC] Allocated 64 bytes
+0x75d92f75e020	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e030	   [FREE] Memory freed of size 80 bytes
+0x75d92dafc010	 [MALLOC] Allocated 1048576 bytes
+0x75d92dafc010	   [FREE] Memory freed
+		 [SYSTEM] Parent fork
+		 [SYSTEM] Child fork
+0x75d92f75e010	 [SYSTEM] Fastbin match for size 32 bytes
+0x75d92f75e010	 [MALLOC] Allocated 16 bytes
+0x75d92f75e010	 [SYSTEM] Fastbin match for size 32 bytes
+0x75d92f75e000	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e010	 [MALLOC] Allocated 16 bytes
+0x75d92f75e010	   [FREE] Memory freed of size 32 bytes
+0x75d92f75e010	  [ERROR] Double free
+0x75d92f75e000	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e010	   [FREE] Memory freed of size 32 bytes
+0x75d92f75e010	  [ERROR] Double free
+0x75d92f64e000	 [SYSTEM] Heap of size SMALL (524288) allocated
+0x75d92f64e010	 [MALLOC] Allocated 570 bytes
+0x75d92f64e000	 [SYSTEM] Coalescing adjacent chunks
+0x75d92f64e000	 [SYSTEM] Chunk added to UnsortedBin
+0x75d92f64e010	   [FREE] Memory freed of size 592 bytes
+0x75d92f64e000	 [SYSTEM] Heap of size SMALL (524288) allocated
+0x75d92f64e010	 [MALLOC] Allocated 570 bytes
+0x75d92f64e000	 [SYSTEM] Coalescing adjacent chunks
+0x75d92f64e000	 [SYSTEM] Chunk added to UnsortedBin
+0x75d92dafc010	 [MALLOC] Allocated 1048576 bytes
+0x75d92f64e010	   [FREE] Memory freed of size 592 bytes
+0x75d92dafc010	 [MALLOC] Allocated 1048576 bytes
+0x75d92dafc010	   [FREE] Memory freed
+0x75d92dafc010	   [FREE] Memory freed
+		 [SYSTEM] Prepare fork
+		 [SYSTEM] Parent fork
+		 [SYSTEM] Child fork
+		 [SYSTEM] Prepare fork
+		 [SYSTEM] Parent fork
+		 [SYSTEM] Child fork
+0x75d92f75e010	 [SYSTEM] Fastbin match for size 32 bytes
+0x75d92f75e010	 [SYSTEM] Fastbin match for size 32 bytes
+0x75d92f75e010	 [MALLOC] Allocated 16 bytes
+0x75d92f75e010	 [MALLOC] Allocated 16 bytes
+0x75d92f75e000	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e000	 [SYSTEM] Chunk added to FastBin
+0x75d92f75e010	   [FREE] Memory freed of size 32 bytes
+0x75d92f75e010	   [FREE] Memory freed of size 32 bytes
+0x75d92f75e010	  [ERROR] Double free
+0x75d92f75e010	  [ERROR] Double free
+0x75d92f64e000	 [SYSTEM] Heap of size SMALL (524288) allocated
+0x75d92f64e000	 [SYSTEM] Heap of size SMALL (524288) allocated
+0x75d92f64e010	 [MALLOC] Allocated 570 bytes
+0x75d92f64e010	 [MALLOC] Allocated 570 bytes
+0x75d92f64e000	 [SYSTEM] Coalescing adjacent chunks
+0x75d92f64e000	 [SYSTEM] Chunk added to UnsortedBin
+0x75d92f64e000	 [SYSTEM] Coalescing adjacent chunks
+0x75d92f64e010	   [FREE] Memory freed of size 592 bytes
+0x75d92f64e000	 [SYSTEM] Chunk added to UnsortedBin
+0x75d92f64e010	   [FREE] Memory freed of size 592 bytes
+0x75d92dafc010	 [MALLOC] Allocated 1048576 bytes
+0x75d92dafc010	 [MALLOC] Allocated 1048576 bytes
+0x75d92dafc010	   [FREE] Memory freed
+0x75d92dafc010	   [FREE] Memory freed

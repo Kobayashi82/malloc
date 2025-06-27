@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 14:31:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 23:13:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,17 @@
 		// options_initialize();
 		// printf("%s\n", g_manager.options.LOGFILE);
 
-		char *popo = malloc(15);
+		char *popo = malloc(0);
+		char *popo1 = malloc(0);
+		char *popo2 = malloc(0);
+		char *popo3 = malloc(0);
+		char *popo4 = malloc(0);
 		// popo += 8;
 		free(popo);
-
+		free(popo1);
+		free(popo2);
+		free(popo3);
+		free(popo4);
 		// print_freelist_ranges();
 		//while(1);
 	}

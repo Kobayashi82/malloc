@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 12:25:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 17:17:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 23:59:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 			arena = arena_get();
 			tcache = arena;
 			if (!arena) {
-				if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Failed to assign arena\n");
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to assign arena\n");
 				return (NULL);
 			}
 		} else arena = tcache;
@@ -48,8 +48,8 @@
 				if (ptr) ft_memset(ptr, 0, total);
 			}
 
-			if (ptr && g_manager.options.DEBUG)	aprintf(2, "%p\t [CALLOC] Allocated %d bytes\n", ptr, size);
-			else if (g_manager.options.DEBUG)	aprintf(2, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
+			if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [CALLOC] Allocated %d bytes\n", ptr, size);
+			else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
 
 			if (ptr) SET_MAGIC(ptr);
 

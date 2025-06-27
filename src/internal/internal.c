@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 22:40:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 00:52:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,11 @@
 			case MTX_TRYLOCK:	return (pthread_mutex_trylock(ptr_mutex));
 		}
 
-		if (result) abort();
+		if (result) {
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Mutex failed\n");
+			abort();
+		}
+
 		return (result);
 	}
 
@@ -67,13 +71,13 @@
 
 	#pragma region "Prepare"
 
-		static int try_lock_timeout(pthread_mutex_t *mtx_ptr, int timeout) {
+		int try_lock_timeout(pthread_mutex_t *mtx_ptr, int timeout) {
 			for (int i = 0; i < timeout; i++) {
 				int ret = mutex(mtx_ptr, MTX_TRYLOCK);
 				if (!ret) return (0);
 
 				if (ret != EBUSY) {
-					if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] locking mutex in fork\n");
+					if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] locking mutex in fork\n");
 					return (ret);
 				}
 				
@@ -85,12 +89,12 @@
 				#endif
 			}
 
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] timeout locking mutex in fork\n");
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] timeout locking mutex in fork\n");
 			return (ETIMEDOUT);
 		}
 
-		static void prepare_fork() {
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Prepare fork\n");
+		void prepare_fork() {
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t [SYSTEM] Prepare fork\n");
 
 			int ret = try_lock_timeout(&g_manager.mutex, 1000);
 			if (ret) return;
@@ -116,8 +120,8 @@
 
 	#pragma region "Parent"
 
-		static void parent_fork() {
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Parent fork\n");
+		void parent_fork() {
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t [SYSTEM] Parent fork\n");
 
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
@@ -131,8 +135,8 @@
 
 	#pragma region "Child"
 
-		static void child_fork() {
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Child fork\n");
+		void child_fork() {
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t [SYSTEM] Child fork\n");
 
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
@@ -144,14 +148,18 @@
 
 	#pragma endregion
 
-	static void do_init(void) {
-		pthread_atfork(prepare_fork, parent_fork, child_fork);
-	}
+	#pragma region "Initialize"
 
-	void forksafe_init() {
-		static pthread_once_t init_once = PTHREAD_ONCE_INIT;
-		pthread_once(&init_once, do_init);
-	}
+		void do_init(void) {
+			pthread_atfork(prepare_fork, parent_fork, child_fork);
+		}
+
+		void forksafe_init() {
+			static pthread_once_t init_once = PTHREAD_ONCE_INIT;
+			pthread_once(&init_once, do_init);
+		}
+
+	#pragma endregion
 
 #pragma endregion
 
@@ -163,8 +171,8 @@
 		size_t total_size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 		void *ptr = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (ptr == MAP_FAILED) {
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
-			abort();
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
+			abort(); return (NULL);
 		}
 
 		return (ptr);
@@ -178,11 +186,20 @@
 		if (!ptr || !size) return (0);
 
 		if (munmap(ptr, size)) {
-			if (g_manager.options.DEBUG) aprintf(2, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
 			return (1);
 		}
 
 		return (0);
+	}
+
+#pragma endregion
+
+#pragma region "Abort"
+
+	int abort_now() {
+		if (!g_manager.options.CHECK_ACTION) abort();
+		return (1);
 	}
 
 #pragma endregion
@@ -197,7 +214,8 @@
 			mutex(&g_manager.mutex, MTX_INIT);
 			get_pagesize();
 			options_initialize();
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d created\n", g_manager.arena.id);
+			forksafe_init();
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t [SYSTEM] Arena #%d created\n", g_manager.arena.id);
 		}
 	}
 

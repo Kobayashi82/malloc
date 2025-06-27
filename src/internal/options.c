@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 17:00:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 00:44:11 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,9 @@
 	#pragma region "CHECK_ACTION"
 
 		int validate_check_action(int value) {
-			if (value < 0)	return (0);
-			return (value & 7);
+			if (value < 0)		return (0);
+			if (value > 2)		return (2);
+			return (value);
 		}
 
 	#pragma endregion
@@ -122,6 +123,8 @@
 				ft_strlcat(g_manager.options.LOGFILE, "/", PATH_MAX);
 				ft_strlcat(g_manager.options.LOGFILE, value, PATH_MAX);				// Filename
 			}
+
+			g_manager.options.fd_out = open(g_manager.options.LOGFILE, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 		}
 
 	#pragma endregion
@@ -169,6 +172,7 @@
 		if (var && ft_isdigit_s(var))	g_manager.options.LOGGING = (ft_atoi(var));
 		else							g_manager.options.LOGGING = 0;
 
+		g_manager.options.fd_out = 2;
 		if (g_manager.options.DEBUG && g_manager.options.LOGGING) {
 			var = getenv("MALLOC_LOGFILE");
 			if (var)	validate_logfile(var);
@@ -187,7 +191,7 @@
 		mutex(&g_manager.mutex, MTX_LOCK);
 
 			if (g_manager.arena_count) {
-				if (g_manager.options.DEBUG) aprintf(2, "\t[MALLOPT] Changes are not allowed after the first allocation\n");
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t[MALLOPT] Changes are not allowed after the first allocation\n");
 				return (1);
 			}
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 17:31:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 23:59:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 			}
 
 			if (!real_realloc_win) {
-				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
 				return (NULL);
 			}
 
@@ -39,14 +39,14 @@
 			if (!real_realloc_unix) real_realloc_unix = dlsym(((void *) -1L), "realloc");
 
 			if (!real_realloc_unix) {
-				if (g_manager.options.DEBUG)	aprintf(2, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
 				return (NULL);
 			}
 
 			void *new_ptr = real_realloc_unix(ptr, size);
 		#endif
 
-		if (g_manager.options.DEBUG)			aprintf(2, "%p\t[REALLOC] Delegated to the native realloc from %p with %d bytes\n", new_ptr, ptr, size);
+		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, "%p\t[REALLOC] Delegated to the native realloc from %p with %d bytes\n", new_ptr, ptr, size);
 		return (new_ptr);
 	}
 
@@ -68,7 +68,7 @@
 			arena = arena_get();
 			tcache = arena;
 			if (!arena) {
-				if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Failed to assign arena\n");
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to assign arena\n");
 				return (NULL);
 			}
 		} else arena = tcache;
@@ -88,7 +88,7 @@
 			else												new_ptr = find_memory(arena, size);
 
 			if (!new_ptr) {
-				if ( g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Failed to re-allocated %d bytes\n", size);
+				if ( g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to re-allocated %d bytes\n", size);
 				mutex(&arena->mutex, MTX_UNLOCK);
 				free(ptr);
 				return (NULL);
@@ -99,7 +99,7 @@
 			if (size < copy_size) copy_size = size;
 			ft_memcpy(new_ptr, ptr, copy_size);
 
-			if (g_manager.options.DEBUG) aprintf(2, "%p\t[REALLOC] Memory reassigned from %p with %d bytes\n", new_ptr, ptr, size);
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t[REALLOC] Memory reassigned from %p with %d bytes\n", new_ptr, ptr, size);
 
 			if (new_ptr) SET_MAGIC(new_ptr);
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 22:34:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 00:46:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 	#include <errno.h>
 	#include <pthread.h>
 	#include <dlfcn.h>
+	#include <fcntl.h>
 	#include <sys/mman.h>
 
 	#ifdef _WIN32
@@ -80,6 +81,7 @@
 	#define GET_SIZE(chunk) 			(size_t)((chunk)->size & ~15)
 
 	// ALIGMENTS
+	#define ZERO_MALLOC_BASE			(void *)0x1000					// 
 	#define PAGE_SIZE					get_pagesize()					// 4096 bytes
 	#define ALIGNMENT					(uint8_t)(ARCHITECTURE / 4)		// 8 or 16 bytes
 	#define IS_ALIGNED(ptr)				(((uintptr_t)GET_HEAD(ptr) & (ALIGNMENT - 1)) == 0)
@@ -153,12 +155,14 @@
 		bool			DEBUG;						// 
 		bool			LOGGING;					// 
 		char 			LOGFILE[PATH_MAX];			// 
+		int				fd_out;						// 
 	} t_options;
 
 	typedef struct s_manager {
 		int				arena_count;				// Current number of arenas
 		t_options		options;					// Options
 		t_arena			arena;						// Main arena
+		size_t			zero_malloc_counter;		// 
 		pthread_mutex_t	mutex;						// Mutex for global synchronization
 	} t_manager;
 
@@ -180,6 +184,7 @@
 	void	forksafe_init();
 	void	ensure_init();
 	size_t	get_pagesize();
+	int		abort_now();
 
 	// Options
 	void	options_initialize();

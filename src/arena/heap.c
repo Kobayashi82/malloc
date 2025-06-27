@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 14:21:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 23:59:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@
 		else					size = (size + sizeof(t_chunk) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 		void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (ptr == MAP_FAILED) {
-			if (g_manager.options.DEBUG && type != LARGE) aprintf(2, "\t\t  [ERROR] Failed to create heap of size %s (%d)\n", (type == TINY ? "TINY" : "SMALL"), size);
+			if (g_manager.options.DEBUG && type != LARGE) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to create heap of size %s (%d)\n", (type == TINY ? "TINY" : "SMALL"), size);
 			return (NULL);
 		}
 
@@ -63,6 +63,7 @@
 		if (!arena->heap_header) {
 			if (arena == &g_manager.arena) {
 				t_heap_header *heap_header = internal_alloc(PAGE_SIZE);
+				if (!heap_header) return (NULL);
 				arena->heap_header = heap_header;
 				heap_header->total = 60;
 				heap_header->used = 1;
@@ -101,6 +102,7 @@
 
 			if (!found) {
 				t_heap_header *new_heap_header = internal_alloc(PAGE_SIZE);
+				if (!heap_header) return (NULL);
 				heap_header->next = new_heap_header;
 				new_heap_header->total = 60;
 				new_heap_header->used = 1;
@@ -129,7 +131,7 @@
 		t_chunk *chunk = (t_chunk *)ptr;
 		chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | (type == SMALL ? HEAP_TYPE : 0) | TOP_CHUNK | (type == LARGE ? MMAP_CHUNK : 0);
 
-		if (g_manager.options.DEBUG && type != LARGE) aprintf(2, "%p\t [SYSTEM] Heap of size %s (%d) allocated\n", heap->ptr, (type == TINY ? "TINY" : "SMALL"), heap->size);
+		if (g_manager.options.DEBUG && type != LARGE) aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Heap of size %s (%d) allocated\n", heap->ptr, (type == TINY ? "TINY" : "SMALL"), heap->size);
 
 		if (heap && type == LARGE) {
 			arena->alloc_count++;
@@ -151,18 +153,18 @@
 	
 		t_heap *heap = heap_find(arena, ptr);
 		if (!heap) {
-			if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to detroy heap\n");
+			if (g_manager.options.DEBUG && type != LARGE)		aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to detroy heap\n");
 			return (1);
 		}
 
 		int result = 0;
 		if (munmap(ptr, size)) {
 			result = 1;
-			if (g_manager.options.DEBUG && type != LARGE)		aprintf(2, "\t\t  [ERROR] Failed to detroy heap\n");
+			if (g_manager.options.DEBUG && type != LARGE)		aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to detroy heap\n");
 		}
 		heap->active = false;
 
-		if (!result && type != LARGE && g_manager.options.DEBUG) aprintf(2, "%p\t [SYSTEM] Heap of size (%d) freed\n", ptr, size);
+		if (!result && type != LARGE && g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Heap of size (%d) freed\n", ptr, size);
 		if (!result && type == LARGE) arena->free_count++;
 
 		return (result);

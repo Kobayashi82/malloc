@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 17:14:11 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 23:59:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,25 +24,33 @@
 		
 		t_arena	*arena;
 		void	*ptr = NULL;
-		
+
+		if (!size) {
+			mutex(&g_manager.mutex, MTX_LOCK);
+
+				size_t aligned_offset = (g_manager.zero_malloc_counter * ALIGNMENT);
+				g_manager.zero_malloc_counter++;
+
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+			return (void*)(ZERO_MALLOC_BASE + aligned_offset);
+		}
+
 		if (!tcache) {
 			arena = arena_get();
 			tcache = arena;
 			if (!arena) {
-				if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Failed to assign arena\n");
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to assign arena\n");
 				return (NULL);
 			}
 		} else arena = tcache;
 
 		mutex(&arena->mutex, MTX_LOCK);
 
-			if (!size) size = 1;
-
 			if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK)	ptr = heap_create(arena, LARGE, size);
 			else												ptr = find_memory(arena, size);
 
-			if (ptr && g_manager.options.DEBUG)	aprintf(2, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
-			else if (g_manager.options.DEBUG)	aprintf(2, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
+			if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
+			else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
 
 			if (ptr) SET_MAGIC(ptr);
 
