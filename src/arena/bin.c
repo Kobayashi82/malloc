@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 22:03:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 17:42:40 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@
 							bool	available = free_size >= size;
 							int		usage = ((heap_size - free_size) * 100) / heap_size;
 
-							if (available && usage > 10) { best_heap = heap; found = true; break; }
+							if (available && usage > g_manager.options.MIN_USAGE_PERCENT) { best_heap = heap; found = true; break; }
 							if (available && usage > best_usage) { best_usage = usage; best_heap = heap; }
 						}
 						heap++;

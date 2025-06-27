@@ -1,8 +1,35 @@
 # TODO
 
-- [✗] Cambiar heaps y arenas a un modo single page
+- [✗] ERRNO
+- [✗] Magic number
+- [✗] Contador alocaciones y fress
 - [✗] Contador de frees para eliminar heap (quizas mejor cuando se haga coalescing se limpia zonas vacias. Por investigar)
-- [✗] Fastbin[0-1] de 8 y 16 bytes es useless
+- [✗] Bins
+- [✗] Coalescing
+- [✗] Data-Races
+- [✗] Perturb (recordar que calloc puede tener que actuar en mmap si perturb)
+- [✗] Free heap
+- [✗] Signals
+
+- Debug
+- [✗] Logging
+- [✗] Printing
+- [✗] Allocation history
+- [✗] Print memory
+- [✗] Print memory hex
+- [?] Eliminar: MALLOC_FRAGMENTATION_ y MALLOC_CHECK_
+
+- Script
+- [✗] Evaluation
+- [✗] Speed comparison
+- [✗] Size comparison
+
+- Documentacion
+- [✗] Porque size_t como encabezado
+- [✗] Heaps (types and sizes)
+- [✗] Bins
+- [✗] Frees
+- [✗] Coalescing
 
 ## Allocation Order
 
@@ -32,10 +59,10 @@
 
 ## Main
 
-- [✗] Malloc
-- [✗] Calloc
-- [✗] Realloc
-- [✗] Free
+- [✓] Malloc
+- [✓] Calloc
+- [X] Realloc
+- [✓] Free
 - [✓] Mallopt
 
 ## Free
