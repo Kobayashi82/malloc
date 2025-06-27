@@ -60,7 +60,7 @@
 - [X] Malloc
 - [X] Calloc
 - [X] Realloc
-- [ ] Free
+- [X] Free
 - [X] Mallopt
 
 ## Free
@@ -76,7 +76,7 @@
 
 - [X] Multi-Threading with arenas and fork-safe support
 - [X] Debug environment variables and mallopt()
-- [ ] Debug logging to file
+- [X] Debug logging to file
 - [ ] Bin management (fastbin, smallbin, largebin & unsortedbin)
 - [ ] Coalescing
 - [ ] Print memory
