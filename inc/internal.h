@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 15:02:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 16:55:40 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 	#include <errno.h>
 	#include <pthread.h>
 	#include <dlfcn.h>
+	#include <sys/mman.h>
 
 	#ifdef _WIN32
 		#include <windows.h>
@@ -33,7 +34,6 @@
 #pragma region "Defines"
 
 	// ARCHITECTURE
-	#define _GNU_SOURCE
 	#define ARCHITECTURE				(sizeof(size_t) * 8)			// 32 or 64 bits
 	
 	#ifndef SIZE_MAX
@@ -103,15 +103,11 @@
 
 #pragma region "Enumerators"
 
-	enum { TINY, SMALL, LARGE };
-	enum { FASTBIN, SMALLBIN, UNSORTEDBIN, LARGEBIN };
-	enum { MTX_INIT, MTX_LOCK, MTX_TRYLOCK, MTX_UNLOCK, MTX_DESTROY };
+	enum { TINY, SMALL, LARGE, FASTBIN, SMALLBIN, UNSORTEDBIN, LARGEBIN, MTX_INIT, MTX_LOCK, MTX_TRYLOCK, MTX_UNLOCK, MTX_DESTROY };
 
 #pragma endregion
 
 #pragma region "Structures"
-
-	typedef pthread_mutex_t	mtx_t;
 
 	typedef struct s_chunk {
 		size_t			size;						// Size of the chunk's user data
@@ -143,7 +139,7 @@
 		void			*largebin[10];				// ???
 		t_heap_header	*heap_header;				// 
 		struct s_arena	*next;          			// Pointer to the next arena
-		mtx_t			mutex;          			// Mutex for thread safety in the current arena
+		pthread_mutex_t	mutex;          			// Mutex for thread safety in the current arena
 	} t_arena;
 
 	typedef struct s_options {
@@ -154,31 +150,31 @@
 		unsigned char	PERTURB;					// Rellena la zona de memoria. malloc = ~PERTURB	free = PERTURB
 		int				ARENA_TEST;					// 
 		int				ARENA_MAX;					// Hard limit for arenas based on CPU count
-		bool			DEBUG;
-		bool			LOGGING;
-		char 			LOGFILE[PATH_MAX];
+		bool			DEBUG;						// 
+		bool			LOGGING;					// 
+		char 			LOGFILE[PATH_MAX];			// 
 	} t_options;
 
 	typedef struct s_manager {
 		int				arena_count;				// Current number of arenas
 		t_options		options;					// Options
 		t_arena			arena;						// Main arena
-		mtx_t			mutex;						// Mutex for global synchronization
+		pthread_mutex_t	mutex;						// Mutex for global synchronization
 	} t_manager;
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	extern __thread t_arena	*tcache;
-	extern t_manager		g_manager;
+	extern __thread t_arena	*tcache;				// 
+	extern t_manager		g_manager;				// 
 
 #pragma endregion
 
 #pragma region "Methods"
 
 	// Internal
-	int		mutex(mtx_t *ptr_mutex, int action);
+	int		mutex(pthread_mutex_t *ptr_mutex, int action);
 	void	*internal_alloc(size_t size);
 	int		internal_free(void *ptr, size_t size);
 	void	ensure_init();

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 14:30:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 17:09:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,22 +146,6 @@
 	
 #pragma endregion
 
-	int	first_digit(void *ptr) {
-		uintptr_t val = (uintptr_t)ptr;
-
-		while (val >= 0x10) val /= 0x10;
-		return ((int)(val & 0xF));
-	}
-
-	int	check_digit(t_arena *arena, void *ptr1) {
-		int	target_digit = first_digit(ptr1);
-		int	base_digit = 0;
-
-		if (arena->heap_header) base_digit = first_digit(arena->heap_header);
-
-		return (base_digit && target_digit == base_digit);
-	}
-
 #pragma region "Free"
 
 	__attribute__((visibility("default")))
@@ -201,9 +185,16 @@
 		}
 
 		if (!heap_ptr) {
-			if (!check_digit(&g_manager.arena, ptr))	realfree(ptr);
-			// else if (g_manager.options.DEBUG)			aprintf(2, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
-			// else										aprintf(2, "Invalid pointer\n");
+			if (arena->heap_header) {
+				uintptr_t val1 = (uintptr_t)ptr;
+				uintptr_t val2 = (uintptr_t)arena->heap_header;
+
+				while (val1 >= 0x10) val1 /= 0x10;
+				while (val2 >= 0x10) val2 /= 0x10;
+
+				if (!((val1 & 0xF) == (val2 & 0xF)))	realfree(ptr);
+			} else if (g_manager.options.DEBUG)			aprintf(2, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
+			else										aprintf(2, "Invalid pointer\n");
 		}
 	}
 

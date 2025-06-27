@@ -6,13 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 14:59:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 16:59:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "arena.h"
+	#include "internal.h"
 
 #pragma endregion
 
@@ -25,7 +25,7 @@
 
 #pragma region "Mutex"
 
-	int mutex(mtx_t *ptr_mutex, int action) {
+	int mutex(pthread_mutex_t *ptr_mutex, int action) {
 		int result = 0;
 
 		switch (action) {
@@ -63,39 +63,35 @@
 
 #pragma endregion
 
-#pragma region "Internal"
+#pragma region "Alloc"
 
-	#pragma region "Alloc"
+	void *internal_alloc(size_t size) {
+		if (!size) return (NULL);
 
-		void *internal_alloc(size_t size) {
-			if (!size) return (NULL);
-
-			size_t total_size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-			void *ptr = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			if (ptr == MAP_FAILED) {
-				if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
-				abort();
-			}
-
-			return (ptr);
+		size_t total_size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+		void *ptr = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+		if (ptr == MAP_FAILED) {
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
+			abort();
 		}
 
-	#pragma endregion
+		return (ptr);
+	}
 
-	#pragma region "Free"
+#pragma endregion
 
-		int internal_free(void *ptr, size_t size) {
-			if (!ptr || !size) return (0);
+#pragma region "Free"
 
-			if (munmap(ptr, size)) {
-				if (g_manager.options.DEBUG) aprintf(2, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
-				return (1);
-			}
+	int internal_free(void *ptr, size_t size) {
+		if (!ptr || !size) return (0);
 
-			return (0);
+		if (munmap(ptr, size)) {
+			if (g_manager.options.DEBUG) aprintf(2, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
+			return (1);
 		}
 
-	#pragma endregion
+		return (0);
+	}
 
 #pragma endregion
 

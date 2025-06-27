@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 12:25:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/25 13:19:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 17:17:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 	void *calloc(size_t nmemb, size_t size) {
 		ensure_init();
 
+		t_arena	*arena;
 		void	*ptr = NULL;
 		size_t	total = 0;
 
@@ -29,8 +30,30 @@
 		if (nmemb > SIZE_MAX / size)	return (NULL);
 
 		total = nmemb * size;
-		if (g_manager.options.DEBUG) aprintf(2, "\t\t [CALLOC] Asking for %d bytes\n", size);
-		if ((ptr = malloc(total))) ft_memset(ptr, 0, total);
+
+		if (!tcache) {
+			arena = arena_get();
+			tcache = arena;
+			if (!arena) {
+				if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Failed to assign arena\n");
+				return (NULL);
+			}
+		} else arena = tcache;
+
+		mutex(&arena->mutex, MTX_LOCK);
+
+			if (ALIGN(total + sizeof(t_chunk)) > SMALL_CHUNK) ptr = heap_create(arena, LARGE, total);
+			else {
+				ptr = find_memory(arena, total);
+				if (ptr) ft_memset(ptr, 0, total);
+			}
+
+			if (ptr && g_manager.options.DEBUG)	aprintf(2, "%p\t [CALLOC] Allocated %d bytes\n", ptr, size);
+			else if (g_manager.options.DEBUG)	aprintf(2, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
+
+			if (ptr) SET_MAGIC(ptr);
+
+		mutex(&arena->mutex, MTX_UNLOCK);
 
 		return (ptr);
 	}

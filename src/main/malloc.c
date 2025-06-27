@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 13:44:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 17:14:11 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,10 @@
 			if (ptr && g_manager.options.DEBUG)	aprintf(2, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
 			else if (g_manager.options.DEBUG)	aprintf(2, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
 
+			if (ptr) SET_MAGIC(ptr);
+
 		mutex(&arena->mutex, MTX_UNLOCK);
 
-		if (ptr) SET_MAGIC(ptr);
 		return (ptr);
 	}
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 13:12:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 16:46:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #pragma region "Includes"
 
 	#include "unistd.h"
-	#include <sys/mman.h>
 
 #pragma endregion
 

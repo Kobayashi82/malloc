@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 12:56:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 17:31:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,23 +73,39 @@
 			}
 		} else arena = tcache;
 
-		// If ptr is not allocated by us, delegate to native realloc
-		// if (!heap_find(ptr, arena)) return (realrealloc(ptr, size));
+		mutex(&arena->mutex, MTX_LOCK);
 
-		// Extend chunk or malloc(size)
-		// Free old chunk if apply
+			if (!heap_find(arena, ptr)) {
+				mutex(&arena->mutex, MTX_UNLOCK);
+				free(ptr);
+				return (realrealloc(ptr, size));
+			}
 
-		new_ptr = malloc(size);
-		if (!new_ptr) return (NULL);
+			// Extend chunk or malloc(size)
+			// Free old chunk if apply
 
-		t_chunk *chunk = GET_HEAD(ptr);
-		size_t copy_size = GET_SIZE(chunk);
-		if (size < copy_size) copy_size = size;
-		ft_memcpy(new_ptr, ptr, copy_size);
+			if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK)	new_ptr = heap_create(arena, LARGE, size);
+			else												new_ptr = find_memory(arena, size);
+
+			if (!new_ptr) {
+				if ( g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] Failed to re-allocated %d bytes\n", size);
+				mutex(&arena->mutex, MTX_UNLOCK);
+				free(ptr);
+				return (NULL);
+			}
+
+			t_chunk *chunk = GET_HEAD(ptr);
+			size_t copy_size = GET_SIZE(chunk);
+			if (size < copy_size) copy_size = size;
+			ft_memcpy(new_ptr, ptr, copy_size);
+
+			if (g_manager.options.DEBUG) aprintf(2, "%p\t[REALLOC] Memory reassigned from %p with %d bytes\n", new_ptr, ptr, size);
+
+			if (new_ptr) SET_MAGIC(new_ptr);
+
+		mutex(&arena->mutex, MTX_UNLOCK);
+
 		free(ptr);
-		
-		if (g_manager.options.DEBUG) aprintf(2, "%p\t[REALLOC] Memory reassigned from %p with %d bytes\n", new_ptr, ptr, size);
-
 		return (new_ptr);
 	}
 
