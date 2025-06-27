@@ -1,33 +1,33 @@
 # TODO
 
-- [✗] ERRNO
-- [✗] Magic number
-- [✗] Contador alocaciones y fress
-- [✗] Contador de frees para eliminar heap (quizas mejor cuando se haga coalescing se limpia zonas vacias. Por investigar)
-- [✗] Bins
-- [✗] Coalescing
-- [✗] Data-Races
-- [✗] Perturb (recordar que calloc puede tener que actuar en mmap si perturb)
-- [✗] Free heap
+- [ ] ERRNO
+- [ ] Magic number
+- [ ] Contador alocaciones y fress
+- [ ] Contador de frees para eliminar heap (quizas mejor cuando se haga coalescing se limpia zonas vacias. Por investigar)
+- [ ] Bins
+- [ ] Coalescing
+- [ ] Data-Races
+- [ ] Perturb (recordar que calloc puede tener que actuar en mmap si perturb)
+- [ ] Free heap
 
 - Debug
-- [✗] Logging
-- [✗] Printing
-- [✗] Allocation history
-- [✗] Print memory
-- [✗] Print memory hex
+- [ ] Logging
+- [ ] Printing
+- [ ] Allocation history
+- [ ] Print memory
+- [ ] Print memory heX
 
 - Script
-- [✗] Evaluation
-- [✗] Speed comparison
-- [✗] Size comparison
+- [ ] Evaluation
+- [ ] Speed comparison
+- [ ] Size comparison
 
 - Documentacion
-- [✗] Porque size_t como encabezado
-- [✗] Heaps (types and sizes)
-- [✗] Bins
-- [✗] Frees
-- [✗] Coalescing
+- [ ] Porque size_t como encabezado
+- [ ] Heaps (types and sizes)
+- [ ] Bins
+- [ ] Frees
+- [ ] Coalescing
 
 ## Allocation Order
 
@@ -44,45 +44,44 @@
 
 ## Bins
 
-- [✗] Fastbin (MXFAST) - (no coalescing)
-- [✗] Smallbin - (coalescing)
-- [✗] Unsortedbin
-- [✗] Largebin - (coalescing)
+- [ ] Fastbin (MXFAST) - (no coalescing)
+- [ ] Smallbin - (coalescing)
+- [ ] Unsortedbin
+- [ ] Largebin - (coalescing)
 
 ## Cosas
 
-- [✗] Coalescing
-- [✗] Perturb
-- [✗] Free heap
+- [ ] Coalescing
+- [ ] Perturb
+- [ ] Free heap
 
 ## Main
 
-- [✓] Malloc
-- [✓] Calloc
+- [X] Malloc
+- [X] Calloc
 - [X] Realloc
-- [✓] Free
-- [✓] Mallopt
+- [ ] Free
+- [X] Mallopt
 
 ## Free
 
-- [✓] Not aligned
-- [✓] LARGE (double free is delegated to native free, if not, is middle chunk)
-- [✓] Double free
-- [✓] Top chunk
-- [✓] Middle chunk
-- [✓] Not allocated (delegated to native free)
+- [X] Not aligned
+- [X] LARGE (double free is delegated to native free, if not, is middle chunk)
+- [X] Double free
+- [X] Top chunk
+- [X] Middle chunk
+- [X] Not allocated (delegated to native free)
 
-## Extra
+## EXtra
 
-- [✗] Signals
-- [✓] Multi-Threading with arenas and fork-safe support
-- [✓] Debug environment variables and mallopt()
-- [✗] Debug logging to file
-- [✗] Bin management (fastbin, smallbin, largebin & unsortedbin)
-- [✗] Coalescing
-- [✗] Print memory
-- [✗] Print memory hex
-- [✗] Allocations history
+- [X] Multi-Threading with arenas and fork-safe support
+- [X] Debug environment variables and mallopt()
+- [ ] Debug logging to file
+- [ ] Bin management (fastbin, smallbin, largebin & unsortedbin)
+- [ ] Coalescing
+- [ ] Print memory
+- [ ] Print memory heX
+- [ ] Allocations history
 
 ## Delegate Free
 
