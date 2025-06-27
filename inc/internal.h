@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 00:46:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 01:12:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@
 	#define M_PERTURB					-6								//
 	#define M_CHECK_ACTION				-5								//
 	#define M_MXFAST			 		 1								//
-	#define M_FRAG_PERCENT			 	 2								// Si una zona esta mas fragmentada que esto, no usarla (crear nueva si es necesario)
 	#define M_MIN_USAGE_PERCENT			 3								// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
 	#define M_DEBUG						 7								// (DEBUG) Enable debug mode
 	#define M_LOGGING					 8								// (DEBUG) Captura backtrace con backtrace() y lo guardas junto con cada allocación.
@@ -146,7 +145,6 @@
 
 	typedef struct s_options {
 		int				MXFAST;						// Max size (in bytes) for allocations using fastbins (0 disables fastbins)
-		int				FRAG_PERCENT;				// Si una zona esta mas fragmentada que esto, no usarla (crear nueva si es necesario)
 		int				MIN_USAGE_PERCENT;			// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
 		int				CHECK_ACTION;				// Muestra informacion cuando hay errores
 		unsigned char	PERTURB;					// Rellena la zona de memoria. malloc = ~PERTURB	free = PERTURB

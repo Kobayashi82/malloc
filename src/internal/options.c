@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 00:44:11 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 01:11:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,6 @@
 
 			if (value < 0)		return (0);
 			if (value > max)	return (max);
-			return (value);
-		}
-
-	#pragma endregion
-
-	#pragma region "FRAGMENTATION_PERCENT"
-
-		int validate_frag_percent(int value) {
-			if (value < 0)		return (0);
-			if (value > 100)	return (100);
 			return (value);
 		}
 
@@ -140,10 +130,6 @@
 		if (var && ft_isdigit_s(var))	g_manager.options.MXFAST = validate_mxfast(ft_atoi(var));
 		else							g_manager.options.MXFAST = 80;
 
-		var = getenv("MALLOC_FRAGMENTATION_");
-		if (var && ft_isdigit_s(var))	g_manager.options.FRAG_PERCENT = validate_frag_percent(ft_atoi(var));
-		else							g_manager.options.FRAG_PERCENT = 75;
-
 		var = getenv("MALLOC_MIN_USAGE_");
 		if (var && ft_isdigit_s(var))	g_manager.options.MIN_USAGE_PERCENT = validate_min_usage_percent(ft_atoi(var));
 		else							g_manager.options.MIN_USAGE_PERCENT = 10;
@@ -199,7 +185,6 @@
 
 		switch (param) {
 			case M_MXFAST:				g_manager.options.MXFAST			= validate_mxfast(value);				return (1);
-			case M_FRAG_PERCENT:		g_manager.options.FRAG_PERCENT		= validate_frag_percent(value);			return (1);
 			case M_MIN_USAGE_PERCENT:	g_manager.options.MIN_USAGE_PERCENT	= validate_min_usage_percent(value);	return (1);
 			case M_CHECK_ACTION:		g_manager.options.CHECK_ACTION		= validate_check_action(value);			return (1);
 			case M_PERTURB:				g_manager.options.PERTURB			= validate_perturb(value);				return (1);

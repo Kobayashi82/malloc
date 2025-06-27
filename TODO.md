@@ -9,7 +9,6 @@
 - [✗] Data-Races
 - [✗] Perturb (recordar que calloc puede tener que actuar en mmap si perturb)
 - [✗] Free heap
-- [✗] Signals
 
 - Debug
 - [✗] Logging
@@ -17,7 +16,6 @@
 - [✗] Allocation history
 - [✗] Print memory
 - [✗] Print memory hex
-- [?] Eliminar: MALLOC_FRAGMENTATION_ y MALLOC_CHECK_
 
 - Script
 - [✗] Evaluation
