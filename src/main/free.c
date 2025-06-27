@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 23:45:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 14:30:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,7 +201,7 @@
 		}
 
 		if (!heap_ptr) {
-			// if (!check_digit(&g_manager.arena, ptr))	realfree(ptr);
+			if (!check_digit(&g_manager.arena, ptr))	realfree(ptr);
 			// else if (g_manager.options.DEBUG)			aprintf(2, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
 			// else										aprintf(2, "Invalid pointer\n");
 		}

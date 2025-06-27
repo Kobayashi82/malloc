@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 23:56:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 14:59:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,89 +39,6 @@
 		if (result) abort();
 		return (result);
 	}
-
-#pragma endregion
-
-#pragma region "Fork"
-
-	#pragma region "Prepare"
-
-		static int try_lock_timeout(mtx_t *mtx_ptr, int timeout) {
-			for (int i = 0; i < timeout; i++) {
-				int ret = mutex(mtx_ptr, MTX_TRYLOCK);
-				if (!ret) return (0);
-
-				if (ret != EBUSY) {
-					if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] locking mutex in fork\n");
-					return (ret);
-				}
-				
-				// Wait 1ms before next try
-				#ifdef _WIN32
-					Sleep(1);
-				#else
-					usleep(1000);
-				#endif
-			}
-
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t  [ERROR] timeout locking mutex in fork\n");
-			return (ETIMEDOUT);
-		}
-
-		static void prepare_fork() {
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Prepare fork\n");
-
-			int ret = try_lock_timeout(&g_manager.mutex, 1000);
-			if (ret) return;
-
-			t_arena *arena = &g_manager.arena;
-			while (arena) {
-				ret = try_lock_timeout(&arena->mutex, 1000);
-				if (ret) {
-					t_arena *arena_ptr = arena;
-					arena = &g_manager.arena;
-					while (arena && arena != arena_ptr) {
-						mutex(&arena->mutex, MTX_UNLOCK);
-						arena = arena->next;
-					}
-					mutex(&g_manager.mutex, MTX_UNLOCK);
-					return;
-				}
-				arena = arena->next;
-			}
-		}
-
-	#pragma endregion
-
-	#pragma region "Parent"
-
-		static void parent_fork() {
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Parent fork\n");
-
-			t_arena *arena = &g_manager.arena;
-			while (arena) {
-				mutex(&arena->mutex, MTX_UNLOCK);
-				arena = arena->next;
-			}
-			mutex(&g_manager.mutex, MTX_UNLOCK);
-		}
-
-	#pragma endregion
-
-	#pragma region "Child"
-
-		static void child_fork() {
-			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Child fork\n");
-
-			t_arena *arena = &g_manager.arena;
-			while (arena) {
-				mutex(&arena->mutex, MTX_UNLOCK);
-				arena = arena->next;
-			}
-			mutex(&g_manager.mutex, MTX_UNLOCK);
-		}
-
-	#pragma endregion
 
 #pragma endregion
 
@@ -182,101 +99,20 @@
 
 #pragma endregion
 
-#pragma region "Terminate"
-
-	void arena_terminate2() {
-		t_arena *current, *next;
-
-		mutex(&g_manager.mutex, MTX_LOCK);
-
-			mutex(&g_manager.arena.mutex, MTX_DESTROY);
-			current = g_manager.arena.next;
-			while (current) {
-				mutex(&current->mutex, MTX_DESTROY);
-
-				// liberar zonas
-
-				next = current->next;
-				internal_free(current, sizeof(t_arena));
-				current = next;
-			}
-
-		mutex(&g_manager.mutex, MTX_UNLOCK);
-		mutex(&g_manager.mutex, MTX_DESTROY);
-
-		if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Library finalized\n");
-	}
-
-	#include <fcntl.h>
-
-	void arena_terminate() {
-		t_arena	*arena, *next;
-
-		// if debug, print memoria status (free, not free, heaps, etc.)
-
-		mutex(&g_manager.mutex, MTX_LOCK);
-
-			arena = &g_manager.arena;
-			while (arena) {
-				mutex(&arena->mutex, MTX_LOCK);
-
-					t_heap_header *heap_header = arena->heap_header;
-					while (heap_header) {
-						t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
-
-						for (int i = 0; i < heap_header->used; i++) {
-							if (heap->active) heap_destroy(arena, heap->ptr, heap->type, heap->size);
-							heap++;
-						}
-
-						heap_header = heap_header->next;
-					}
-
-					// clean info pages
-
-					next = arena->next;
-				
-				mutex(&arena->mutex, MTX_UNLOCK);
-				mutex(&arena->mutex, MTX_DESTROY);
-
-				// if (arena != &g_manager.arena) internal_free(arena, sizeof(t_arena));
-				arena = next;
-			}
-
-		mutex(&g_manager.mutex, MTX_UNLOCK);
-		mutex(&g_manager.mutex, MTX_DESTROY);
-
-		// No funciona write en el destructor
-		//
-		// if (g_manager.options.DEBUG) {
-		// 	int fd = open("/tmp/malloc_debug.log", O_CREAT | O_WRONLY | O_APPEND, 0644);
-		// 	if (fd != -1) {
-		// 		aprintf(fd, "\t\t [SYSTEM] Library finalized\n");
-		// 		close(fd);
-		// 	}
-		// }
-
-	}
-
-#pragma endregion
-
 #pragma region "Constructor"
 
-	static pthread_once_t init_once = PTHREAD_ONCE_INIT;
-
-	static void do_init(void) {
-		mutex(&g_manager.mutex, MTX_INIT);
-		options_initialize();
-		pthread_atfork(prepare_fork, parent_fork, child_fork);
-		if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Library initialized\n");
-	}
-
 	void ensure_init() {
-		pthread_once(&init_once, do_init);
+		static int initialized = 0;
+
+		if (!initialized) {
+			initialized = 1;
+			mutex(&g_manager.mutex, MTX_INIT);
+			get_pagesize();
+			options_initialize();
+			if (g_manager.options.DEBUG) aprintf(2, "\t\t [SYSTEM] Arena #%d created\n", g_manager.arena.id);
+		}
 	}
 
-	__attribute__((destructor)) static void malloc_terminate() {
-		arena_terminate();
-	}
+	__attribute__((constructor)) static void malloc_initialize() { ensure_init(); }
 
 #pragma endregion

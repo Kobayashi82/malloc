@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 17:51:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 14:53:37 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,22 +161,22 @@
 			aprintf(2, "\n=== Heap ===\n\n");
 
 			// TINY allocation
-			char *small = (char *)malloc(TINY_ALLOC);
+			char *tiny = (char *)malloc(TINY_ALLOC);
+			if (tiny) {
+				strcpy(tiny, "TINY");
+				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, tiny);
+			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
+			free(tiny);
+			if (tiny && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", tiny);
+
+			// MEDIUM allocation
+			char *small = (char *)malloc(MEDIUM_ALLOC);
 			if (small) {
-				strcpy(small, "TINY");
-				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, small);
+				strcpy(small, "MEDIUM");
+				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, small);
 			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
 			free(small);
 			if (small && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", small);
-
-			// MEDIUM allocation
-			char *medium = (char *)malloc(MEDIUM_ALLOC);
-			if (medium) {
-				strcpy(medium, "MEDIUM");
-				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, medium);
-			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
-			free(medium);
-			if (medium && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", medium);
 
 			// LARGE allocation
 			char *large = (char *)malloc(LARGE_ALLOC);
@@ -234,7 +234,7 @@
 
 		threads_join();
 
-		fork_test();
+		// fork_test();
 
 		aprintf(2, "\n");
 		return (0);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 22:06:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 13:44:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@
 
 			if (!size) size = 1;
 
-			// ptr = heap_create(arena, LARGE, size);
 			if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK)	ptr = heap_create(arena, LARGE, size);
 			else												ptr = find_memory(arena, size);
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 14:57:56 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 12:48:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,9 +171,11 @@
 			if (var && ft_isdigit_s(var))	g_manager.options.LOGGING = (ft_atoi(var));
 			else							g_manager.options.LOGGING = 0;
 
-			var = getenv("MALLOC_LOGFILE");
-			if (var)						validate_logfile(var);
-			else							validate_logfile("auto");
+			if (g_manager.options.DEBUG && g_manager.options.LOGGING) {
+				var = getenv("MALLOC_LOGFILE");
+				if (var)	validate_logfile(var);
+				else		validate_logfile("auto");
+			}
 		}
 
 	#pragma endregion
@@ -204,6 +206,15 @@
 				case M_DEBUG:				g_manager.options.DEBUG				= (value);								return (1);
 				case M_LOGGING:				g_manager.options.LOGGING			= (value);								return (1);
 			}
+
+			if (param == M_DEBUG || param == M_LOGGING) {
+				if (g_manager.options.DEBUG && g_manager.options.LOGGING) {
+					char *var = getenv("MALLOC_LOGFILE");
+					if (var)	validate_logfile(var);
+					else		validate_logfile("auto");
+				}
+			}
+
 			return (0);
 		}
 

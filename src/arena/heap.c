@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 00:34:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 14:21:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@
 		while (heap_header) {
 			t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 
-			for (int i = 0; i < heap_header->used; i++) {
+			for (int i = 0; i < heap_header->used; ++i) {
 				if (ptr >= heap->ptr && ptr < (void *)((char *)heap->ptr + heap->size)) {
 					if (heap->active) return (heap);
 					found = heap;
 				}
-				heap++;
+				heap = (t_heap *)((char *)heap + ALIGN(sizeof(t_heap)));
 			}
 
 			heap_header = heap_header->next;
@@ -91,14 +91,15 @@
 				heap->top_chunk = ptr;
 			}
 		} else {
+			bool found = false;
 			t_heap_header *heap_header = arena->heap_header;
 			while (heap_header) {
-				if (heap_header->used < heap_header->total) break;
+				if (heap_header->used < heap_header->total) { found = true; break; }
 				if (!heap_header->next) break;
 				heap_header = heap_header->next;
 			}
 
-			if (!heap_header->next) {
+			if (!found) {
 				t_heap_header *new_heap_header = internal_alloc(PAGE_SIZE);
 				heap_header->next = new_heap_header;
 				new_heap_header->total = 60;
@@ -114,7 +115,7 @@
 				heap->top_chunk = ptr;
 			} else {
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
-				for (int i = 0; i < heap_header->used; ++i) heap++;
+				heap = (t_heap *)((char *)heap + ((ALIGN(sizeof(t_heap)) * heap_header->used)));
 				heap_header->used++;
 				heap->ptr = ptr;
 				heap->size = size;
@@ -127,7 +128,6 @@
 
 		t_chunk *chunk = (t_chunk *)ptr;
 		chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | (type == SMALL ? HEAP_TYPE : 0) | TOP_CHUNK | (type == LARGE ? MMAP_CHUNK : 0);
-		ptr = (void *)((char *)chunk + sizeof(t_chunk));
 
 		if (g_manager.options.DEBUG && type != LARGE) aprintf(2, "%p\t [SYSTEM] Heap of size %s (%d) allocated\n", heap->ptr, (type == TINY ? "TINY" : "SMALL"), heap->size);
 

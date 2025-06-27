@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 22:52:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/27 15:02:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,6 @@
 	#include <errno.h>
 	#include <pthread.h>
 	#include <dlfcn.h>
-	#include <stdio.h>
-	#include <string.h>
 
 	#ifdef _WIN32
 		#include <windows.h>
