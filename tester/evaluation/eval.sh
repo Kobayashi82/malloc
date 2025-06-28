@@ -1,14 +1,17 @@
 #!/bin/bash
 
+# ────────────── Get script directory ──────────────
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # ────────────── Colors ───────────────────
 RED='\033[0;31m'; BROWN='\033[0;33m'; YELLOW='\033[1;33m'; GREEN='\033[0;32m'; BLUE='\033[0;34m'; CYAN='\033[0;36m'; MAGENTA='\033[1;35m'; GREENB='\033[1;32m'; NC='\033[0m'
 
 # ────────────── Compilation ──────────────
 tests=(test0 test1 test2 test3 test4)
 for t in "${tests[@]}"; do
-	file="tests/${t}.c"
+	file="${SCRIPT_DIR}/tests/${t}.c"
 	[[ -f "$file" ]] || { echo -e "${RED}Missing $file${NC}"; exit 1; }
-	clang "$file" -o "tests/$t" || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
+	clang "$file" -o "${SCRIPT_DIR}/tests/$t" || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
 done
 echo
 
@@ -81,12 +84,12 @@ get_color() {
 declare -A N_MEM N_PAGES N_MIN N_REALLOC N_ABORT C_MEM C_PAGES C_MIN C_REALLOC C_ABORT
 for t in "${tests[@]}"; do
 	# native malloc
-	read mem pages minor realloc abort < <(run "./tests/$t")
+	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/tests/$t")
 	N_MEM[$t]=$mem; N_PAGES[$t]=$pages; N_MIN[$t]=$minor; N_REALLOC[$t]=$realloc; N_ABORT[$t]=$abort
 	# custom malloc
-	export LD_LIBRARY_PATH="/home/kobay/malloc/build/lib:$LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH="${SCRIPT_DIR}/../../build/lib:$LD_LIBRARY_PATH"
 	export LD_PRELOAD="libft_malloc.so"
-	read mem pages minor realloc abort < <(run "./tests/$t")
+	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/tests/$t")
 	C_MEM[$t]=$mem; C_PAGES[$t]=$pages; C_MIN[$t]=$minor; C_REALLOC[$t]=$realloc; C_ABORT[$t]=$abort
 	unset LD_PRELOAD
 done
@@ -206,4 +209,4 @@ fi
 
 echo
 
-rm -f tests/test0 tests/test1 tests/test2 tests/test3 tests/test4
+rm -f "${SCRIPT_DIR}/tests/test0" "${SCRIPT_DIR}/tests/test1" "${SCRIPT_DIR}/tests/test2" "${SCRIPT_DIR}/tests/test3" "${SCRIPT_DIR}/tests/test4"
