@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 11:55:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 13:57:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,5 +225,23 @@
 			else if (g_manager.options.CHECK_ACTION != 2)	aprintf(g_manager.options.fd_out, "Invalid pointer\n");
 		}
 	}
+
+#pragma endregion
+
+#pragma region "Information"
+
+	// Frees a block of memory previously allocated.
+	//
+	//   void free(void *ptr);
+	//
+	//   ptr   – pointer returned by malloc/calloc/realloc.
+	//
+	//   • On success: the memory block pointed to by ptr is deallocated.
+	//   • On failure: undefined behavior.
+	//
+	// Notes:
+	//   • ptr can be NULL. In that case, free() does nothing.
+	//   • After freeing, ptr becomes invalid. Do not access the memory after calling free().
+	//   • It is the user's responsibility to ensure that ptr points to a valid allocated block.
 
 #pragma endregion

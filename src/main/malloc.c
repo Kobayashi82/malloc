@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 13:02:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 13:53:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,5 +58,23 @@
 
 		return (ptr);
 	}
+
+#pragma endregion
+
+#pragma region "Information"
+
+	// Allocates memory.
+	//
+	//   void *malloc(size_t size);
+	//
+	//   size  – the number of bytes to allocate.
+	//
+	//   • On success: returns a pointer aligned for the requested size.
+	//   • On failure: returns NULL and sets errno to:
+	//       – ENOMEM: not enough memory.
+	//
+	// Notes:
+	//   • If size == 0:
+	//       – returns a unique pointer that can be freed.
 
 #pragma endregion

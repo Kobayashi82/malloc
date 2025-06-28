@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 16:46:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 13:14:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 	int		ft_isdigit_s(char *str);
 	int		ft_max(int n1, int n2);
 	int		ft_min(int n1, int n2);
+	int		is_power_of_two(size_t n);
 
 	// MEM
 	void	*ft_memset(void *b, int c, size_t len);

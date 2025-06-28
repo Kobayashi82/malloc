@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 13:03:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 13:50:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,5 +109,25 @@
 		free(ptr);
 		return (new_ptr);
 	}
+
+#pragma endregion
+
+#pragma region "Information"
+
+	// Resizes a previously allocated memory block.
+	//
+	//   void *realloc(void *ptr, size_t size);
+	//
+	//   ptr   – pointer returned by malloc/calloc/realloc.
+	//   size  – the new size of the memory block, in bytes.
+	//
+	//   • On success: returns a pointer aligned for the requested size (may be the same as ptr or a new location).
+	//   • On failure: returns NULL, original block unchanged and sets errno to:
+	//       – ENOMEM: not enough memory.
+	//
+	// Notes:
+	//   • If size == 0:
+	//       – ptr != NULL → returns NULL and free ptr.
+	//       – ptr == NULL → behaves like malloc(size).
 
 #pragma endregion

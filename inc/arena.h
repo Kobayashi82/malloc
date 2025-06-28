@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 13:03:15 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 14:05:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,5 +45,8 @@
 
 	void	*reallocarray(void *ptr, size_t nmemb, size_t size);
 	size_t	malloc_usable_size(void *ptr);
+	void	*aligned_alloc(size_t alignment, size_t size);
+	void	*memalign(size_t alignment, size_t size);
+	int		posix_memalign(void **memptr, size_t alignment, size_t size);
 
 #pragma endregion
