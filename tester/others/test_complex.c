@@ -5,8 +5,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "../includes/ft_malloc.h"
-
 int is_memory_writable(void *ptr, size_t size)
 {
     if (ptr == NULL)
@@ -45,7 +43,7 @@ void test_malloc_zero()
     printf("Testing malloc with zero size...\n");
 
     void *ptr = malloc(0);
-    assert(ptr == NULL);
+    assert(ptr != NULL);
 
     printf("Malloc zero test passed\n");
 }
@@ -293,6 +291,6 @@ void run_all_tests()
 int main()
 {
     run_all_tests();
-    show_alloc_mem();
+    // show_alloc_mem();
     return 0;
 }

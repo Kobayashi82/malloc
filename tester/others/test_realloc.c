@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../includes/ft_malloc.h"
+#include <stdlib.h>
 
 void test_realloc()
 {
@@ -44,6 +44,6 @@ void test_realloc()
 int main()
 {
     test_realloc();
-    show_alloc_mem();
+    // show_alloc_mem();
     return 0;
 }

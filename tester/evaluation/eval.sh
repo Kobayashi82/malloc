@@ -8,7 +8,7 @@ tests=(test0 test1 test2 test3 test4)
 for t in "${tests[@]}"; do
 	file="tests/${t}.c"
 	[[ -f "$file" ]] || { echo -e "${RED}Missing $file${NC}"; exit 1; }
-	clang "$file" -o "tests/$t" || { echo -e "${RED}Test compilation failed $file${NC}"; exit 1; }
+	clang "$file" -o "tests/$t" || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
 done
 echo
 

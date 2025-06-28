@@ -16,7 +16,7 @@ else
 fi
 
 if [ ! -f "$LIB_DIR/libft_malloc.so" ]; then
-	echo -e "${RED}No se pudo encontrar la librería ${YELLOW}libft_malloc.so${NC}\n"
+	echo -e "${RED}Unable to find library ${YELLOW}libft_malloc.so${NC}\n"
 	exit 1
 fi
 
@@ -24,7 +24,7 @@ normal_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}                 Malloc Tester                 ${NC}"
 	echo -e " ${GREEN}===============================================${NC}"
-	clang -g -o test aprintf.c test.c
+	clang -g -o test test.c
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -36,7 +36,7 @@ debug_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}             Malloc Tester (DEBUG)             ${NC}"
 	echo -e " ${GREEN}===============================================${NC}"
-	clang -g -o test aprintf.c test.c -DDEBUG_MODE
+	clang -g -o test test.c -DDEBUG_MODE
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -45,16 +45,14 @@ debug_test() {
 }
 
 leaks_test() {
-	# echo -e "${RED}valgrind fuerza el uso del allocator native${NC}\n"
-	# exit 1
 	if ! command -v valgrind &> /dev/null; then
-		echo -e "${RED}valgrind no está instalado${NC}\n"
+		echo -e "${RED}valgrind is not installed${NC}\n"
 		exit 1
 	fi
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}             Malloc Tester (LEAKS)             ${NC}"
 	echo -e " ${GREEN}===============================================${NC}\n"
-	clang -g -o test aprintf.c test.c
+	clang -g -o test test.c
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -67,7 +65,7 @@ basic_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}              Malloc Tester (BASIC)            ${NC}"
 	echo -e " ${GREEN}===============================================${NC}\n"
-	clang -g -Wno-free-nonheap-object -o test aprintf.c basic.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR} -pthread
+	clang -g -Wno-free-nonheap-object -o test basic.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR} -pthread
 	./test
 	echo
 }
@@ -85,22 +83,9 @@ rm test
 # -lft_malloc				= -l busca lib + ft_malloc + .so
 # -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
 
-# Terminal:
-# export LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
-# export LD_PRELOAD="libft_malloc.so"
-#
-# export LD_LIBRARY_PATH="/mnt/d/Programas/Mis Programas/42/Active/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
-# export LD_LIBRARY_PATH="/home/vzurera-/42/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
+# Unix:
 # export LD_LIBRARY_PATH="/home/kobay/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
-#
 # export MALLOC_DEBUG=1
-
-# gdb:
-# set environment LD_LIBRARY_PATH="../build/lib:$LD_LIBRARY_PATH"
-# set environment LD_PRELOAD="libft_malloc.so"
 
 # Mac:
 # export DYLD_LIBRARY_PATH="/[project_path]/build/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/[project_path]/build/lib/libft_malloc.so"
-
-
-# export LD_LIBRARY_PATH="/home/kobay/pollon/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"

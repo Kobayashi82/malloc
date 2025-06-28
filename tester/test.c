@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 17:50:10 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 23:17:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@
 	static pthread_t	threads[THREADS];
 	static unsigned int	n_threads;
 
-	int aprintf(int fd, char const *format, ...);
+	// int aprintf(int fd, char const *format, ...);
 
 #pragma endregion
 
@@ -71,11 +71,11 @@
 					str = malloc(SMALL_ALLOC);
 					if (str) {
 						str[0] = 'a';
-						if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d) for thread #%d\t\t(%p)\n", SMALL_ALLOC, thread_num, str);
+						if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d) for thread #%d\t\t(%p)\n", SMALL_ALLOC, thread_num, str);
 						free(str);
-						if (str && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
+						if (str && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
 					} else {
-						if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
+						if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed for thread #%d\n", thread_num);
 					}
 				}
 
@@ -83,11 +83,11 @@
 				str = malloc(LARGE_ALLOC);
 				if (str) {
 					str[0] = 'a';
-					if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d) for thread #%d\t(%p)\n", LARGE_ALLOC, thread_num, str);
+					if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d) for thread #%d\t(%p)\n", LARGE_ALLOC, thread_num, str);
 					free(str);
-					if (str && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
+					if (str && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", str);
 				} else {
-					if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed for thread #%d\n", thread_num);
+					if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed for thread #%d\n", thread_num);
 				}
 
 				return (NULL);
@@ -105,7 +105,7 @@
 
 				for (int i = 0; i < THREADS; i++) {
 					if (pthread_create(&threads[i], NULL, thread_test, &thread_args[i]) != 0) {
-						aprintf(2, "[ERROR]\tThread creation failed for thread %d\n", i + 1);
+						printf("[ERROR]\tThread creation failed for thread %d\n", i + 1);
 						break;
 					}
 					n_threads++;
@@ -119,7 +119,7 @@
 			static void threads_join() {
 				for (int i = 0; i < n_threads; i++) {
 					if (pthread_join(threads[i], NULL) != 0)
-						aprintf(2, "[ERROR]\tThread join failed for thread %d\n", i + 1);
+						printf("[ERROR]\tThread join failed for thread %d\n", i + 1);
 				}
 			}
 
@@ -130,26 +130,26 @@
 	#pragma region "Realloc"
 
 		static void realloc_test() {
-			aprintf(2, "\n=== Realloc ===\n\n");
+			printf("\n=== Realloc ===\n\n");
 
 			// SMALL allocation
 			char *ptr = malloc(TINY_ALLOC);
 			if (ptr) {
 				strcpy(ptr, "TINY");
-				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, ptr);
+				if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, ptr);
 
 				// SMALL re-allocation
 				ptr = realloc(ptr, SMALL_ALLOC);
 				if (ptr) {
 					strcpy(ptr, "SMALL");
-					if (!DEBUG_MODE) aprintf(2, "[REALLOC]\tExtended (%d)\t\t\t\t(%p)\n", SMALL_ALLOC, ptr);
+					if (!DEBUG_MODE) printf("[REALLOC]\tExtended (%d)\t\t\t\t(%p)\n", SMALL_ALLOC, ptr);
 				} else {
-					if (!DEBUG_MODE) aprintf(2, "[ERROR]\tRealloc failed\n");
+					if (!DEBUG_MODE) printf("[ERROR]\tRealloc failed\n");
 				}
 				free(ptr);
-				if (ptr && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", ptr);
+				if (ptr && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", ptr);
 			} else {
-				if (!DEBUG_MODE) aprintf(2, "[ERROR]\tRealloc failed\n");
+				if (!DEBUG_MODE) printf("[ERROR]\tRealloc failed\n");
 			}
 		}
 
@@ -158,34 +158,34 @@
 	#pragma region "Heap"
 
 		static void heap_test() {
-			aprintf(2, "\n=== Heap ===\n\n");
+			printf("\n=== Heap ===\n\n");
 
 			// TINY allocation
 			char *tiny = (char *)malloc(TINY_ALLOC);
 			if (tiny) {
 				strcpy(tiny, "TINY");
-				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, tiny);
-			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, tiny);
+			} else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
 			free(tiny);
-			if (tiny && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", tiny);
+			if (tiny && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", tiny);
 
 			// MEDIUM allocation
 			char *small = (char *)malloc(MEDIUM_ALLOC);
 			if (small) {
 				strcpy(small, "MEDIUM");
-				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, small);
-			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, small);
+			} else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
 			free(small);
-			if (small && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", small);
+			if (small && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", small);
 
 			// LARGE allocation
 			char *large = (char *)malloc(LARGE_ALLOC);
 			if (large) {
 				strcpy(large, "LARGE");
-				if (!DEBUG_MODE) aprintf(2, "[MALLOC]\tAllocated (%d)\t\t\t(%p)\n", LARGE_ALLOC, large);
-			} else if (!DEBUG_MODE) aprintf(2, "[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t(%p)\n", LARGE_ALLOC, large);
+			} else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
 			free(large);
-			if (large && !DEBUG_MODE) aprintf(2, "[FREE]\t\tMemory freed\t\t\t\t(%p)\n", large);
+			if (large && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", large);
 		}
 
 	#pragma endregion
@@ -195,11 +195,11 @@
 		static int fork_test() {
 			int pid = fork();
 
-			if (pid == -1)			{ aprintf(2, "[ERROR]\tFork failed\n");		exit(1); }
+			if (pid == -1)			{ printf("[ERROR]\tFork failed\n");		exit(1); }
 			else if (pid == 0) {
 				int pid2 = fork();
 
-				if (pid2 == -1)		{ aprintf(2, "[ERROR]\tFork 2 failed\n");	exit(1); }
+				if (pid2 == -1)		{ printf("[ERROR]\tFork 2 failed\n");	exit(1); }
 				else if (pid2 == 0)	{ heap_test();								exit(0); }
 
 				heap_test();
@@ -226,11 +226,11 @@
 
 		realloc_test();
 
-		aprintf(2, "\n=== Threads ===\n\n");
+		printf("\n=== Threads ===\n\n");
 
 		threads_create();
 
-		fork_test();					// Fork with threads
+		// fork_test();					// Fork with threads
 
 		threads_join();
 
@@ -238,28 +238,16 @@
 
 		char *ptr = malloc(1);
 		size_t size = malloc_usable_size(ptr);
-		aprintf(2, "[USABLE_SIZE]\t%d bytes available\t\t\t(%p)\n", size, ptr);
+		printf("[USABLE_SIZE]\t%zu bytes available\t\t\t(%p)\n", size, ptr);
 
 		char *ptr2 = reallocarray(ptr, 15, 10);
 		size = malloc_usable_size(ptr2);
-		aprintf(2, "[USABLE_SIZE]\t%d bytes available\t\t\t(%p)\n", size, ptr2);
+		printf("[USABLE_SIZE]\t%zu bytes available\t\t\t(%p)\n", size, ptr2);
 
 		free(ptr2);
 
-		aprintf(2, "\n");
+		printf("\n");
 		return (0);
 	}
-
-#pragma endregion
-
-#pragma region "Information"
-
-	// NOTE: Con THREADS = 152 se produce un segfault
-
-	// A partir del 5º hilo parece ser que pthread_create deja de usar el pool de threads y empieza a usar malloc de la glibc.
-	// La llamada la hace internamente y no la puedo interceptar con mi malloc.
-	// Lo curioso es que en pthread_join se llama a free y esta si se intercepta. Lo cual da lugar a que mi free recibe un puntero
-	// por hilo (a partir del 5º) que no puede liberar porque no pertenece a mi malloc.
-	// La solucion es que si mi free recibe un puntero que no pertenece a mi malloc, llama a free de la glibc para que lo procese.
 
 #pragma endregion

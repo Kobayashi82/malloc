@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 13:53:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 23:00:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,12 @@
 
 				size_t aligned_offset = (g_manager.zero_malloc_counter * ALIGNMENT);
 				g_manager.zero_malloc_counter++;
-
+				
 			mutex(&g_manager.mutex, MTX_UNLOCK);
-			return (void*)(ZERO_MALLOC_BASE + aligned_offset);
+
+			ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
+			if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [MALLOC] Allocated %u bytes\n", ptr, size);
+			return (ptr);
 		}
 
 		if (!tcache) {
