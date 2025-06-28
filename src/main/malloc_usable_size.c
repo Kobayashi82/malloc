@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 11:48:55 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 12:36:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 12:54:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,12 +210,18 @@
 
 #pragma region "Information"
 
-	// Returns the actual usable size of a memory block.
-	// 
-	// Memory allocators often allocate more memory than requested due to alignment.
-	// This means that when you request n bytes, the allocator may reserve more space than you asked for.
-	// 
-	// malloc_usable_size() returns the total number of usable bytes available in that allocated block,
-	// which may be equal to or greater than the size originally requested.
+	// malloc_usable_size(): returns the usable size of a memory block.
+	//
+	//   ptr – pointer returned by malloc/calloc/realloc
+	//
+	// How it works:
+	//   • Allocators often reserve more memory than requested, due to alignment or internal metadata.
+	//   • When you request n bytes, the actual allocation may be larger.
+	//   • malloc_usable_size(ptr) tells you how many usable bytes are available in that block.
+	//
+	// Notes:
+	//   • The returned size is always >= the requested size (unless ptr is NULL).
+	//   • Do NOT rely on the extra space — it's allocator-specific and may not be portable.
+	//   • Passing an invalid or non-malloced pointer results in undefined behavior.
 
 #pragma endregion

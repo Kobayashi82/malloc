@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 12:26:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 13:02:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@
 			if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK)	ptr = heap_create(arena, LARGE, size);
 			else												ptr = find_memory(arena, size);
 
-			if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
+			if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [MALLOC] Allocated %u bytes\n", ptr, size);
 			else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 			if (ptr) SET_MAGIC(ptr);

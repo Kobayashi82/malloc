@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 23:59:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 13:03:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@
 
 		mutex(&arena->mutex, MTX_LOCK);
 
+			// tiene que buscar en todas las arenas
 			if (!heap_find(arena, ptr)) {
 				mutex(&arena->mutex, MTX_UNLOCK);
 				free(ptr);
@@ -88,7 +89,7 @@
 			else												new_ptr = find_memory(arena, size);
 
 			if (!new_ptr) {
-				if ( g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to re-allocated %d bytes\n", size);
+				if ( g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to re-allocated %u bytes\n", size);
 				mutex(&arena->mutex, MTX_UNLOCK);
 				free(ptr);
 				return (NULL);
@@ -99,7 +100,7 @@
 			if (size < copy_size) copy_size = size;
 			ft_memcpy(new_ptr, ptr, copy_size);
 
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t[REALLOC] Memory reassigned from %p with %d bytes\n", new_ptr, ptr, size);
+			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t[REALLOC] Memory reassigned from %p with %u bytes\n", new_ptr, ptr, size);
 
 			if (new_ptr) SET_MAGIC(new_ptr);
 
