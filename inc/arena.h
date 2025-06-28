@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/26 23:45:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 12:36:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,11 @@
 
 	// Main
 	void	realfree(void *ptr);
-	void	*realrealloc(void *ptr, size_t size);
 	void	free(void *ptr);
 	void	*malloc(size_t size);
 	void	*realloc(void *ptr, size_t size);
 	void	*calloc(size_t nmemb, size_t size);
+
+	size_t	malloc_usable_size(void *ptr);
 
 #pragma endregion

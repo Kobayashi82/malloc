@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 01:12:10 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 12:11:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@
 	#define GET_SIZE(chunk) 			(size_t)((chunk)->size & ~15)
 
 	// ALIGMENTS
-	#define ZERO_MALLOC_BASE			(void *)0x1000					// 
+	#define ZERO_MALLOC_BASE			(void *)0x100000000000					// 
 	#define PAGE_SIZE					get_pagesize()					// 4096 bytes
 	#define ALIGNMENT					(uint8_t)(ARCHITECTURE / 4)		// 8 or 16 bytes
 	#define IS_ALIGNED(ptr)				(((uintptr_t)GET_HEAD(ptr) & (ALIGNMENT - 1)) == 0)

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/31 23:43:13 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 23:39:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 12:25:59 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@
 
 	#pragma endregion
 
-	#pragma region "Number"
+	#pragma region "Number N"
 
 		static void print_n_buf(unsigned long n, unsigned int base, t_buffer *buf, int uppercase) {
 			char *strbase = uppercase ? "0123456789ABCDEF" : "0123456789abcdef";
@@ -63,13 +63,22 @@
 
 	#pragma endregion
 
+	#pragma region "Number U"
+
+		static void print_u_buf(size_t n, t_buffer *buf) {
+			if (n >= 10)			print_u_buf(n / 10, buf);
+			if (!buf->error)		print_c_buf("0123456789"[n % 10], buf);
+		}
+
+	#pragma endregion
+
 	#pragma region "Chooser"
 
 		static void chooser_buf(int c, va_list args, t_buffer *buf) {
 			if		(c == '%')		print_c_buf('%', buf);
 			else if (c == 'c')		print_c_buf(va_arg(args, int), buf);
 			else if (c == 's')		print_s_buf(va_arg(args, char *), buf);
-			else if (c == 'u')		print_n_buf(va_arg(args, unsigned int), 10, buf, 0);
+			else if (c == 'u')		print_u_buf(va_arg(args, size_t), buf);
 			else if (c == 'p')		print_n_buf(va_arg(args, unsigned long), 17, buf, 0);
 			else if (c == 'x')		print_n_buf(va_arg(args, unsigned int), 16, buf, 0);
 			else if (c == 'X')		print_n_buf(va_arg(args, unsigned int), 16, buf, 1);

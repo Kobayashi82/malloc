@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/06/27 23:30:40 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/06/28 11:54:52 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -83,6 +83,7 @@ SRC_DIR		= src/
 SRCS		= internal/internal.c internal/options.c internal/logging.c	\
 			  arena/arena.c arena/heap.c arena/bin.c arena/coalescing.c	\
 			  main/malloc.c main/calloc.c main/realloc.c main/free.c	\
+			  main/malloc_usable_size.c	\
 			  utils/string.c utils/number.c utils/mem.c utils/aprintf.c
 
 # ───────────────────────────────────────────────────────────── #

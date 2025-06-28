@@ -1,5 +1,7 @@
 # TODO
 
+heap_find solo busca en la arena actual
+
 - [ ] ERRNO
 - [ ] Magic number
 - [ ] Contador alocaciones y fress
@@ -57,11 +59,12 @@
 
 ## Main
 
-- [X] Malloc
-- [X] Calloc
-- [X] Realloc
-- [X] Free
-- [X] Mallopt
+- [X] malloc
+- [X] calloc
+- [X] realloc
+- [X] free
+- [X] mallopt
+- [X] malloc_usable_size
 
 ## Free
 
@@ -72,7 +75,7 @@
 - [X] Middle chunk
 - [X] Not allocated (delegated to native free)
 
-## EXtra
+## Extra
 
 - [X] Multi-Threading with arenas and fork-safe support
 - [X] Debug environment variables and mallopt()

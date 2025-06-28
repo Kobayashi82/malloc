@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free.c                                             :+:      :+:    :+:   */
+/*   malloc_usable_size.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 11:55:30 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/06/28 11:48:55 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/06/28 12:36:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,92 +32,91 @@
 
 #pragma endregion
 
-#pragma region "Real Free"
+#pragma region "Real Malloc Usable Size"
 
-	void realfree(void *ptr) {
-		if (!ptr) return;
+	static size_t real_malloc_usable_size(void *ptr) {
+		if (!ptr) return 0;
 
 		#ifdef _WIN32
-			static void (__cdecl *real_free_win)(void*);
-			if (!real_free_win) {
+			static size_t (__cdecl *real_malloc_usable_size_win)(void*);
+			if (!real_malloc_usable_size_win) {
 				HMODULE m = GetModuleHandleA("msvcrt.dll");
-				if (m) real_free_win = (void(__cdecl*)(void*))GetProcAddress(m, "free");
+				if (m) real_malloc_usable_size_win = (size_t(__cdecl*)(void*))GetProcAddress(m, "_msize");
 			}
 
-			if (!real_free_win) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
-				return;
+			if (!real_malloc_usable_size_win) {
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to native malloc_usable_size failed\n", ptr);
+				return (0);
 			}
 
-			real_free_win(ptr);
+			return (real_malloc_usable_size_win(ptr));
 		#else
-			static void (*real_free_unix)(void*);
-			if (!real_free_unix) real_free_unix = dlsym(((void *) -1L), "free");
-
-			if (!real_free_unix) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
-				return;
+			static size_t (*real_malloc_usable_size_unix)(void*);
+			if (!real_malloc_usable_size_unix) 
+				real_malloc_usable_size_unix = dlsym(RTLD_NEXT, "malloc_usable_size");
+			
+			if (!real_malloc_usable_size_unix) {
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to native malloc_usable_size failed\n", ptr);
+				return (0);
 			}
 
-			real_free_unix(ptr);
+			return (real_malloc_usable_size_unix(ptr));
 		#endif
-
-		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, "%p\t   [FREE] Delegated to the native free\n", ptr);
 	}
 
 #pragma endregion
 
-#pragma region "Free PTR"
+#pragma region "Usable PTR"
 
-	static int free_ptr(t_arena *arena, void *ptr, t_heap *heap) {
-		if (!ptr ||!arena || !heap) return (0);
+	static size_t usable_ptr(void *ptr, t_heap *heap) {
+		if (!ptr || !heap) return (0);
 
 		// Not aligned
 		if (!IS_ALIGNED(ptr)) {
 			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
 			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
-			return (abort_now());
+			abort_now();
+			return (0);
 		}
 
 		// Heap freed
 		if (!heap->active) {
 			if (heap->type == LARGE && GET_PTR(heap->ptr) == ptr) {
-				if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Double free\n", ptr);
-				else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Double free\n");
+				if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
+				else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Invalid pointer\n");
 			} else {
 				if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
 				else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Invalid pointer\n");
 			}
-			return (abort_now());
+			abort_now();
+			return (0);
 		}
 
 		// LARGE
 		if (heap->type == LARGE) {
-			if (GET_HEAD(ptr) == heap->ptr) {
-				int result = heap_destroy(arena, heap->ptr, LARGE, heap->size);
-				if		(result && g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
-				else if (g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t   [FREE] Memory freed\n", ptr);
+				if (GET_HEAD(ptr) != heap->ptr) {
+				if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
+				abort_now();
 				return (0);
 			}
-
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
-			return (abort_now());
 		}
 
 		// Double free
 		if (HAS_POISON(ptr)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Double free\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Double free\n");
-			return (abort_now());
+			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
+			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
+			abort_now();
+			return (0);
 		}
 
 		// In top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
-		if ((chunk->size & TOP_CHUNK)) {
+		if ((chunk->size & TOP_CHUNK) && heap->type != LARGE) {
 			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
 			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
-			return (abort_now());
+			abort_now();
+			return (0);
 		}
 
 		// In middle chunk
@@ -125,45 +124,27 @@
 		if (!(next_chunk->size & PREV_INUSE)) {
 			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
 			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
-			return (abort_now());
+			abort_now();
+			return (0);
 		}
 
-		SET_POISON(ptr);
-		heap->free += GET_SIZE(chunk) + sizeof(t_chunk);
+		// Full chunk size
+		size_t chunk_size = GET_SIZE(chunk);
 
-		// Add to bins
-		next_chunk->size &= ~PREV_INUSE;
-		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
-		SET_PREV_SIZE(next_chunk, GET_SIZE(chunk));
-		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
-			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
-			link_chunk(chunk, chunk_size, FASTBIN, arena);
-		} else {
-			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
-			chunk = coalescing(chunk, arena, heap);
-			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
-			link_chunk(chunk, chunk_size, UNSORTEDBIN, arena);
-		}
+		if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t[MALLOC_USABLE_SIZE] %d bytes available in chunk\n", ptr, chunk_size);
 
-		arena->free_count++;
-		if (heap->free == heap->size) {
-			// Mark for elimination
-		}
-
-		if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t   [FREE] Memory freed of size %d bytes\n", ptr, chunk_size);
-
-		return (0);
+		return (chunk_size);
 	}
-	
+
 #pragma endregion
 
-#pragma region "Free"
+#pragma region "Malloc Usable Size"
 
 	__attribute__((visibility("default")))
-	void free(void *ptr) {
+	size_t malloc_usable_size(void *ptr) {
 		ensure_init();
 
-		if (!ptr) return;
+		if (!ptr) return (0);
 
 		// malloc(0)
 		if (check_digit(ptr, ZERO_MALLOC_BASE)) {
@@ -173,30 +154,31 @@
 					if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
 					else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Invalid pointer\n");
 					mutex(&g_manager.mutex, MTX_UNLOCK);
-					abort_now(); return ;
+					abort_now(); return (0);
 				}
 
 				if (ptr < ZERO_MALLOC_BASE || ptr >= (void *)((char *)ZERO_MALLOC_BASE + (g_manager.zero_malloc_counter * ALIGNMENT))) {
 					if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
 					else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Invalid pointer\n");
 					mutex(&g_manager.mutex, MTX_UNLOCK);
-					abort_now(); return ;
+					abort_now(); return (0);
 				}
 
 				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t   [FREE] Memory freed of size 0 bytes\n", ptr);
 			
 			mutex(&g_manager.mutex, MTX_UNLOCK);
-			return ;
+			return (0);
 		}
 
 		t_arena	*arena = tcache;
 		t_heap	*heap_ptr = NULL;
+		size_t	chunk_size = 0;
 
 		if (!arena) arena = &g_manager.arena;
 		if (arena) {
 			mutex(&arena->mutex, MTX_LOCK);
 
-				if ((heap_ptr = heap_find(arena, ptr))) free_ptr(arena, ptr, heap_ptr);
+				if ((heap_ptr = heap_find(arena, ptr))) chunk_size = usable_ptr(ptr, heap_ptr);
 
 			mutex(&arena->mutex, MTX_UNLOCK);
 		}
@@ -209,7 +191,7 @@
 					if (arena == curr_arena) { curr_arena = curr_arena->next; continue; }
 					mutex(&curr_arena->mutex, MTX_LOCK);
 
-						if ((heap_ptr = heap_find(curr_arena, ptr))) free_ptr(curr_arena, ptr, heap_ptr);
+						if ((heap_ptr = heap_find(curr_arena, ptr))) chunk_size = usable_ptr(ptr, heap_ptr);
 
 					mutex(&curr_arena->mutex, MTX_UNLOCK);
 					if (heap_ptr) break;
@@ -219,11 +201,21 @@
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 		}
 
-		if (!heap_ptr) {
-			if (!check_digit(ptr, arena->heap_header))		realfree(ptr);
-			else if (g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)	aprintf(g_manager.options.fd_out, "Invalid pointer\n");
-		}
+		if (!heap_ptr && !check_digit(ptr, arena->heap_header)) chunk_size = real_malloc_usable_size(ptr);
+
+		return (chunk_size);
 	}
+
+#pragma endregion
+
+#pragma region "Information"
+
+	// Returns the actual usable size of a memory block.
+	// 
+	// Memory allocators often allocate more memory than requested due to alignment.
+	// This means that when you request n bytes, the allocator may reserve more space than you asked for.
+	// 
+	// malloc_usable_size() returns the total number of usable bytes available in that allocated block,
+	// which may be equal to or greater than the size originally requested.
 
 #pragma endregion

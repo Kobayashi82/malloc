@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 23:59:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 12:26:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 	__attribute__((visibility("default")))
 	void *malloc(size_t size) {
 		ensure_init();
-		
+
 		t_arena	*arena;
 		void	*ptr = NULL;
 
@@ -50,7 +50,7 @@
 			else												ptr = find_memory(arena, size);
 
 			if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [MALLOC] Allocated %d bytes\n", ptr, size);
-			else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %d bytes\n", size);
+			else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 			if (ptr) SET_MAGIC(ptr);
 
