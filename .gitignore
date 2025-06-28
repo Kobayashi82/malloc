@@ -15,5 +15,7 @@ doc/malloc\ 6.2.pdf
 !README.md
 !tester
 !tester/**
+!evaluation
+!evaluation/**
 !TODO.md
 !LICENSE
