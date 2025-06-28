@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 17:49:56 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 18:16:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,7 +234,6 @@
 			get_pagesize();
 			options_initialize();
 			forksafe_init();
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t [SYSTEM] Arena #%d created\n", g_manager.arena.id);
 		}
 	}
 

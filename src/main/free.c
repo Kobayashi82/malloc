@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 17:48:10 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 18:02:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@
 			return (abort_now());
 		}
 
-		// In top chunk
+		// Top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK)) {
 			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
@@ -107,7 +107,7 @@
 			return (abort_now());
 		}
 
-		// In middle chunk
+		// Middle chunk
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
 			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunks (not allocated))\n", ptr);
@@ -202,14 +202,14 @@
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 
 		// Heap freed
-		if (inactive && inactive->type == LARGE && GET_HEAD(ptr) == inactive->ptr) {
-			aprintf(2, "%p - %p - %p\n", inactive, inactive->ptr, ptr);
+		if (inactive && (inactive->type != LARGE || GET_HEAD(ptr) == inactive->ptr)) {
 			if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Double free (inactive)\n", ptr);
 			else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Double free\n");
 			abort_now(); return ;
 		}
 
-		if (!heap) realfree(ptr);
+		// Delegate
+		if (!inactive && !heap) realfree(ptr);
 	}
 
 #pragma endregion
