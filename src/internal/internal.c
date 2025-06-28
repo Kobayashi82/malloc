@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 00:52:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 17:49:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,6 +198,25 @@
 #pragma region "Abort"
 
 	int abort_now() {
+		// t_arena *arena = tcache;
+		// t_heap_header *heap_header = arena->heap_header;
+
+		// while (heap_header) {
+		// 	t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
+
+		// 	for (int i = 0; i < heap_header->used; ++i) {
+		// 		char *type;
+		// 		if (heap->type == TINY) type = "Tiny";
+		// 		if (heap->type == SMALL) type = "Small";
+		// 		if (heap->type == LARGE) type = "Large";
+		// 		aprintf(g_manager.options.fd_out, "heap: %p\nptr: %p\ntype: %s\nActive: %s\n\n", heap, heap->ptr, type, heap->active == true ? "True" : "False");
+
+		// 		heap = (t_heap *)((char *)heap + ALIGN(sizeof(t_heap)));
+		// 	}
+
+		// 	heap_header = heap_header->next;
+		// }
+
 		if (!g_manager.options.CHECK_ACTION) abort();
 		return (1);
 	}

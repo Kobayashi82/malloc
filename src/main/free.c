@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 13:57:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 17:48:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,42 +72,29 @@
 	static int free_ptr(t_arena *arena, void *ptr, t_heap *heap) {
 		if (!ptr ||!arena || !heap) return (0);
 
-		// Not aligned
-		if (!IS_ALIGNED(ptr)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
-			return (abort_now());
-		}
-
-		// Heap freed
-		if (!heap->active) {
-			if (heap->type == LARGE && GET_PTR(heap->ptr) == ptr) {
-				if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Double free\n", ptr);
-				else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Double free\n");
-			} else {
-				if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-				else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Invalid pointer\n");
-			}
-			return (abort_now());
-		}
-
 		// LARGE
 		if (heap->type == LARGE) {
 			if (GET_HEAD(ptr) == heap->ptr) {
-				int result = heap_destroy(arena, heap->ptr, LARGE, heap->size);
-				if		(result && g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Unable to unmap memory\n", ptr);
-				else if (g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t   [FREE] Memory freed\n", ptr);
+					
+				// Corruption
+				if (!HAS_MAGIC(ptr)) {
+					if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Corrupted memory (LARGE)\n", ptr);
+					else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Corrupted memory\n");
+					return (abort_now());
+				}
+
+				if (heap_destroy(heap)) arena->free_count++;
 				return (0);
 			}
 
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk (LARGE))\n", ptr);
 			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
 			return (abort_now());
 		}
 
 		// Double free
 		if (HAS_POISON(ptr)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Double free\n", ptr);
+			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Double free (Poison)\n", ptr);
 			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Double free\n");
 			return (abort_now());
 		}
@@ -123,8 +110,15 @@
 		// In middle chunk
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunks (not allocated))\n", ptr);
 			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
+			return (abort_now());
+		}
+
+		// Corruption
+		if (!HAS_MAGIC(ptr)) {
+			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Corrupted memory\n", ptr);
+			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Corrupted memory\n");
 			return (abort_now());
 		}
 
@@ -165,65 +159,57 @@
 
 		if (!ptr) return;
 
+		// Not aligned
+		if ((uintptr_t)ptr % ALIGNMENT) {
+			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
+			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
+			abort_now(); return ;
+		}
+
 		// malloc(0)
 		if (check_digit(ptr, ZERO_MALLOC_BASE)) {
 			mutex(&g_manager.mutex, MTX_LOCK);
 
-				if ((uintptr_t)ptr % ALIGNMENT) {
-					if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
-					else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Invalid pointer\n");
-					mutex(&g_manager.mutex, MTX_UNLOCK);
-					abort_now(); return ;
-				}
-
-				if (ptr < ZERO_MALLOC_BASE || ptr >= (void *)((char *)ZERO_MALLOC_BASE + (g_manager.zero_malloc_counter * ALIGNMENT))) {
-					if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
-					else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Invalid pointer\n");
-					mutex(&g_manager.mutex, MTX_UNLOCK);
-					abort_now(); return ;
-				}
-
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t   [FREE] Memory freed of size 0 bytes\n", ptr);
+				if (ptr > ZERO_MALLOC_BASE && ptr < (void *)((char *)ZERO_MALLOC_BASE + (g_manager.zero_malloc_counter * ALIGNMENT)))
+					if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t   [FREE] Memory freed of size 0 bytes\n", ptr);
 			
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 			return ;
 		}
 
-		t_arena	*arena = tcache;
-		t_heap	*heap_ptr = NULL;
+		t_arena	*arena = &g_manager.arena;
+		t_heap	*heap = NULL;
+		t_heap	*inactive = NULL;
 
-		if (!arena) arena = &g_manager.arena;
-		if (arena) {
-			mutex(&arena->mutex, MTX_LOCK);
-
-				if ((heap_ptr = heap_find(arena, ptr))) free_ptr(arena, ptr, heap_ptr);
-
-			mutex(&arena->mutex, MTX_UNLOCK);
-		}
-
-		if (!heap_ptr) {
 			mutex(&g_manager.mutex, MTX_LOCK);
 
-				t_arena *curr_arena = &g_manager.arena;
-				while (curr_arena) {
-					if (arena == curr_arena) { curr_arena = curr_arena->next; continue; }
-					mutex(&curr_arena->mutex, MTX_LOCK);
+				while (arena) {
+					mutex(&arena->mutex, MTX_LOCK);
 
-						if ((heap_ptr = heap_find(curr_arena, ptr))) free_ptr(curr_arena, ptr, heap_ptr);
+						if ((heap = heap_find(arena, ptr))) {
+							if (heap->active) {
+								free_ptr(arena, ptr, heap);
+								mutex(&arena->mutex, MTX_UNLOCK);
+								mutex(&g_manager.mutex, MTX_UNLOCK);
+								return ;
+							} else inactive = heap;
+						}
 
-					mutex(&curr_arena->mutex, MTX_UNLOCK);
-					if (heap_ptr) break;
-					curr_arena = curr_arena->next;
+					mutex(&arena->mutex, MTX_UNLOCK);
+					arena = arena->next;
 				}
 
 			mutex(&g_manager.mutex, MTX_UNLOCK);
+
+		// Heap freed
+		if (inactive && inactive->type == LARGE && GET_HEAD(ptr) == inactive->ptr) {
+			aprintf(2, "%p - %p - %p\n", inactive, inactive->ptr, ptr);
+			if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Double free (inactive)\n", ptr);
+			else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, "Double free\n");
+			abort_now(); return ;
 		}
 
-		if (!heap_ptr) {
-			if (!check_digit(ptr, arena->heap_header))		realfree(ptr);
-			else if (g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)	aprintf(g_manager.options.fd_out, "Invalid pointer\n");
-		}
+		if (!heap) realfree(ptr);
 	}
 
 #pragma endregion

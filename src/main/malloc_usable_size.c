@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 11:48:55 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 13:54:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 15:38:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,12 +120,14 @@
 		}
 
 		// In middle chunk
-		t_chunk *next_chunk = GET_NEXT(chunk);
-		if (!(next_chunk->size & PREV_INUSE)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
-			abort_now();
-			return (0);
+		if (heap->type != LARGE) {
+			t_chunk *next_chunk = GET_NEXT(chunk);
+			if (!(next_chunk->size & PREV_INUSE)) {
+				if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Invalid pointer\n");
+				abort_now();
+				return (0);
+			}
 		}
 
 		// Full chunk size
@@ -148,6 +150,7 @@
 
 		// malloc(0)
 		if (check_digit(ptr, ZERO_MALLOC_BASE)) {
+			return (0);
 			mutex(&g_manager.mutex, MTX_LOCK);
 
 				if ((uintptr_t)ptr % ALIGNMENT) {
@@ -201,7 +204,8 @@
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 		}
 
-		if (!heap_ptr && !check_digit(ptr, arena->heap_header)) chunk_size = real_malloc_usable_size(ptr);
+		// if (!heap_ptr && !check_digit(ptr, arena->heap_header)) chunk_size = real_malloc_usable_size(ptr);
+		if (!heap_ptr) chunk_size = real_malloc_usable_size(ptr);
 
 		return (chunk_size);
 	}

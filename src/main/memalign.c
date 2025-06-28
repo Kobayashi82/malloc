@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 14:06:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 14:27:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,21 @@
 
 #pragma region "Memalign"
 
-	__attribute__((visibility("default")))
-	void *memalign(size_t alignment, size_t size) {
-		ensure_init();
+	// __attribute__((visibility("default")))
+	// void *memalign(size_t alignment, size_t size) {
+	// 	ensure_init();
 
-		if (!is_power_of_two(alignment)) return (NULL);
+	// 	if (!is_power_of_two(alignment)) return (NULL);
 
-		void *ptr = NULL;
+	// 	void *ptr = NULL;
 
-		(void) size;
-		// Más flexible que aligned_alloc
-		// ptr = your_aligned_allocation(alignment, size);
-		// if (ptr) register_allocation(ptr, size, alignment);
+	// 	(void) size;
+	// 	// Más flexible que aligned_alloc
+	// 	// ptr = your_aligned_allocation(alignment, size);
+	// 	// if (ptr) register_allocation(ptr, size, alignment);
 
-		return (ptr);
-	}
+	// 	return (ptr);
+	// }
 
 #pragma endregion
 

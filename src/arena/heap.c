@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 23:59:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 17:37:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@
 				t_heap_header *heap_header = internal_alloc(PAGE_SIZE);
 				if (!heap_header) return (NULL);
 				arena->heap_header = heap_header;
-				heap_header->total = 60;
+				heap_header->total = 85;
 				heap_header->used = 1;
 				heap_header->next = NULL;
 
@@ -79,7 +79,7 @@
 			} else {
 				t_heap_header *heap_header = (t_heap_header *)((char *)arena + ALIGN(sizeof(t_arena)));
 				arena->heap_header = heap_header;
-				heap_header->total = 50;
+				heap_header->total = 73;
 				heap_header->used = 1;
 				heap_header->next = NULL;
 
@@ -104,7 +104,7 @@
 				t_heap_header *new_heap_header = internal_alloc(PAGE_SIZE);
 				if (!heap_header) return (NULL);
 				heap_header->next = new_heap_header;
-				new_heap_header->total = 60;
+				new_heap_header->total = 85;
 				new_heap_header->used = 1;
 				new_heap_header->next = NULL;
 
@@ -148,24 +148,20 @@
 
 #pragma region "Destroy"
 
-	int heap_destroy(t_arena *arena, void *ptr, int type, size_t size) {
-		if (!arena || !ptr || !size || type < TINY || type > LARGE) return (1);
-	
-		t_heap *heap = heap_find(arena, ptr);
-		if (!heap) {
-			if (g_manager.options.DEBUG && type != LARGE)		aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to detroy heap\n");
-			return (1);
-		}
+	int heap_destroy(t_heap *heap) {
+		if (!heap) return (1);
 
 		int result = 0;
-		if (munmap(ptr, size)) {
+		if (munmap(heap->ptr, heap->size)) {
 			result = 1;
-			if (g_manager.options.DEBUG && type != LARGE)		aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to detroy heap\n");
+			if (g_manager.options.DEBUG && heap->type == LARGE)		aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Unable to unmap memory\n", heap->ptr);
+			if (g_manager.options.DEBUG && heap->type != LARGE)		aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to detroy heap\n");
 		}
+
 		heap->active = false;
 
-		if (!result && type != LARGE && g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Heap of size (%d) freed\n", ptr, size);
-		if (!result && type == LARGE) arena->free_count++;
+		if (!result && heap->type == LARGE && g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p - %p\t   [FREE] Memory freed\n", heap, heap->ptr);
+		if (!result && heap->type != LARGE && g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Heap of size (%d) freed\n", heap->ptr, heap->size);
 
 		return (result);
 	}

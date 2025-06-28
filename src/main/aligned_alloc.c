@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 14:06:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/28 14:27:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,21 +18,21 @@
 
 #pragma region "Aligned Alloc"
 
-	__attribute__((visibility("default")))
-	void *aligned_alloc(size_t alignment, size_t size) {
-		ensure_init();
+	// __attribute__((visibility("default")))
+	// void *aligned_alloc(size_t alignment, size_t size) {
+	// 	ensure_init();
 
-		// Validar parámetros
-		if (!is_power_of_two(alignment) || size % alignment) return (NULL);
+	// 	// Validar parámetros
+	// 	if (!is_power_of_two(alignment) || size % alignment) return (NULL);
 		
-		void *ptr = NULL;
+	// 	void *ptr = NULL;
 
-		// Tu lógica de asignación alineada
-		// ptr = your_aligned_allocation(alignment, size);
-		// if (ptr) register_allocation(ptr, size, alignment);
+	// 	// Tu lógica de asignación alineada
+	// 	// ptr = your_aligned_allocation(alignment, size);
+	// 	// if (ptr) register_allocation(ptr, size, alignment);
 
-		return (ptr);
-	}
+	// 	return (ptr);
+	// }
 
 #pragma endregion
 
