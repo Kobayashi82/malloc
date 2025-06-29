@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:02 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 20:01:56 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 20:06:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,20 +254,14 @@
 
 #pragma region "Information"
 
-	// Allocates memory for an array of objects, initializing them to zero.
+	// Shows a detailed map of all current allocations.
 	//
-	//   void *calloc(size_t nmemb, size_t size);
+	//	void show_alloc_mem(void);
 	//
-	//   nmemb – number of elements.
-	//   size  – the size of each element, in bytes.
-	//
-	//   • On success: returns a pointer aligned for the requested size with all bytes initialized to zero.
-	//   • On failure: returns NULL and sets errno to:
-	//       – ENOMEM: not enough memory.
+	//   • On success: prints a detailed report of all current allocations.
 	//
 	// Notes:
-	//   • If nmemb == 0 || size == 0:
-	//       – returns a unique pointer that can be freed.
-	//   • Memory is zero-initialized, meaning all bits are set to 0.
+	//   • Output is written to file descriptor 1 (stdout).
+	//   • Heaps are sorted before printing, and grouped by arena.
 
 #pragma endregion
