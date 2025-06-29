@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:34:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 12:53:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,17 +44,6 @@
 		#define PATH_MAX 				4096
 	#endif
 	
-	// OPTIONS
-	#define M_ARENA_MAX					-8								//
-	#define M_ARENA_TEST				-7								//
-	#define M_PERTURB					-6								//
-	#define M_CHECK_ACTION				-5								//
-	#define M_MXFAST			 		 1								//
-	#define M_MIN_USAGE_PERCENT			 3								// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
-	#define M_DEBUG						 7								// (DEBUG) Enable debug mode
-	#define M_LOGGING					 8								// (DEBUG) Captura backtrace con backtrace() y lo guardas junto con cada allocación.
-	#define M_LOGFILE					 9								// (DEBUG) Con diferentes comportamientos según el valor:
-
 	// MAGIC & POISON
 	#define MAGIC_BYTES					((size_t)0xABCDEF0123456789ULL)	// 4 or 8 bytes
 	#define POISON_BYTES				((size_t)0xDEADBEEFCAFEBABEULL)	// 4 or 8 bytes
@@ -186,10 +175,11 @@
 
 	// Options
 	void	options_initialize();
-	int		mallopt(int param, int value);
+	int		options_set(int param, int value);
 
 	// Native
 	void	native_free(void *ptr);
 	void	*native_realloc(void *ptr, size_t size);
+	size_t	native_malloc_usable_size(void *ptr);
 
 #pragma endregion

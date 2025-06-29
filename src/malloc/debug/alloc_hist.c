@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   alloc_mem_ex.c                                     :+:      :+:    :+:   */
+/*   alloc_hist.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/29 12:15:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:19:40 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/06/29 12:16:03 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/06/29 12:47:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@
 
 #pragma endregion
 
-#pragma region "Show Alloc Mem Ex"
+#pragma region "Show Alloc History"
 
-	void show_alloc_mem_ex() {
+	__attribute__((visibility("default")))
+	void show_alloc_history() {
 		
 	}
 

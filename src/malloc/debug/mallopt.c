@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   alloc_hist.c                                       :+:      :+:    :+:   */
+/*   mallopt.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:16:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:25:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 12:57:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,11 @@
 
 #pragma endregion
 
-#pragma region "Show Alloc History"
+#pragma region "Mallopt"
 
-	void show_alloc_history() {
-		
+	__attribute__((visibility("default")))
+	int mallopt(int param, int value) {
+		return (options_set(param, value));
 	}
 
 #pragma endregion

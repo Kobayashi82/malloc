@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 11:48:55 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 15:38:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 12:45:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,40 +28,6 @@
 		while (val2 >= 0x10) val2 /= 0x10;
 
 		return ((val1 & 0xF) == (val2 & 0xF));
-	}
-
-#pragma endregion
-
-#pragma region "Real Malloc Usable Size"
-
-	static size_t real_malloc_usable_size(void *ptr) {
-		if (!ptr) return 0;
-
-		#ifdef _WIN32
-			static size_t (__cdecl *real_malloc_usable_size_win)(void*);
-			if (!real_malloc_usable_size_win) {
-				HMODULE m = GetModuleHandleA("msvcrt.dll");
-				if (m) real_malloc_usable_size_win = (size_t(__cdecl*)(void*))GetProcAddress(m, "_msize");
-			}
-
-			if (!real_malloc_usable_size_win) {
-				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to native malloc_usable_size failed\n", ptr);
-				return (0);
-			}
-
-			return (real_malloc_usable_size_win(ptr));
-		#else
-			static size_t (*real_malloc_usable_size_unix)(void*);
-			if (!real_malloc_usable_size_unix) 
-				real_malloc_usable_size_unix = dlsym(RTLD_NEXT, "malloc_usable_size");
-			
-			if (!real_malloc_usable_size_unix) {
-				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to native malloc_usable_size failed\n", ptr);
-				return (0);
-			}
-
-			return (real_malloc_usable_size_unix(ptr));
-		#endif
 	}
 
 #pragma endregion
@@ -204,8 +170,7 @@
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 		}
 
-		// if (!heap_ptr && !check_digit(ptr, arena->heap_header)) chunk_size = real_malloc_usable_size(ptr);
-		if (!heap_ptr) chunk_size = real_malloc_usable_size(ptr);
+		if (!heap_ptr) chunk_size = native_malloc_usable_size(ptr);
 
 		return (chunk_size);
 	}

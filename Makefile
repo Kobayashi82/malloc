@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/06/29 12:34:27 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/06/29 12:58:17 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -81,11 +81,19 @@ SRC_DIR		= src/
 # ─────────── #
 
 SRCS		= internal/internal.c internal/options.c internal/native.c	\
+\
 			  arena/arena.c arena/heap.c arena/bin.c arena/coalescing.c	\
-			  main/free.c main/malloc.c main/realloc.c main/calloc.c	\
-			  main/reallocarray.c main/aligned_alloc.c main/memalign.c	\
-			  main/posix_memalign.c main/malloc_usable_size.c			\
-			  debug/alloc_mem.c debug/alloc_mem_ex.c debug/alloc_hist.c	\
+\
+			  malloc/main/free.c malloc/main/malloc.c					\
+			  malloc/main/realloc.c malloc/main/calloc.c				\
+\
+			  malloc/extra/reallocarray.c malloc/extra/aligned_alloc.c	\
+			  malloc/extra/memalign.c malloc/extra/posix_memalign.c		\
+			  malloc/extra/malloc_usable_size.c							\
+\
+			  malloc/debug/mallopt.c malloc/debug/alloc_hist.c			\
+			  malloc/debug/alloc_mem.c malloc/debug/alloc_mem_ex.c		\
+\
 			  utils/string.c utils/number.c utils/mem.c utils/aprintf.c
 
 # ───────────────────────────────────────────────────────────── #

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 01:11:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 12:59:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,10 +168,9 @@
 
 #pragma endregion
 
-#pragma region "Mallopt"
+#pragma region "Set"
 
-	__attribute__((visibility("default")))
-	int mallopt(int param, int value) {
+	int options_set(int param, int value) {
 		ensure_init();
 
 		mutex(&g_manager.mutex, MTX_LOCK);
