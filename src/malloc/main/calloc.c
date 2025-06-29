@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 12:25:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 13:55:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 13:02:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,5 @@
 	//   • If nmemb == 0 || size == 0:
 	//       – returns a unique pointer that can be freed.
 	//   • Memory is zero-initialized, meaning all bits are set to 0.
-
 
 #pragma endregion

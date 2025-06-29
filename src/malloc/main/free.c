@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:33:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 13:29:40 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,31 +16,15 @@
 
 #pragma endregion
 
-#pragma region "Check Digit"
-
-	static int check_digit(void *ptr1, void *ptr2) {
-		if (!ptr1 || !ptr2) return (0);
-
-		uintptr_t val1 = (uintptr_t)ptr1;
-		uintptr_t val2 = (uintptr_t)ptr2;
-
-		while (val1 >= 0x10) val1 /= 0x10;
-		while (val2 >= 0x10) val2 /= 0x10;
-
-		return ((val1 & 0xF) == (val2 & 0xF));
-	}
-
-#pragma endregion
-
 #pragma region "Free PTR"
 
 	static int free_ptr(t_arena *arena, void *ptr, t_heap *heap) {
-		if (!ptr ||!arena || !heap) return (0);
+		if (!arena || !ptr || !heap) return (0);
 
 		// LARGE
 		if (heap->type == LARGE) {
 			if (GET_HEAD(ptr) == heap->ptr) {
-					
+
 				// Corruption
 				if (!HAS_MAGIC(ptr)) {
 					if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Corrupted memory (LARGE)\n", ptr);
@@ -146,25 +130,25 @@
 		t_heap	*heap = NULL;
 		t_heap	*inactive = NULL;
 
-			mutex(&g_manager.mutex, MTX_LOCK);
+		mutex(&g_manager.mutex, MTX_LOCK);
 
-				while (arena) {
-					mutex(&arena->mutex, MTX_LOCK);
+			while (arena) {
+				mutex(&arena->mutex, MTX_LOCK);
 
-						if ((heap = heap_find(arena, ptr))) {
-							if (heap->active) {
-								free_ptr(arena, ptr, heap);
-								mutex(&arena->mutex, MTX_UNLOCK);
-								mutex(&g_manager.mutex, MTX_UNLOCK);
-								return ;
-							} else inactive = heap;
-						}
+					if ((heap = heap_find(arena, ptr))) {
+						if (heap->active) {
+							free_ptr(arena, ptr, heap);
+							mutex(&arena->mutex, MTX_UNLOCK);
+							mutex(&g_manager.mutex, MTX_UNLOCK);
+							return ;
+						} else inactive = heap;
+					}
 
-					mutex(&arena->mutex, MTX_UNLOCK);
-					arena = arena->next;
-				}
+				mutex(&arena->mutex, MTX_UNLOCK);
+				arena = arena->next;
+			}
 
-			mutex(&g_manager.mutex, MTX_UNLOCK);
+		mutex(&g_manager.mutex, MTX_UNLOCK);
 
 		// Heap freed
 		if (inactive && (inactive->type != LARGE || GET_HEAD(ptr) == inactive->ptr)) {

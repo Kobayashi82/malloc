@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:20:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:58:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 13:04:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,6 @@
 	int		mallopt(int param, int value);
 	void	show_alloc_history();
 	void	show_alloc_mem();
-	void	show_alloc_mem_ex();
+	void	show_alloc_mem_ex(void *ptr, size_t offset, size_t length);
 
 #pragma endregion

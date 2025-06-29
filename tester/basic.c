@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:49:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 15:12:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,23 @@
 
 	#include "malloc.h"
 
+	#include <string.h>
+
 #pragma endregion
 
 #pragma region "Main"
 
 	int main() {
-		mallopt(M_DEBUG, 1);
+		mallopt(M_DEBUG, 0);
 
-		char *popo = malloc(0);
-		char *popo1 = malloc(0);
-		char *popo2 = malloc(0);
-		char *popo3 = malloc(0);
-		char *popo4 = malloc(0);
-		// popo += 8;
-		free(popo);
+		char *popo1 = malloc(100);
 		free(popo1);
-		free(popo2);
-		free(popo3);
-		free(popo4);
+		popo1 = malloc(354);
+		strcpy(popo1, "gcc -g -Wno-free-nonheap-object -o testing testing.c -I./inc -L./build/lib -lft_malloc -Wl,-rpath=./build/lib -pthread\n-Wno-free-nonheap-object	= Desactiva advertencia de free() al compilar\n-lft_malloc				= -l busca lib + ft_malloc + .so\n -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime");
+		show_alloc_mem_ex(popo1, 60, 60);
+		free(popo1);
+		// popo += 8;
+
 	}
 
 #pragma endregion

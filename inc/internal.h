@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:53:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 13:11:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,6 +171,7 @@
 	void	forksafe_init();
 	void	ensure_init();
 	size_t	get_pagesize();
+	int		check_digit(void *ptr1, void *ptr2);
 	int		abort_now();
 
 	// Options

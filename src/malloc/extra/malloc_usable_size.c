@@ -6,29 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 11:48:55 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:45:45 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 13:11:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
-
-#pragma endregion
-
-#pragma region "Check Digit"
-
-	static int check_digit(void *ptr1, void *ptr2) {
-		if (!ptr1 || !ptr2) return (0);
-
-		uintptr_t val1 = (uintptr_t)ptr1;
-		uintptr_t val2 = (uintptr_t)ptr2;
-
-		while (val1 >= 0x10) val1 /= 0x10;
-		while (val2 >= 0x10) val2 /= 0x10;
-
-		return ((val1 & 0xF) == (val2 & 0xF));
-	}
 
 #pragma endregion
 
