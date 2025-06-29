@@ -1,36 +1,5 @@
 # TODO
 
-heap_find solo busca en la arena actual
-
-- [ ] ERRNO
-- [ ] Magic number
-- [ ] Contador alocaciones y fress
-- [ ] Contador de frees para eliminar heap (quizas mejor cuando se haga coalescing se limpia zonas vacias. Por investigar)
-- [ ] Bins
-- [ ] Coalescing
-- [ ] Data-Races
-- [ ] Perturb (recordar que calloc puede tener que actuar en mmap si perturb)
-- [ ] Free heap
-
-- Debug
-- [ ] Logging
-- [ ] Printing
-- [ ] Allocation history
-- [ ] Print memory
-- [ ] Print memory heX
-
-- Script
-- [ ] Evaluation
-- [ ] Speed comparison
-- [ ] Size comparison
-
-- Documentacion
-- [ ] Porque size_t como encabezado
-- [ ] Heaps (types and sizes)
-- [ ] Bins
-- [ ] Frees
-- [ ] Coalescing
-
 ## Allocation Order
 
 - mmap (if too large)
@@ -42,61 +11,67 @@ heap_find solo busca en la arena actual
 - repeat if fastbin not empty
 - top chunk
 
-(see Allocation.md)
+## Global
+
+- [ ] ERRNO
+- [ ] Data-Races
+
+## Chunks
+
+- [ ] Corruption (Magic / Poison)
+- [ ] Perturb
+- [ ] Coalescing
 
 ## Bins
 
-- [ ] Fastbin (MXFAST) - (no coalescing)
+- [X] Fastbin (MXFAST) - (no coalescing)
 - [ ] Smallbin - (coalescing)
 - [ ] Unsortedbin
 - [ ] Largebin - (coalescing)
 
-## Cosas
+## Heaps
 
-- [ ] Coalescing
-- [ ] Perturb
 - [ ] Free heap
+- [ ] Contador de frees para eliminar heap
+- [ ] heap_find solo busca en la arena actual
 
 ## Main
 
-- [X] malloc
-- [X] calloc
-- [X] realloc
 - [X] free
-- [X] mallopt
-- [X] malloc_usable_size
-
-## Free
-
-- [X] Not aligned
-- [X] LARGE (double free is delegated to native free, if not, is middle chunk)
-- [X] Double free
-- [X] Top chunk
-- [X] Middle chunk
-- [X] Not allocated (delegated to native free)
+- [X] malloc
+- [X] realloc
+- [X] calloc
 
 ## Extra
 
-- [X] Multi-Threading with arenas and fork-safe support
-- [X] Debug environment variables and mallopt()
-- [X] Debug logging to file
-- [ ] Bin management (fastbin, smallbin, largebin & unsortedbin)
+- [X] reallocarray
+- [ ] aligned_alloc
+- [ ] memalign
+- [ ] posix_memalign
+- [X] malloc_usable_size
+
+## Debug
+
+- [X] mallopt
+- [ ] show_alloc_hist
+- [X] show_alloc_mem
+- [X] show_alloc_mem_ex
+
+## Documentation
+
+- [ ] Arenas
+- [ ] Heaps
+- [ ] Header
+- [ ] Chunks
+- [ ] Bins
+- [ ] Alignment 
 - [ ] Coalescing
-- [ ] Print memory
-- [ ] Print memory heX
-- [ ] Allocations history
+- [ ] Corruption
 
-## Delegate Free
+- [ ] Main
+- [ ] Extra
+- [ ] Debug
 
-Se evita comportamientos indefinidos que podrían ocurrir si intentaras liberar memoria que no fue asignada por tu implementación y que podrían haber sido asignados por otros allocadores de memoria antes de que tu biblioteca fuera cargada.
+- [ ] Fork-Safe
+- [ ] Preload library
 
-- Es una medida de seguridad esencial para evitar corrupción de memoria.
-- Es una práctica estándar en implementaciones personalizadas de `malloc`.
-- Solo se usa como fallback cuando se detecta que el puntero no pertenece a tu allocador.
-- No forma parte de la lógica principal de asignación/liberación, sino de la gestión de casos límite.
-
-## Delegate Realloc
-
-- Al igual que cuando se delega un puntero a liberar (free), en realloc puede ser necesario liberar un puntero que no ha sido asignado por nuestro malloc y en ese caso, se delega al realloc nativo.
-
-- Como alternativa, podria asignarse un chunk o espacio de memoria para el realloc y delegar la liberación del puntero si no es nuestro. Quizas use este modo por defecto y evito delegar realloc.

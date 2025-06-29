@@ -12,14 +12,13 @@ Malloc es un proyecto de la escuela 42 que implementa un sistema completo de ges
 - **Funciones Estándar**: `malloc()`, `free()`, `realloc()` compatibles con libc
 - **Visualización**: `show_alloc_mem()` para inspección del estado de memoria
 - **Thread Safety**: Soporte completo para aplicaciones multi-hilo y forks
-- **Gestión de Zonas**: Sistema de zonas TINY, SMALL y LARGE optimizado
+- **Gestión de Zonas**: Sistema de zonas TINY, SMALL y LARGE
 
 ### 🚀 Características Avanzadas
 
 #### **Sistema de Arenas**
 - **Múltiples Arenas**: Cada hilo puede usar arenas separadas para reducir contención
 - **Balanceado de Carga**: Distribución inteligente entre arenas disponibles
-- **Escalabilidad**: Mejor rendimiento en aplicaciones multi-hilo intensivas
 
 #### **Bins Especializados**
 - **FastBin**: Cacheo rápido para asignaciones pequeñas y frecuentes
@@ -29,32 +28,12 @@ Malloc es un proyecto de la escuela 42 que implementa un sistema completo de ges
 
 #### **Optimizaciones de Memoria**
 - **Coalescing**: Fusión automática de bloques adyacentes libres
-- **Alineación**: Alineación óptima de memoria para rendimiento
+- **Alineación**: Alineación óptima de memoria
 
 #### **Protección y Seguridad**
-- **Validación de Punteros**: Verificación de integridad en operaciones free/realloc
+- **Validación de Punteros**: Verificación de integridad de memoria
 
 ## 🏗️ Arquitectura
-
-### Estructura de Arenas
-```
-Arena 1
-├── id					// 
-├── *fastbin[10]		// (16-160 bytes) Arrays de listas simples (LIFO)
-├── *unsortedbin[10]	// ???
-├── *smallbin[31]		// (176-512 bytes para TINY, 513-4096 para SMALL) Doblemente enlazadas
-├── *largebin[10]		// ???
-├── *tiny				// Linked list of TINY heaps
-├── *small				// Linked list of SMALL heaps
-├── *large				// Linked list of LARGE heaps (single chunk per heap)
-├── *next				// Pointer to the next arena
-└── mutex				// Mutex for thread safety in the current arena
-```
-
-### Gestión de Tamaños
-- **TINY**: 1-128 bytes → Gestión con bitmap
-- **SMALL**: 129-1024 bytes → SmallBins + FastBins  
-- **LARGE**: >1024 bytes → LargeBins + mmap directo
 
 ## 🔧 Instalación
 
@@ -139,41 +118,66 @@ export MALLOC_ARENA_MAX=8
 
 ## 📚 Funciones Adicionales
 
-### show_alloc_mem_ex()
-```c
-// Función extendida con información detallada
-void show_alloc_mem_ex();
-```
+### show_alloc_mem()
 
 **Salida ejemplo:**
 ```
-=== Malloc Memory Report ===
-ARENA 0 (Thread: 12345)
-  FastBins [16]: 3 chunks
-  FastBins [24]: 1 chunk  
-  SmallBins [32-40]: 5 chunks
-  LargeBins [1024+]: 2 chunks
+————————————
+ • Arena #1
+———————————————————————————————————————
+ • Allocations: 7       • Frees: 1
+ • TINY: 1              • SMALL: 1
+ • LARGE: 0             • TOTAL: 2
+———————————————————————————————————————
 
-TINY Zones: 0x7F8A12000000
-  0x7F8A12000020 - 0x7F8A12000040: 32 bytes [ALLOC]
-  0x7F8A12000040 - 0x7F8A12000050: 16 bytes [FREE]
+ SMALL : 0x70000
+— — — — — — — — — — — — — — — — —
+ 0x70010 - 0x707e0 : 2000 bytes
+                    — — — — — — —
+                     2000 bytes
 
-SMALL Zones: 0x7F8A13000000  
-  0x7F8A13000020 - 0x7F8A13000220: 512 bytes [ALLOC]
-  0x7F8A13000220 - 0x7F8A13000420: 512 bytes [FREE]
+ TINY : 0xf0000
+— — — — — — — — — — — — — — — — —
+ 0xf0010 - 0xf0020 : 16 bytes
+ 0xf0030 - 0xf0040 : 16 bytes
+ 0xf0050 - 0xf0060 : 16 bytes
+ 0xf0070 - 0xf0080 : 16 bytes
+ 0xf0090 - 0xf00a0 : 16 bytes
+                    — — — — — — —
+                     80 bytes
 
-LARGE Allocations:
-  0x7F8A14000000 - 0x7F8A14002000: 8192 bytes [mmap]
+———————————————————————————————————————
+ 2080 bytes in arena #1
 
-Total Allocated: 52,698 bytes
-Total System Memory: 65,536 bytes  
-Fragmentation: 19.6%
+
+———————————————————————————————————————————————————————————————
+ • 7 allocations, 1 free and 2080 bytes across 1 arena
 ```
 
-### mallopt() - Control de Comportamiento
-```c
-#include "malloc.h"
 
+### show_alloc_mem_ex()
+
+**Salida ejemplo:**
+```
+——————————————————————————————————————
+ • Pointer: 0x703ab8cbf010 (Arena #1)
+————————————————————————————————————————————————————————————————————————————————————
+ • Size: 112 bytes      • Offset: 0 bytes      • Length: 112 bytes
+————————————————————————————————————————————————————————————————————————————————————
+ 0x703ab8cbf000  71 00 00 00 00 00 00 00  89 67 45 23 01 ef cd ab  q........gE#....
+————————————————————————————————————————————————————————————————————————————————————
+ 0x703ab8cbf010  48 65 6c 6c 6f 20 57 6f  72 6c 64 21 00 00 00 00  Hello World!....
+ 0x703ab8cbf020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+ 0x703ab8cbf030  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+ 0x703ab8cbf040  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+ 0x703ab8cbf050  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+ 0x703ab8cbf060  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+ 0x703ab8cbf070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  ................
+————————————————————————————————————————————————————————————————————————————————————
+```
+
+### mallopt()
+```c
 // Configurar número máximo de arenas
 mallopt(M_ARENA_MAX, 4);
 ...
@@ -183,18 +187,11 @@ mallopt(M_ARENA_MAX, 4);
 
 ### **Rendimiento**
 - **FastBins**: Acceso O(1) para tamaños comunes
-- **Bitmap**: Gestión ultra-rápida para bloques pequeños
 - **Coalescing**: Reducción de fragmentación automática
 
 ### **Escalabilidad Multi-hilo**
 - **Arena por Hilo**: Minimiza contención entre hilos
-- **Lock-free TCache**: Operaciones sin bloqueos cuando es posible
 - **Balanceado Dinámico**: Distribución inteligente de carga
-
-### **Uso de Memoria**
-- **Defragmentación**: Consolidación automática de espacio libre
-- **Lazy Allocation**: Asignación de arenas bajo demanda
-- **mprotect**: Liberación de páginas no utilizadas
 
 ## 🧪 Testing
 
@@ -226,25 +223,15 @@ make test-compatibility  # Programas reales
 # Mejora: +25% en operaciones mixtas
 ```
 
-### Detección de Problemas
-```bash
-# Ejecutar con Valgrind
-valgrind --tool=memcheck ./programa
-
-# Usar AddressSanitizer
-gcc -fsanitize=address programa.c -L. -lft_malloc
-```
-
 ## 🔬 Detalles Técnicos
 
 ### **Gestión de Memoria**
-- ✅ **Sin Memory Leaks**: Liberación completa de recursos
-- ✅ **Detección de Corrupción**: ...
+- ✅ **Detección de Corrupción**: Magic number and poison bytes
 - ✅ **Alineación Óptima**: 8/16 bytes según arquitectura
 
 ### **Thread Safety**
 - ✅ **Locks Granulares**: Un lock por arena para minimizar contención
-- ✅ **Señales Seguras**: Manejo correcto de interrupciones
+- ✅ **Fork-Safe**: Fork seguro en entornos multi-hilo
 
 ### **Compatibilidad**
 - ✅ **Drop-in Replacement**: Reemplaza malloc del sistema sin modificaciones
@@ -259,8 +246,6 @@ gcc -fsanitize=address programa.c -L. -lft_malloc
 | malloc medio | 45ns | 67ns | **+33%** |  
 | free | 8ns | 12ns | **+33%** |
 | Multi-hilo | 892 ops/μs | 634 ops/μs | **+41%** |
-
-esto está por ver... lol
 
 ## License
 
