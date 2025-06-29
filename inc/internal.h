@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 13:11:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 18:30:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@
 	#define GET_PREV_SIZE(chunk)		(*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)))
 	#define SET_PREV_SIZE(chunk, size)	(*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)) = (size))
 	#define GET_SIZE(chunk) 			(size_t)((chunk)->size & ~15)
+	#define IS_TOPCHUNK(chunk)			(((chunk)->size & TOP_CHUNK) != 0)
+	#define IS_FREE(chunk)				(((GET_NEXT(chunk))->size & PREV_INUSE) == 0)
 
 	// ALIGMENTS
 	#define ZERO_MALLOC_BASE			(void *)0x100000000000					// 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 15:12:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 18:23:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,15 @@
 
 		char *popo1 = malloc(100);
 		free(popo1);
-		popo1 = malloc(354);
+		popo1 = malloc(16);
+		popo1 = malloc(16);
+		popo1 = malloc(16);
+		popo1 = malloc(16);
+		popo1 = malloc(16);
 		strcpy(popo1, "gcc -g -Wno-free-nonheap-object -o testing testing.c -I./inc -L./build/lib -lft_malloc -Wl,-rpath=./build/lib -pthread\n-Wno-free-nonheap-object	= Desactiva advertencia de free() al compilar\n-lft_malloc				= -l busca lib + ft_malloc + .so\n -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime");
-		show_alloc_mem_ex(popo1, 60, 60);
+		// show_alloc_mem_ex(popo1, 60, 60);
+		char *popo2 = malloc(2000);
+		show_alloc_mem();
 		free(popo1);
 		// popo += 8;
 
