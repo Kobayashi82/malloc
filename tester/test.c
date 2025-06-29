@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 23:17:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 23:33:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,11 +238,11 @@
 
 		char *ptr = malloc(1);
 		size_t size = malloc_usable_size(ptr);
-		printf("[USABLE_SIZE]\t%zu bytes available\t\t\t(%p)\n", size, ptr);
+		printf("[MALLOC_USABLE_SIZE]\t%zu bytes available\t\t\t(%p)\n", size, ptr);
 
 		char *ptr2 = reallocarray(ptr, 15, 10);
 		size = malloc_usable_size(ptr2);
-		printf("[USABLE_SIZE]\t%zu bytes available\t\t\t(%p)\n", size, ptr2);
+		printf("[MALLOC_USABLE_SIZE]\t%zu bytes available\t\t\t(%p)\n", size, ptr2);
 
 		free(ptr2);
 

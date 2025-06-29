@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:20:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 13:04:56 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 23:30:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,14 @@
 	void	*memalign(size_t alignment, size_t size);
 	int		posix_memalign(void **memptr, size_t alignment, size_t size);
 	size_t	malloc_usable_size(void *ptr);
+	void	*valloc(size_t size);
+	void	*pvalloc(size_t size);
 
 	// Debug
 	int		mallopt(int param, int value);
-	void	show_alloc_history();
+	void	malloc_stats();
 	void	show_alloc_mem();
 	void	show_alloc_mem_ex(void *ptr, size_t offset, size_t length);
+	void	show_alloc_history();
 
 #pragma endregion

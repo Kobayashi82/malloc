@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 15:14:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 23:28:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,25 +25,25 @@
 
 		for (size_t i = 0; i < length; i += ALIGNMENT) {
 			// Pointer
-			aprintf(1, " %p  ", (void *)(tmp_ptr + i));
+			aprintf(2, " %p  ", (void *)(tmp_ptr + i));
 
 			// Hexadecimal (8 or 16 bytes per row splitted at 8 or 4 bytes, depends of ALIGNMENT)
 			for (size_t j = 0; j < ALIGNMENT; j++) {
 				if (i + j < length) {
-					if (tmp_ptr[i + j] < 16) aprintf(1, "0");
-					aprintf(1, "%x ", (unsigned int)tmp_ptr[i + j]);
-				} else aprintf(1, "   ");
-				if (j == (ALIGNMENT/2 - 1)) aprintf(1, " ");
+					if (tmp_ptr[i + j] < 16) aprintf(2, "0");
+					aprintf(2, "%x ", (unsigned int)tmp_ptr[i + j]);
+				} else aprintf(2, "   ");
+				if (j == (ALIGNMENT/2 - 1)) aprintf(2, " ");
 			}
-			aprintf(1, " ");
+			aprintf(2, " ");
 
 			// ASCII
 			for (size_t j = 0; j < ALIGNMENT && i + j < length; j++) {
 				unsigned char c = tmp_ptr[i + j];
-				aprintf(1, "%c", (c >= 32 && c <= 126) ? c : '.');
+				aprintf(2, "%c", (c >= 32 && c <= 126) ? c : '.');
 			}
 
-			aprintf(1, "\n");
+			aprintf(2, "\n");
 		}
 	}
 
@@ -62,15 +62,15 @@
 		size_t	remaining = chunk_size - offset;
 		size_t	size = (!length || length > remaining) ? remaining : length;
 
-		aprintf(1, "——————————————————————————————————————\n");
-		aprintf(1, " • Pointer: %p (Arena #%d)\n", ptr, arena->id);
-		aprintf(1, "————————————————————————————————————————————————————————————————————————————————————\n");
-		aprintf(1, " • Size: %u bytes      • Offset: %u bytes      • Length: %u bytes%s\n", chunk_size, offset, size, remaining < length ? " (truncated)" : "");
-		aprintf(1, "————————————————————————————————————————————————————————————————————————————————————\n");
+		aprintf(2, "——————————————————————————————————————\n");
+		aprintf(2, " • Pointer: %p (Arena #%d)\n", ptr, arena->id);
+		aprintf(2, "————————————————————————————————————————————————————————————————————————————————————\n");
+		aprintf(2, " • Size: %u bytes      • Offset: %u bytes      • Length: %u bytes%s\n", chunk_size, offset, size, remaining < length ? " (truncated)" : "");
+		aprintf(2, "————————————————————————————————————————————————————————————————————————————————————\n");
 		print_hex((char *)chunk, sizeof(t_chunk));
-		aprintf(1, "————————————————————————————————————————————————————————————————————————————————————\n");
+		aprintf(2, "————————————————————————————————————————————————————————————————————————————————————\n");
 		print_hex((char *)ptr + offset, size);
-		aprintf(1, "————————————————————————————————————————————————————————————————————————————————————\n");
+		aprintf(2, "————————————————————————————————————————————————————————————————————————————————————\n");
 	}
 
 #pragma endregion

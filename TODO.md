@@ -34,6 +34,7 @@
 - [ ] Free heap
 - [ ] Contador de frees para eliminar heap
 - [ ] heap_find solo busca en la arena actual
+- [ ] your_aligned_allocation()
 
 ## Main
 
@@ -45,17 +46,20 @@
 ## Extra
 
 - [X] reallocarray
-- [ ] aligned_alloc
-- [ ] memalign
+- [X] aligned_alloc
+- [X] memalign
 - [ ] posix_memalign
 - [X] malloc_usable_size
+- [X] valloc
+- [X] pvalloc
 
 ## Debug
 
 - [X] mallopt
-- [ ] show_alloc_hist
+- [X] malloc_stats
 - [X] show_alloc_mem
 - [X] show_alloc_mem_ex
+- [ ] show_alloc_hist
 
 ## Documentation
 

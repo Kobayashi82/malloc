@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 14:06:27 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 23:04:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,52 @@
 	// int posix_memalign(void **memptr, size_t alignment, size_t size) {
 	// 	ensure_init();
 
-	// 	*memptr = NULL;
+	// 	if (alignment < sizeof(void *) || !is_power_of_two(alignment)) {
+	// 		if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
+	// 		return (EINVAL);
+	// 	}
+	
+	// 	t_arena	*arena;
+	// 	void	*ptr = NULL;
 
-	// 	// Validaciones POSIX específicas
-	// 	if (alignment % sizeof(void *) != 0 || !is_power_of_two(alignment)) return (EINVAL);
+	// 	if (!size) {
+	// 		mutex(&g_manager.mutex, MTX_LOCK);
 
-	// 	void *ptr = NULL;
+	// 			size_t aligned_offset = (g_manager.zero_malloc_counter * alignment);
+	// 			g_manager.zero_malloc_counter++;
+				
+	// 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
-	// 	(void) size;
-	// 	// ptr = your_aligned_allocation(alignment, size);
-	// 	// if (!ptr) return (ENOMEM);
+	// 		ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
+	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [POSIX_MEMALIGN] Allocated %u bytes\n", ptr, size);
+	// 		else if (!ptr) return (ENOMEM);
 
+	// 		*memptr = ptr;
+	// 		return (0);
+	// 	}
+
+	// 	if (!tcache) {
+	// 		arena = arena_get();
+	// 		tcache = arena;
+	// 		if (!arena) {
+	// 			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to assign arena\n");
+	// 			return (NULL);
+	// 		}
+	// 	} else arena = tcache;
+
+	// 	mutex(&arena->mutex, MTX_LOCK);
+
+	// 		// ptr = your_aligned_allocation(alignment, size);
+	
+	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [POSIX_MEMALIGN] Allocated %u bytes\n", ptr, size);
+	// 		else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+
+	// 		if (ptr) SET_MAGIC(ptr);
+
+	// 	mutex(&arena->mutex, MTX_UNLOCK);
+
+	// 	if (!ptr) return (ENOMEM);
 	// 	*memptr = ptr;
-	// 	// register_allocation(ptr, size, alignment);
 
 	// 	return (0);
 	// }

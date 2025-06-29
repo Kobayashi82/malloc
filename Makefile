@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/06/29 12:58:17 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/06/29 23:29:25 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -92,7 +92,7 @@ SRCS		= internal/internal.c internal/options.c internal/native.c	\
 			  malloc/extra/malloc_usable_size.c							\
 \
 			  malloc/debug/mallopt.c malloc/debug/alloc_hist.c			\
-			  malloc/debug/alloc_mem.c malloc/debug/alloc_mem_ex.c		\
+			  malloc/debug/malloc_stats.c malloc/debug/alloc_mem_ex.c	\
 \
 			  utils/string.c utils/number.c utils/mem.c utils/aprintf.c
 

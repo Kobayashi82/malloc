@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   alloc_mem.c                                        :+:      :+:    :+:   */
+/*   malloc_stats.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:02 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 20:06:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 23:29:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,11 +119,11 @@
 			while (chunk) {
 				if (IS_TOPCHUNK(chunk)) break;
 				if (!IS_FREE(chunk)) {
-					write(1, " ", 1);
+					write(2, " ", 1);
 					print_hex5(1,  (uintptr_t)GET_PTR(chunk));
-					write(1, " - ", 3);
+					write(2, " - ", 3);
 					print_hex5(1,  (uintptr_t)GET_NEXT(chunk));
-					aprintf(1, " : %u bytes\n", GET_SIZE(chunk));
+					aprintf(2, " : %u bytes\n", GET_SIZE(chunk));
 					total += GET_SIZE(chunk);
 				}
 				chunk = GET_NEXT(chunk);
@@ -139,13 +139,13 @@
 		static size_t print_heaps(t_arena *arena, t_heap **heaps, int heaps_count, int tiny_count, int small_count, int large_count) {
 			if (!arena || !heaps) return (0);
 
-			aprintf(1, "————————————\n");
-			aprintf(1, " • Arena #%d\n", arena->id);
-			aprintf(1, "———————————————————————————————————————\n");
-			aprintf(1, " • Allocations: %u\t• Frees: %u\n", arena->alloc_count, arena->free_count);
-			aprintf(1, " • TINY: %u \t\t• SMALL: %u\n", tiny_count, small_count);
-			aprintf(1, " • LARGE: %u\t\t• TOTAL: %u\n", large_count, heaps_count);
-			aprintf(1, "———————————————————————————————————————\n\n");
+			aprintf(2, "————————————\n");
+			aprintf(2, " • Arena #%d\n", arena->id);
+			aprintf(2, "———————————————————————————————————————\n");
+			aprintf(2, " • Allocations: %u\t• Frees: %u\n", arena->alloc_count, arena->free_count);
+			aprintf(2, " • TINY: %u \t\t• SMALL: %u\n", tiny_count, small_count);
+			aprintf(2, " • LARGE: %u\t\t• TOTAL: %u\n", large_count, heaps_count);
+			aprintf(2, "———————————————————————————————————————\n\n");
 
 			size_t arena_total = 0;
 
@@ -157,24 +157,24 @@
 				if (heaps[i]->type == SMALL) type = "SMALL";
 				if (heaps[i]->type == LARGE) type = "LARGE";
 				
-				if (i > 0) aprintf(1, "\n");
+				if (i > 0) aprintf(2, "\n");
 
-				aprintf(1, " %s : ", type);
+				aprintf(2, " %s : ", type);
 				print_hex5(1,  (uintptr_t)heap->ptr);
-				write(1, "\n", 1);
-				aprintf(1, "— — — — — — — — — — — — — — — — —\n");
+				write(2, "\n", 1);
+				aprintf(2, "— — — — — — — — — — — — — — — — —\n");
 				size_t heap_total = print_heap(heaps[i]);
 				arena_total += heap_total;
 
 				if (heap_total) {
-					aprintf(1, "                    — — — — — — —\n");
-					aprintf(1, "                     %u byte%s\n", heap_total, heap_total == 1 ? "" : "s");
+					aprintf(2, "                    — — — — — — —\n");
+					aprintf(2, "                     %u byte%s\n", heap_total, heap_total == 1 ? "" : "s");
 				}
 			}
 
 			if (arena_total) {
-				aprintf(1, "\n———————————————————————————————————————\n");
-				aprintf(1, " %u byte%s in arena #%d\n\n\n", arena_total, arena_total == 1 ? "" : "s", arena->id);
+				aprintf(2, "\n———————————————————————————————————————\n");
+				aprintf(2, " %u byte%s in arena #%d\n\n\n", arena_total, arena_total == 1 ? "" : "s", arena->id);
 			}
 
 			return (arena_total);
@@ -187,7 +187,10 @@
 #pragma region "Show Alloc Mem"
 
 	__attribute__((visibility("default")))
-	void show_alloc_mem() {
+	void show_alloc_mem() { malloc_stats(); }
+
+	__attribute__((visibility("default")))
+	void malloc_stats() {
 	
 		mutex(&g_manager.mutex, MTX_LOCK);
 
@@ -221,34 +224,14 @@
 			}
 
 			
-			if (!total) aprintf(1, "No memory has been allocated\n");
+			if (!total) aprintf(2, "No memory has been allocated\n");
 			else if (g_manager.arena_count > 0) {
-				aprintf(1, "———————————————————————————————————————————————————————————————\n");
-				aprintf(1, " • %d allocation%s, %d free%s and %u byte%s across %d arena%s\n", alloc_count, alloc_count == 1 ? "" : "s", free_count, free_count == 1 ? "" : "s", total, total == 1 ? "" : "s", g_manager.arena_count, g_manager.arena_count == 1 ? "" : "s");
+				aprintf(2, "———————————————————————————————————————————————————————————————\n");
+				aprintf(2, " • %d allocation%s, %d free%s and %u byte%s across %d arena%s\n", alloc_count, alloc_count == 1 ? "" : "s", free_count, free_count == 1 ? "" : "s", total, total == 1 ? "" : "s", g_manager.arena_count, g_manager.arena_count == 1 ? "" : "s");
 			}
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 	}
-
-// Print mem debe ordenador los heaps para imprimirlos... A ver que se me ocurre.
-
-// Claro que lo lógico es primero arena 1 y ordenado esos heaps, luego arena 2, etc.
-
-// Array de punteros?
-// Cuento cuantos heaps activos hay y luego creo el array y lo ordeno en base a heap-ptr.
-
-// Se muestra
-
-// arena #n
-
-// TINY : ptr
-// ptr1 - ptr2 : n bytes
-// ...
-// Total : n bytes
-
-// Tiene en cuenta headers?
-// Y las estadísticas? En alloc history mejor.
-// Pero puedo hacer otra función que sea print_stats
 
 #pragma endregion
 
