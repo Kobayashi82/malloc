@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 23:16:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 12:28:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 
 #pragma region "Includes"
 
-	#include "unistd.h"
+	#include "malloc.h"
+
+	#include <unistd.h>
 
 #pragma endregion
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 17:11:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 12:30:47 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #pragma region "Includes"
 
 	#include "internal.h"
+	#include "malloc.h"
 
 #pragma endregion
 
@@ -35,18 +36,5 @@
 
 	// Bin
 	void	*find_memory(t_arena *arena, size_t size);
-
-	// Main
-	void	realfree(void *ptr);
-	void	free(void *ptr);
-	void	*malloc(size_t size);
-	void	*realloc(void *ptr, size_t size);
-	void	*calloc(size_t nmemb, size_t size);
-
-	void	*reallocarray(void *ptr, size_t nmemb, size_t size);
-	size_t	malloc_usable_size(void *ptr);
-	void	*aligned_alloc(size_t alignment, size_t size);
-	void	*memalign(size_t alignment, size_t size);
-	int		posix_memalign(void **memptr, size_t alignment, size_t size);
 
 #pragma endregion

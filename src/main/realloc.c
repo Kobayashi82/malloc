@@ -6,49 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 13:50:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 12:33:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
-
-#pragma endregion
-
-#pragma region "Real Realloc"
-
-	void *realrealloc(void *ptr, size_t size) {
-		if (!ptr || !size) return (NULL);
-
-		#ifdef _WIN32
-			static void *(__cdecl *real_realloc_win)(void *, size_t);
-			if (!real_realloc_win) {
-				HMODULE m = GetModuleHandleA("msvcrt.dll");
-				if (m) real_realloc_win = (void*(__cdecl*)(void*, size_t))GetProcAddress(m, "realloc");
-			}
-
-			if (!real_realloc_win) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
-				return (NULL);
-			}
-
-			void *new_ptr = real_realloc_win(ptr, size);
-		#else
-			static void *(*real_realloc_unix)(void *, size_t);
-			if (!real_realloc_unix) real_realloc_unix = dlsym(((void *) -1L), "realloc");
-
-			if (!real_realloc_unix) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
-				return (NULL);
-			}
-
-			void *new_ptr = real_realloc_unix(ptr, size);
-		#endif
-
-		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, "%p\t[REALLOC] Delegated to the native realloc from %p with %d bytes\n", new_ptr, ptr, size);
-		return (new_ptr);
-	}
 
 #pragma endregion
 
@@ -79,7 +43,7 @@
 			if (!heap_find(arena, ptr)) {
 				mutex(&arena->mutex, MTX_UNLOCK);
 				free(ptr);
-				return (realrealloc(ptr, size));
+				return (native_realloc(ptr, size));
 			}
 
 			// Extend chunk or malloc(size)

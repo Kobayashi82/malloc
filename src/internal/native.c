@@ -1,0 +1,88 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   native.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/29 12:32:32 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/06/29 12:34:31 by vzurera-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#pragma region "Includes"
+
+	#include "arena.h"
+
+#pragma endregion
+
+#pragma region "Native Free"
+
+	void native_free(void *ptr) {
+		if (!ptr) return;
+
+		#ifdef _WIN32
+			static void (__cdecl *real_free_win)(void*);
+			if (!real_free_win) {
+				HMODULE m = GetModuleHandleA("msvcrt.dll");
+				if (m) real_free_win = (void(__cdecl*)(void*))GetProcAddress(m, "free");
+			}
+
+			if (!real_free_win) {
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
+				return;
+			}
+
+			real_free_win(ptr);
+		#else
+			static void (*real_free_unix)(void*);
+			if (!real_free_unix) real_free_unix = dlsym(((void *) -1L), "free");
+
+			if (!real_free_unix) {
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
+				return;
+			}
+
+			real_free_unix(ptr);
+		#endif
+
+		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, "%p\t   [FREE] Delegated to the native free\n", ptr);
+	}
+
+#pragma endregion
+
+#pragma region "Native Realloc"
+
+	void *native_realloc(void *ptr, size_t size) {
+		if (!ptr || !size) return (NULL);
+
+		#ifdef _WIN32
+			static void *(__cdecl *real_realloc_win)(void *, size_t);
+			if (!real_realloc_win) {
+				HMODULE m = GetModuleHandleA("msvcrt.dll");
+				if (m) real_realloc_win = (void*(__cdecl*)(void*, size_t))GetProcAddress(m, "realloc");
+			}
+
+			if (!real_realloc_win) {
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
+				return (NULL);
+			}
+
+			void *new_ptr = real_realloc_win(ptr, size);
+		#else
+			static void *(*real_realloc_unix)(void *, size_t);
+			if (!real_realloc_unix) real_realloc_unix = dlsym(((void *) -1L), "realloc");
+
+			if (!real_realloc_unix) {
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
+				return (NULL);
+			}
+
+			void *new_ptr = real_realloc_unix(ptr, size);
+		#endif
+
+		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, "%p\t[REALLOC] Delegated to the native realloc from %p with %d bytes\n", new_ptr, ptr, size);
+		return (new_ptr);
+	}
+
+#pragma endregion

@@ -1,24 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   logging.c                                          :+:      :+:    :+:   */
+/*   alloc_hist.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/27 23:30:13 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 01:07:35 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/06/29 12:16:03 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/06/29 12:25:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "internal.h"
+	#include "arena.h"
 
 #pragma endregion
 
-#pragma region "Log History"
+#pragma region "Show Alloc History"
 
-	void log_history() {
+	void show_alloc_history() {
 		
 	}
 

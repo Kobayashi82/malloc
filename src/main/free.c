@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 18:02:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/29 12:33:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,41 +28,6 @@
 		while (val2 >= 0x10) val2 /= 0x10;
 
 		return ((val1 & 0xF) == (val2 & 0xF));
-	}
-
-#pragma endregion
-
-#pragma region "Real Free"
-
-	void realfree(void *ptr) {
-		if (!ptr) return;
-
-		#ifdef _WIN32
-			static void (__cdecl *real_free_win)(void*);
-			if (!real_free_win) {
-				HMODULE m = GetModuleHandleA("msvcrt.dll");
-				if (m) real_free_win = (void(__cdecl*)(void*))GetProcAddress(m, "free");
-			}
-
-			if (!real_free_win) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
-				return;
-			}
-
-			real_free_win(ptr);
-		#else
-			static void (*real_free_unix)(void*);
-			if (!real_free_unix) real_free_unix = dlsym(((void *) -1L), "free");
-
-			if (!real_free_unix) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
-				return;
-			}
-
-			real_free_unix(ptr);
-		#endif
-
-		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, "%p\t   [FREE] Delegated to the native free\n", ptr);
 	}
 
 #pragma endregion
@@ -209,7 +174,7 @@
 		}
 
 		// Delegate
-		if (!inactive && !heap) realfree(ptr);
+		if (!inactive && !heap) native_free(ptr);
 	}
 
 #pragma endregion
