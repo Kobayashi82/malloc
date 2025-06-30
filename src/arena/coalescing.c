@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 14:26:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 00:06:47 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,9 +121,9 @@
 
 #pragma endregion
 
-#pragma region "Coalescing"
+#pragma region "Coalescing Neighbours"
 
-	t_chunk *coalescing(t_chunk *chunk, t_arena *arena, t_heap *heap) {
+	t_chunk *coalescing_neighbours(t_chunk *chunk, t_arena *arena, t_heap *heap) {
 		if (!chunk || !arena || !heap) return (chunk);
 
 		t_chunk *chunk_prev = NULL;
@@ -160,10 +160,20 @@
 				unlink_chunk(chunk_next, arena);
 				SET_PREV_SIZE(chunk_next_next, GET_SIZE(chunk_final) + GET_SIZE(chunk_next) + sizeof(t_chunk));
 				chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | GET_PREV_SIZE(chunk_next_next);
+
 			}
 		}
 
 		return (chunk_final);
+	}
+
+#pragma endregion
+
+#pragma region "Coalescing"
+
+	void coalescing(t_arena *arena, t_heap *heap) {
+		if (!arena || !heap) return ;
+
 	}
 
 #pragma endregion

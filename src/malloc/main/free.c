@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 14:42:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 00:45:40 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@
 			link_chunk(chunk, chunk_size, FASTBIN, arena);
 		} else {
 			if (g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
-			chunk = coalescing(chunk, arena, heap);
+			chunk = coalescing_neighbours(chunk, arena, heap);
 			if (!(chunk->size & TOP_CHUNK)) {
 				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
 				link_chunk(chunk, chunk_size, UNSORTEDBIN, arena);
@@ -92,8 +92,15 @@
 
 		arena->free_count++;
 
-		if (heap->free == heap->size) {
-			// Mark for elimination
+		if (heap->free >= heap->size) {
+			if (heap_count(arena, heap->type) > 0) {
+				// t_chunk *chunk = heap->ptr;
+				// while (!IS_TOPCHUNK(chunk)) {
+				// 	unlink_chunk(chunk, arena);
+				// 	chunk = GET_NEXT(chunk);
+				// }
+				// heap_destroy(heap);
+			}
 		}
 
 		if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t   [FREE] Memory freed of size %d bytes\n", ptr, chunk_size);

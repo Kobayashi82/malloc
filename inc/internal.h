@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 19:14:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 22:03:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,11 +84,11 @@
 	#define PREV_INUSE					0x1								// Bit 0
 
 	#define TINY_CHUNK					512
-	#define TINY_BLOCKS					128
+	#define TINY_BLOCKS					100
 	#define TINY_SIZE					(((TINY_BLOCKS * TINY_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
-	#define SMALL_CHUNK					4096
-	#define SMALL_BLOCKS				128
+	#define SMALL_CHUNK					2048
+	#define SMALL_BLOCKS				100
 	#define SMALL_SIZE					(((SMALL_BLOCKS * SMALL_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 #pragma endregion

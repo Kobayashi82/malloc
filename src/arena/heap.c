@@ -6,13 +6,37 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 17:10:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 00:06:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
+
+#pragma endregion
+
+#pragma region "Count"
+
+	int heap_count(t_arena *arena, int type) {
+		if (!arena || !arena->heap_header) return (0);
+
+		int total = 0;
+
+		t_heap_header *heap_header = arena->heap_header;
+		while (heap_header) {
+			t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
+
+			for (int i = 0; i < heap_header->used; ++i) {
+				if (heap->active && heap->type == type) total++;
+				heap = (t_heap *)((char *)heap + ALIGN(sizeof(t_heap)));
+			}
+
+			heap_header = heap_header->next;
+		}
+
+		return (total);
+	}
 
 #pragma endregion
 
@@ -57,6 +81,11 @@
 			return (NULL);
 		}
 
+		// static int popo = 0;
+		// if (type == TINY) {
+		// 	aprintf(2, 0, "Arenas: %d Creadas: %d\n", g_manager.arena_count, popo++);
+		// }
+
 		t_heap	*heap = NULL;
 
 		// buscar en las lista si hay un heap con el mismo puntero y longitud igual o menor y usar ese si esta inactivo
@@ -73,7 +102,7 @@
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 				heap->ptr = ptr;
 				heap->size = size;
-				heap->free = size - sizeof(t_chunk);
+				heap->free = size;
 				heap->type = type;
 				heap->active = true;
 				heap->top_chunk = ptr;
@@ -87,7 +116,7 @@
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 				heap->ptr = ptr;
 				heap->size = size;
-				heap->free = size - sizeof(t_chunk);
+				heap->free = size;
 				heap->type = type;
 				heap->active = true;
 				heap->top_chunk = ptr;
@@ -112,7 +141,7 @@
 				heap = (t_heap *)((char *)new_heap_header + ALIGN(sizeof(t_heap_header)));
 				heap->ptr = ptr;
 				heap->size = size;
-				heap->free = size - sizeof(t_chunk);
+				heap->free = size;
 				heap->type = type;
 				heap->active = true;
 				heap->top_chunk = ptr;
@@ -122,7 +151,7 @@
 				heap_header->used++;
 				heap->ptr = ptr;
 				heap->size = size;
-				heap->free = size - sizeof(t_chunk);
+				heap->free = size;
 				heap->type = type;
 				heap->active = true;
 				heap->top_chunk = ptr;

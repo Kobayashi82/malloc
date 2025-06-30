@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 15:11:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 22:13:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 	t_arena *arena_get();
 
 	// Heap
+	int		heap_count(t_arena *arena, int type);
 	t_heap	*heap_find(t_arena *arena, void *ptr);
 	void	*heap_create(t_arena *arena, int type, size_t size);
 	int		heap_destroy(t_heap *heap);
@@ -35,7 +36,8 @@
 	// Coalescing
 	int		link_chunk(t_chunk *chunk, size_t size, int type, t_arena *arena);
 	int		unlink_chunk(t_chunk *chunk, t_arena *arena);
-	t_chunk	*coalescing(t_chunk *chunk, t_arena *arena, t_heap *heap);
+	t_chunk	*coalescing_neighbours(t_chunk *chunk, t_arena *arena, t_heap *heap);
+	void	coalescing(t_arena *arena, t_heap *heap);
 
 	// Bin
 	void	*find_memory(t_arena *arena, size_t size);

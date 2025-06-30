@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 18:36:38 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 00:07:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,12 @@
 						if (heap->active && heap->type == type) {
 							size_t	free_size = GET_SIZE(heap->top_chunk);
 							bool	available = free_size >= size;
-							int		usage = ((heap_size - free_size) * 100) / heap_size;
+							int		usage = ((heap->size - free_size) * 100) / heap->size;
 
 							if (available && usage > g_manager.options.MIN_USAGE) { best_heap = heap; found = true; break; }
 							if (available && usage > best_usage) { best_usage = usage; best_heap = heap; }
 						}
-						heap++;
+						heap = (t_heap *)((char *)heap + ALIGN(sizeof(t_heap)));
 					}
 
 					heap_header = heap_header->next;
@@ -130,6 +130,12 @@
 
 				ptr = GET_PTR(chunk);
 				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
+
+				t_heap *heap = heap_find(arena, GET_PTR(chunk));
+				if (heap && heap->active) {
+					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
+				}
+
 				return (ptr);
 			}
 

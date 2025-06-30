@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 19:14:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 21:57:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 	#pragma region "MXFAST"
 
-		int validate_mxfast(int value) {
+		static int validate_mxfast(int value) {
 			if (value < 0 || value > 160) return (0);
 
 			g_manager.options.MXFAST = value;
@@ -32,7 +32,7 @@
 
 	#pragma region "MIN_ZONE_USAGE"
 
-		int validate_min_usage(int value) {
+		static int validate_min_usage(int value) {
 			if (value < 0 || value > 100) return (0);
 
 			g_manager.options.MIN_USAGE = value;
@@ -44,7 +44,7 @@
 
 	#pragma region "CHECK_ACTION"
 
-		int validate_check_action(int value) {
+		static int validate_check_action(int value) {
 			if (value < 0 || value > 3) return (0);
 
 			g_manager.options.CHECK_ACTION = value;
@@ -56,7 +56,7 @@
 
 	#pragma region "PERTURB"
 
-		unsigned char validate_perturb(int value) {
+		static unsigned char validate_perturb(int value) {
 			if (value < 0 || value > 255) return (0);
 
 			g_manager.options.PERTURB = value;
@@ -68,7 +68,7 @@
 
 	#pragma region "ARENA_TEST"
 
-		int validate_arena_test(int value) {
+		static int validate_arena_test(int value) {
 			if (value <= 0 || value > (int)ARCHITECTURE) return (0);
 
 			g_manager.options.ARENA_TEST = value;
@@ -80,7 +80,7 @@
 
 	#pragma region "ARENA_MAX"
 
-		int validate_arena_max(int value) {
+		static int validate_arena_max(int value) {
 			if (value <= 0 || value > (int)ARCHITECTURE * 2) return (0);
 
 			g_manager.options.ARENA_MAX = value;
@@ -92,7 +92,7 @@
 
 	#pragma region "DEBUG"
 
-		int validate_debug(int value) {
+		static int validate_debug(int value) {
 			if (value <= 0 || value > 1) return (0);
 
 			g_manager.options.DEBUG = value;
@@ -104,7 +104,7 @@
 
 	#pragma region "LOGGING"
 
-		int validate_logging(int value) {
+		static int validate_logging(int value) {
 			if (value <= 0 || value > 1) return (0);
 
 			g_manager.options.LOGGING = value;
@@ -116,7 +116,7 @@
 
 	#pragma region "LOGFILE"
 
-		int validate_logfile(char *value) {
+		static int validate_logfile(char *value) {
 			if (!value || !*value) value = "auto";
 
 			char filename[64] = {0};
