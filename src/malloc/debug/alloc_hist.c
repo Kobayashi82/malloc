@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:16:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 17:31:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 18:50:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 			}
 			g_manager.hist_buffer = ptr;
 		} else if (g_manager.hist_buffer && g_manager.hist_size < SIZE_MAX) {
+			size_t old_size = g_manager.hist_size;
 			g_manager.hist_size *= 2;
 			void *ptr = mmap(NULL, g_manager.hist_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 			if (ptr == MAP_FAILED) {
@@ -40,7 +41,7 @@
 			}
 
 			ft_memcpy(ptr, g_manager.hist_buffer, g_manager.hist_pos);
-			if (munmap(g_manager.hist_buffer, g_manager.hist_size))
+			if (munmap(g_manager.hist_buffer, old_size))
 				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory for allocation history\n", g_manager.hist_buffer);
 
 			g_manager.hist_buffer = ptr;

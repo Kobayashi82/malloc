@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 16:55:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 18:05:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,5 +43,3 @@
 	// -Wno-free-nonheap-object	= Desactiva advertencia de free() al compilar
 	// -lft_malloc				= -l busca lib + ft_malloc + .so
 	// -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
-
-#pragma endregion

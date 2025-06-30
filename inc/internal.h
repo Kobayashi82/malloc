@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 16:49:11 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 19:14:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@
 
 	typedef struct s_options {
 		int				MXFAST;						// Max size (in bytes) for allocations using fastbins (0 disables fastbins)
-		int				MIN_USAGE_PERCENT;			// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
+		int				MIN_USAGE;					// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
 		int				CHECK_ACTION;				// Muestra informacion cuando hay errores
 		unsigned char	PERTURB;					// Rellena la zona de memoria. malloc = ~PERTURB	free = PERTURB
 		int				ARENA_TEST;					// 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:20:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 23:30:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 19:23:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,14 @@
 
 #pragma endregion
 
-	#define M_ARENA_MAX					-8								//
-	#define M_ARENA_TEST				-7								//
-	#define M_PERTURB					-6								//
-	#define M_CHECK_ACTION				-5								//
-	#define M_MXFAST			 		 1								//
-	#define M_MIN_USAGE_PERCENT			 3								// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
-	#define M_DEBUG						 7								// (DEBUG) Enable debug mode
-	#define M_LOGGING					 8								// (DEBUG) Captura backtrace con backtrace() y lo guardas junto con cada allocación.
-	#define M_LOGFILE					 9								// (DEBUG) Con diferentes comportamientos según el valor:
+	#define M_ARENA_MAX			-8		// Maximum number of arenas allowed
+	#define M_ARENA_TEST		-7		// Number of arenas at which a hard limit on arenas is computed
+	#define M_PERTURB			-6		// Sets memory to the PERTURB value on allocation, and to value ^ 255 on free
+	#define M_CHECK_ACTION		-5		// Behaviour on abort errors (0: abort, 1: warning, 2: silence)
+	#define M_MXFAST			 1		// Heaps under this usage % are skipped (unless all are under)
+	#define M_MIN_USAGE			 3		// Max size (bytes) for fastbin allocations.mayor tamaño
+	#define M_DEBUG				 7		// enables debug mode
+	#define M_LOGGING			 8		// Stores backtrace with each allocation to a file
 
 #pragma region "Methods"
 

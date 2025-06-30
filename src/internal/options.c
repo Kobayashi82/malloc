@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 14:24:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 19:14:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,21 +21,23 @@
 	#pragma region "MXFAST"
 
 		int validate_mxfast(int value) {
-			int max = 160;
+			if (value < 0 || value > 160) return (0);
 
-			if (value < 0)		return (0);
-			if (value > max)	return (max);
-			return (value);
+			g_manager.options.MXFAST = value;
+
+			return (1);
 		}
 
 	#pragma endregion
 
-	#pragma region "MIN_ZONE_USAGE_PERCENT"
+	#pragma region "MIN_ZONE_USAGE"
 
-		int validate_min_usage_percent(int value) {
-			if (value < 0)		return (0);
-			if (value > 100)	return (100);
-			return (value);
+		int validate_min_usage(int value) {
+			if (value < 0 || value > 100) return (0);
+
+			g_manager.options.MIN_USAGE = value;
+
+			return (1);
 		}
 
 	#pragma endregion
@@ -43,9 +45,11 @@
 	#pragma region "CHECK_ACTION"
 
 		int validate_check_action(int value) {
-			if (value < 0)		return (0);
-			if (value > 2)		return (2);
-			return (value);
+			if (value < 0 || value > 3) return (0);
+
+			g_manager.options.CHECK_ACTION = value;
+
+			return (1);
 		}
 
 	#pragma endregion
@@ -53,7 +57,11 @@
 	#pragma region "PERTURB"
 
 		unsigned char validate_perturb(int value) {
-			return (ft_max(ft_min(value, 255), 0));
+			if (value < 0 || value > 255) return (0);
+
+			g_manager.options.PERTURB = value;
+
+			return (1);
 		}
 
 	#pragma endregion
@@ -61,11 +69,11 @@
 	#pragma region "ARENA_TEST"
 
 		int validate_arena_test(int value) {
-			int max = ARCHITECTURE;
+			if (value <= 0 || value > (int)ARCHITECTURE) return (0);
 
-			if (value <= 0)		return (1);
-			if (value > max)	return (max);
-			return (value);
+			g_manager.options.ARENA_TEST = value;
+
+			return (1);
 		}
 
 	#pragma endregion
@@ -73,19 +81,42 @@
 	#pragma region "ARENA_MAX"
 
 		int validate_arena_max(int value) {
-			int max = ARCHITECTURE * 2;
+			if (value <= 0 || value > (int)ARCHITECTURE * 2) return (0);
 
-			if ((value <= 0 || value > max) && g_manager.options.ARENA_MAX) return (g_manager.options.ARENA_MAX);
-			if (value < 0)		return (0);
-			if (value > max)	return (max);
-			return (value);
+			g_manager.options.ARENA_MAX = value;
+
+			return (1);
+		}
+
+	#pragma endregion
+
+	#pragma region "DEBUG"
+
+		int validate_debug(int value) {
+			if (value <= 0 || value > 1) return (0);
+
+			g_manager.options.DEBUG = value;
+
+			return (1);
+		}
+
+	#pragma endregion
+
+	#pragma region "LOGGING"
+
+		int validate_logging(int value) {
+			if (value <= 0 || value > 1) return (0);
+
+			g_manager.options.LOGGING = value;
+
+			return (1);
 		}
 
 	#pragma endregion
 
 	#pragma region "LOGFILE"
 
-		void validate_logfile(char *value) {
+		int validate_logfile(char *value) {
 			if (!value || !*value) value = "auto";
 
 			char filename[64] = {0};
@@ -115,6 +146,8 @@
 			}
 
 			g_manager.options.fd_out = open(g_manager.options.LOGFILE, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+
+			return (1);
 		}
 
 	#pragma endregion
@@ -126,43 +159,44 @@
 	void options_initialize() {
 		char *var = NULL;
 
+		g_manager.options.fd_out = 2;
+
 		var = getenv("MALLOC_MXFAST_");
-		if (var && ft_isdigit_s(var))	g_manager.options.MXFAST = validate_mxfast(ft_atoi(var));
+		if (var && ft_isdigit_s(var))	validate_mxfast(ft_atoi(var));
 		else							g_manager.options.MXFAST = 80;
 
 		var = getenv("MALLOC_MIN_USAGE_");
-		if (var && ft_isdigit_s(var))	g_manager.options.MIN_USAGE_PERCENT = validate_min_usage_percent(ft_atoi(var));
-		else							g_manager.options.MIN_USAGE_PERCENT = 10;
+		if (var && ft_isdigit_s(var))	validate_min_usage(ft_atoi(var));
+		else							g_manager.options.MIN_USAGE = 10;
 
 		var = getenv("MALLOC_CHECK_");
-		if (var && ft_isdigit_s(var))	g_manager.options.CHECK_ACTION = validate_check_action(ft_atoi(var));
+		if (var && ft_isdigit_s(var))	validate_check_action(ft_atoi(var));
 		else							g_manager.options.CHECK_ACTION = 0;
 
 		var = getenv("MALLOC_PERTURB_");
-		if (var && ft_isdigit_s(var))	g_manager.options.PERTURB = validate_perturb(ft_atoi(var));
+		if (var && ft_isdigit_s(var))	validate_perturb(ft_atoi(var));
 		else							g_manager.options.PERTURB = 0;
 
 		var = getenv("MALLOC_ARENA_TEST");
-		if (var && ft_isdigit_s(var))	g_manager.options.ARENA_TEST = validate_arena_test(ft_atoi(var));
+		if (var && ft_isdigit_s(var))	validate_arena_test(ft_atoi(var));
 		else							g_manager.options.ARENA_TEST = ARCHITECTURE == 32 ? 2 : 8;
 
 		var = getenv("MALLOC_ARENA_MAX");
-		if (var && ft_isdigit_s(var))	g_manager.options.ARENA_MAX = validate_arena_max(ft_atoi(var));
+		if (var && ft_isdigit_s(var))	validate_arena_max(ft_atoi(var));
 		else							g_manager.options.ARENA_MAX = 0;
 
 		var = getenv("MALLOC_DEBUG");
-		if (var && ft_isdigit_s(var))	g_manager.options.DEBUG = (ft_atoi(var));
+		if (var && ft_isdigit_s(var))	g_manager.options.DEBUG = validate_debug(ft_atoi(var));
 		else							g_manager.options.DEBUG = 0;
 
 		var = getenv("MALLOC_LOGGING");
-		if (var && ft_isdigit_s(var))	g_manager.options.LOGGING = (ft_atoi(var));
+		if (var && ft_isdigit_s(var))	g_manager.options.LOGGING = validate_logging(ft_atoi(var));
 		else							g_manager.options.LOGGING = 0;
 
-		g_manager.options.fd_out = 2;
 		if (g_manager.options.DEBUG && g_manager.options.LOGGING) {
 			var = getenv("MALLOC_LOGFILE");
-			if (var)	validate_logfile(var);
-			else		validate_logfile("auto");
+			if (var)					validate_logfile(var);
+			else						validate_logfile("auto");
 		}
 	}
 
@@ -177,31 +211,33 @@
 
 			if (g_manager.arena_count) {
 				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t[MALLOPT] Changes are not allowed after the first allocation\n");
-				return (1);
+				errno = EINVAL;
+				return (0);
 			}
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
+		int result = 0;
 		switch (param) {
-			case M_MXFAST:				g_manager.options.MXFAST			= validate_mxfast(value);				return (1);
-			case M_MIN_USAGE_PERCENT:	g_manager.options.MIN_USAGE_PERCENT	= validate_min_usage_percent(value);	return (1);
-			case M_CHECK_ACTION:		g_manager.options.CHECK_ACTION		= validate_check_action(value);			return (1);
-			case M_PERTURB:				g_manager.options.PERTURB			= validate_perturb(value);				return (1);
-			case M_ARENA_TEST:			g_manager.options.ARENA_TEST		= validate_arena_test(value);			return (1);
-			case M_ARENA_MAX:			g_manager.options.ARENA_MAX			= validate_arena_max(value);			return (1);
-			case M_DEBUG:				g_manager.options.DEBUG				= (value);								return (1);
-			case M_LOGGING:				g_manager.options.LOGGING			= (value);								return (1);
+			case M_MXFAST:			result = validate_mxfast(value);		break ;
+			case M_MIN_USAGE:		result = validate_min_usage(value);		break ;
+			case M_CHECK_ACTION:	result = validate_check_action(value);	break ;
+			case M_PERTURB:			result = validate_perturb(value);		break ;
+			case M_ARENA_TEST:		result = validate_arena_test(value);	break ;
+			case M_ARENA_MAX:		result = validate_arena_max(value);		break ;
+			case M_DEBUG:			result = validate_debug(value);			break ;
+			case M_LOGGING:			result = validate_logging(value);		break ;
 		}
 
 		if (param == M_DEBUG || param == M_LOGGING) {
-			if (g_manager.options.DEBUG && g_manager.options.LOGGING) {
+			if (g_manager.options.DEBUG && g_manager.options.LOGGING && !*g_manager.options.LOGFILE) {
 				char *var = getenv("MALLOC_LOGFILE");
 				if (var)	validate_logfile(var);
-				else		validate_logfile("auto");
 			}
 		}
 
-		return (0);
+		if (result) errno = EINVAL;
+		return (result);
 	}
 
 #pragma endregion

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:02 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 14:28:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:51:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,7 +239,8 @@
 
 	// Shows a detailed map of all current allocations.
 	//
-	//	void show_alloc_mem(void);
+	//   void malloc_stats(void);
+	//   void show_alloc_mem(void);
 	//
 	//   • On success: prints a detailed report of all current allocations.
 	//
