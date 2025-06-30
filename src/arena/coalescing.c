@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 16:58:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 11:26:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,17 @@
 	int link_chunk(t_chunk *chunk, size_t size, int type, t_arena *arena) {
 		if (!chunk || !size || !arena || chunk->size & TOP_CHUNK) return (1);
 
+		if (!HAS_POISON(GET_PTR(chunk))) {
+			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
+			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Memory corrupted\n");
+			return (abort_now());
+		}
+
+		// set perturb
+		// get data on chunk (FD, prev_size y si es un chunk grande, BK y demas)
+		// set perturb
+		// volver a poner la data
+
 		switch (type) {
 			case FASTBIN: {
 				int index = (size - 1) / ALIGNMENT;
@@ -28,6 +39,15 @@
 
 				SET_FD(chunk, arena->fastbin[index]);
 				arena->fastbin[index] = chunk;
+
+				if (g_manager.options.PERTURB) {
+					void *FD = GET_FD(chunk);
+					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB, GET_SIZE(chunk));
+					SET_FD(chunk, FD);
+					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+				}
+
 				return (0);
 			}
 			case SMALLBIN:
@@ -47,6 +67,12 @@
 
 	int unlink_chunk(t_chunk *chunk, t_arena *arena) {
 		if (!chunk || !arena) return (1);
+
+		if (!HAS_POISON(GET_PTR(chunk))) {
+			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
+			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Memory corrupted\n");
+			return (abort_now());
+		}
 
 		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
 		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
@@ -98,9 +124,15 @@
 		// Coalescing Right (if not USED and FASTBIN)
 		chunk_next = GET_NEXT(chunk);
 		if (chunk_next->size & TOP_CHUNK) {
-			unlink_chunk(chunk_next, arena);
+			if (!HAS_MAGIC(GET_PTR(chunk_next))) {
+				if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
+				else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, "Memory corrupted\n");
+				abort_now(); return (chunk_final);
+			}
+			unlink_chunk(chunk_final, arena);
 			chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | TOP_CHUNK | (GET_SIZE(chunk_next) + GET_SIZE(chunk_final) + sizeof(t_chunk));
 			heap->top_chunk = chunk_final;
+			SET_MAGIC(GET_PTR(chunk_final));
 		} else {
 			t_chunk *chunk_next_next = GET_NEXT(chunk_next);
 			if (!(chunk_next_next->size & PREV_INUSE) && GET_PREV_SIZE(chunk_next_next) + sizeof(t_chunk) > (size_t)g_manager.options.MXFAST) {

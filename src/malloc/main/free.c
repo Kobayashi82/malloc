@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 13:29:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 11:08:39 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,16 +79,19 @@
 		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
 		SET_PREV_SIZE(next_chunk, GET_SIZE(chunk));
 		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
-			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
+			if (g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
 			link_chunk(chunk, chunk_size, FASTBIN, arena);
 		} else {
-			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
+			if (g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
 			chunk = coalescing(chunk, arena, heap);
-			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
-			link_chunk(chunk, chunk_size, UNSORTEDBIN, arena);
+			if (!(chunk->size & TOP_CHUNK)) {
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
+				link_chunk(chunk, chunk_size, UNSORTEDBIN, arena);
+			}
 		}
 
 		arena->free_count++;
+
 		if (heap->free == heap->size) {
 			// Mark for elimination
 		}
@@ -115,12 +118,18 @@
 			abort_now(); return ;
 		}
 
-		// malloc(0)
+		// alloc zero
 		if (check_digit(ptr, ZERO_MALLOC_BASE)) {
 			mutex(&g_manager.mutex, MTX_LOCK);
 
-				if (ptr > ZERO_MALLOC_BASE && ptr < (void *)((char *)ZERO_MALLOC_BASE + (g_manager.zero_malloc_counter * ALIGNMENT)))
+				if (ptr > ZERO_MALLOC_BASE && ptr < (void *)((char *)ZERO_MALLOC_BASE + (g_manager.zero_malloc_counter * ALIGNMENT))) {
 					if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t   [FREE] Memory freed of size 0 bytes\n", ptr);
+					mutex(&tcache->mutex, MTX_LOCK);
+
+						tcache->free_count--;
+
+					mutex(&tcache->mutex, MTX_UNLOCK);
+				}
 			
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 			return ;

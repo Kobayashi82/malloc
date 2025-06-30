@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 23:28:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 11:41:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@
 			aprintf(2, "Pointer %p is not at the start of a chunk\n", ptr); return (1);
 		}
 
-		// Double free
+		// Freed
 		if (HAS_POISON(ptr)) { aprintf(2, "Pointer %p is not allocated\n", ptr); return (1); }
 
 		// Top chunk
@@ -126,7 +126,7 @@
 
 				if (ptr > ZERO_MALLOC_BASE && ptr < (void *)((char *)ZERO_MALLOC_BASE + (g_manager.zero_malloc_counter * ALIGNMENT)))
 					aprintf(2, "Pointer %p is invalid\n", ptr);
-			
+
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 			return ;
 		}

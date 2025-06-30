@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 12:37:30 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 14:35:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 10:27:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,39 @@
 	void *reallocarray(void *ptr, size_t nmemb, size_t size) {
 		ensure_init();
 
-		if (nmemb && nmemb > SIZE_MAX / size) {
-			errno = ENOMEM;
-			return (NULL);
+		if (nmemb && nmemb > SIZE_MAX / size) { errno = ENOMEM; return (NULL); }
+		size = nmemb * size;
+			
+		if (!ptr)			return allocate("REALLOC_ARRAY", size, 0);				// ptr NULL is equivalent to malloc(size)
+		if (!size)			return (free(ptr), allocate_zero("REALLOC_ARRAY"));	// size 0 is equivalent to free(ptr)
+		if (!arena_find()) 	return (NULL);
+		
+		void	*new_ptr = NULL;
+		bool	is_new = false;
+
+		mutex(&tcache->mutex, MTX_LOCK);
+
+			// tiene que buscar en todas las arenas
+			if (!heap_find(tcache, ptr)) {
+				mutex(&tcache->mutex, MTX_UNLOCK);
+				return (native_realloc(ptr, size));
+			}
+
+			// Expandir chunk
+			// Free old chunk if apply
+
+		mutex(&tcache->mutex, MTX_UNLOCK);
+
+		// Si no se puede expandir
+		new_ptr = allocate("REALLOC_ARRAY", size, 0);
+		if (new_ptr) {
+			is_new = true;
+			size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
+			ft_memcpy(new_ptr, ptr, (size < copy_size) ? size : copy_size);
 		}
 
-		return (realloc(ptr, nmemb * size));
+		if (is_new) free(ptr);
+		return (new_ptr);
 	}
 
 #pragma endregion

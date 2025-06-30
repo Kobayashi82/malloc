@@ -1,5 +1,20 @@
 # TODO
 
+## Today
+
+- [ ] Alloc_hist
+- [X] Perturb
+- [X] Corruption
+- [X] Errno
+- [ ] Free heap
+- [ ] Contador de frees para eliminar heap
+- [ ] heap_find solo busca en la arena actual
+- [X] make(0) cuenta como alloc and free
+- [X] Separación (reallocarray -> realloc)
+
+aprintf recibe un argumento de si debe enviar a history allocation.
+Y este ya se encarga de llamar a la función de crear el historial con el buffer
+
 ## Allocation Order
 
 - mmap (if too large)
@@ -13,8 +28,8 @@
 
 ## Global
 
-- [ ] ERRNO
 - [ ] Data-Races
+- [ ] Makefile for Windows
 
 ## Chunks
 
@@ -34,7 +49,7 @@
 - [ ] Free heap
 - [ ] Contador de frees para eliminar heap
 - [ ] heap_find solo busca en la arena actual
-- [ ] your_aligned_allocation()
+- [ ] alloc_aligned()
 
 ## Main
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 13:10:49 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 09:18:32 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,3 +256,4 @@
 	__attribute__((constructor)) static void malloc_initialize() { ensure_init(); }
 
 #pragma endregion
+

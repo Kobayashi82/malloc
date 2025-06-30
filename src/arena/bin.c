@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/27 23:59:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 11:09:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 			top_chunk = GET_NEXT(chunk);
 			top_chunk->size = (top_chunk_available - size) | TOP_CHUNK | ((heap->type == SMALL) ? HEAP_TYPE : 0) | PREV_INUSE;
 			heap->top_chunk = top_chunk;
+			SET_MAGIC(GET_PTR(top_chunk));
 
 			return (chunk);
 		}
@@ -159,10 +160,11 @@
 	void *find_memory(t_arena *arena, size_t size) {
 		if (!arena || !size) return (NULL);
 
+		if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK) return (heap_create(arena, LARGE, size));
+
 		void *ptr = NULL;
 
 		size = ALIGN(size + sizeof(t_chunk));
-
 		if (size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, size);
 
 		// if (!ptr && size <= MAX_SIZE_BIN) ptr = find_in_smallbin(arena, size);
@@ -172,8 +174,6 @@
 		// if (!ptr) ptr = find_in_largebin(arena, size);
 
 		if (!ptr) ptr = new_chunk(arena, (size > TINY_CHUNK) ? SMALL : TINY, size);
-
-		if (ptr) arena->alloc_count++;
 
 		return (ptr);
 	}

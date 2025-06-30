@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 00:50:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 09:56:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,23 @@
 		arena->next = NULL;
 		mutex(&arena->mutex, MTX_INIT);
 		g_manager.arena_count++;
+	}
+
+#pragma endregion
+
+#pragma region "Find"
+
+	t_arena *arena_find() {
+		if (!tcache) {
+			tcache = arena_get();
+			if (!tcache) {
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to assign arena\n");
+				errno = ENOMEM;
+				return (NULL);
+			}
+		}
+
+		return (tcache);
 	}
 
 #pragma endregion

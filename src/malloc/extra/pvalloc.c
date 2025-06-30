@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 22:43:25 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 23:16:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 10:33:04 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 
 	// 	mutex(&arena->mutex, MTX_LOCK);
 
-	// 		// ptr = your_aligned_allocation(PAGE_SIZE, size);
+	// 		// ptr = allocate_aligned(PAGE_SIZE, size);
 			
 	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [PVALLOC] Allocated %u bytes\n", ptr, size);
 	// 		else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:30:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 10:04:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #pragma region "Methods"
 
 	// Arena
+	t_arena	*arena_find();
 	t_arena *arena_get();
 
 	// Heap
@@ -36,5 +37,10 @@
 
 	// Bin
 	void	*find_memory(t_arena *arena, size_t size);
+
+	// Allocate
+	void	*allocate_aligned(char *source, size_t alignment, size_t size);
+	void	*allocate_zero(char *source);
+	void	*allocate(char *source, size_t size, unsigned char perturb);
 
 #pragma endregion

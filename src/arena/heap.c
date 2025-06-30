@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 18:17:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 11:09:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,12 +132,10 @@
 		t_chunk *chunk = (t_chunk *)ptr;
 		chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | (type == SMALL ? HEAP_TYPE : 0) | TOP_CHUNK | (type == LARGE ? MMAP_CHUNK : 0);
 
+		if (type != LARGE) SET_MAGIC(GET_PTR(chunk));
 		if (g_manager.options.DEBUG && type != LARGE) aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Heap of size %s (%d) allocated\n", heap->ptr, (type == TINY ? "TINY" : "SMALL"), heap->size);
 
-		if (heap && type == LARGE) {
-			arena->alloc_count++;
-			return (GET_PTR(heap->ptr));
-		}
+		if (heap && type == LARGE) return (GET_PTR(heap->ptr));
 	
 		// static int p = 0;
 		// aprintf(1, "%p heap %d - %d\n", arena, p++, size);
