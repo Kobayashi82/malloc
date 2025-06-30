@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 00:45:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 01:41:55 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,13 +93,13 @@
 		arena->free_count++;
 
 		if (heap->free >= heap->size) {
-			if (heap_count(arena, heap->type) > 0) {
-				// t_chunk *chunk = heap->ptr;
-				// while (!IS_TOPCHUNK(chunk)) {
-				// 	unlink_chunk(chunk, arena);
-				// 	chunk = GET_NEXT(chunk);
-				// }
-				// heap_destroy(heap);
+			if (heap_count(arena, heap->type) > 1) {
+				t_chunk *chunk = heap->ptr;
+				while (!IS_TOPCHUNK(chunk)) {
+					unlink_chunk(chunk, arena);
+					chunk = GET_NEXT(chunk);
+				}
+				heap_destroy(heap);
 			}
 		}
 
