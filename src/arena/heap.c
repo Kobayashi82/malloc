@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 11:09:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 17:10:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@
 
 		void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (ptr == MAP_FAILED) {
-			if (g_manager.options.DEBUG && type != LARGE) aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to create heap of size %s (%d)\n", (type == TINY ? "TINY" : "SMALL"), size);
+			if (g_manager.options.DEBUG && type != LARGE) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to create heap of size %s (%d)\n", (type == TINY ? "TINY" : "SMALL"), size);
 			return (NULL);
 		}
 
@@ -133,12 +133,9 @@
 		chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | (type == SMALL ? HEAP_TYPE : 0) | TOP_CHUNK | (type == LARGE ? MMAP_CHUNK : 0);
 
 		if (type != LARGE) SET_MAGIC(GET_PTR(chunk));
-		if (g_manager.options.DEBUG && type != LARGE) aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Heap of size %s (%d) allocated\n", heap->ptr, (type == TINY ? "TINY" : "SMALL"), heap->size);
+		if (g_manager.options.DEBUG && type != LARGE) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Heap of size %s (%d) allocated\n", heap->ptr, (type == TINY ? "TINY" : "SMALL"), heap->size);
 
 		if (heap && type == LARGE) return (GET_PTR(heap->ptr));
-	
-		// static int p = 0;
-		// aprintf(1, "%p heap %d - %d\n", arena, p++, size);
 
 		return ((void *)heap);
 	}
@@ -153,14 +150,14 @@
 		int result = 0;
 		if (munmap(heap->ptr, heap->size)) {
 			result = 1;
-			if (g_manager.options.DEBUG && heap->type == LARGE)		aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Failed to unmap memory of size %d bytes\n", heap->ptr, heap->size);
-			if (g_manager.options.DEBUG && heap->type != LARGE)		aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Failed to detroy heap of size %s (%d)\n", heap->ptr, (heap->type == TINY ? "TINY" : "SMALL"), heap->size);
+			if (g_manager.options.DEBUG && heap->type == LARGE)		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory of size %d bytes\n", heap->ptr, heap->size);
+			if (g_manager.options.DEBUG && heap->type != LARGE)		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to detroy heap of size %s (%d)\n", heap->ptr, (heap->type == TINY ? "TINY" : "SMALL"), heap->size);
 		}
 
 		heap->active = false;
 
-		if (!result && heap->type == LARGE && g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t   [FREE] Memory freed of size %d bytes\n", heap->ptr, heap->size);
-		if (!result && heap->type != LARGE && g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Heap of size %s (%d) freed\n", heap->ptr, (heap->type == TINY ? "TINY" : "SMALL"), heap->size);
+		if (!result && heap->type == LARGE && g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "%p\t   [FREE] Memory freed of size %d bytes\n", heap->ptr, heap->size);
+		if (!result && heap->type != LARGE && g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Heap of size %s (%d) freed\n", heap->ptr, (heap->type == TINY ? "TINY" : "SMALL"), heap->size);
 
 		return (result);
 	}

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 13:55:19 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:42:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,25 +25,25 @@
 
 		for (size_t i = 0; i < length; i += ALIGNMENT) {
 			// Pointer
-			aprintf(2, " %p  ", (void *)(tmp_ptr + i));
+			aprintf(2, 0, " %p  ", (void *)(tmp_ptr + i));
 
 			// Hexadecimal (8 or 16 bytes per row splitted at 8 or 4 bytes, depends of ALIGNMENT)
 			for (size_t j = 0; j < ALIGNMENT; j++) {
 				if (i + j < length) {
-					if (tmp_ptr[i + j] < 16) aprintf(2, "0");
-					aprintf(2, "%X ", (unsigned int)tmp_ptr[i + j]);
-				} else aprintf(2, "   ");
-				if (j == (ALIGNMENT/2 - 1)) aprintf(2, " ");
+					if (tmp_ptr[i + j] < 16) aprintf(2, 0, "0");
+					aprintf(2, 0, "%X ", (unsigned int)tmp_ptr[i + j]);
+				} else aprintf(2, 0, "   ");
+				if (j == (ALIGNMENT/2 - 1)) aprintf(2, 0, " ");
 			}
-			aprintf(2, " ");
+			aprintf(2, 0, " ");
 
 			// ASCII
 			for (size_t j = 0; j < ALIGNMENT && i + j < length; j++) {
 				unsigned char c = tmp_ptr[i + j];
-				aprintf(2, "%c", (c >= 32 && c <= 126) ? c : '.');
+				aprintf(2, 0, "%c", (c >= 32 && c <= 126) ? c : '.');
 			}
 
-			aprintf(2, "\n");
+			aprintf(2, 0, "\n");
 		}
 	}
 
@@ -57,20 +57,20 @@
 		t_chunk *chunk = GET_HEAD(ptr);
 		size_t	chunk_size = GET_SIZE(chunk);
 
-		if (offset >= chunk_size) { aprintf(2, "Invalid offset, the maximum offset for this pointer is %u bytes\n", chunk_size - 1);	return ; }
+		if (offset >= chunk_size) { aprintf(2, 0, "Invalid offset, the maximum offset for this pointer is %u bytes\n", chunk_size - 1);	return ; }
 
 		size_t	remaining = chunk_size - offset;
 		size_t	size = (!length || length > remaining) ? remaining : length;
 
-		aprintf(2, "——————————————————————————————————————\n");
-		aprintf(2, " • Pointer: %p (Arena #%d)\n", ptr, arena->id);
-		aprintf(2, "————————————————————————————————————————————————————————————————————————————————————\n");
-		aprintf(2, " • Size: %u bytes      • Offset: %u bytes      • Length: %u bytes%s\n", chunk_size, offset, size, remaining < length ? " (truncated)" : "");
-		aprintf(2, "————————————————————————————————————————————————————————————————————————————————————\n");
+		aprintf(2, 0, "——————————————————————————————————————\n");
+		aprintf(2, 0, " • Pointer: %p (Arena #%d)\n", ptr, arena->id);
+		aprintf(2, 0, "————————————————————————————————————————————————————————————————————————————————————\n");
+		aprintf(2, 0, " • Size: %u bytes      • Offset: %u bytes      • Length: %u bytes%s\n", chunk_size, offset, size, remaining < length ? " (truncated)" : "");
+		aprintf(2, 0, "————————————————————————————————————————————————————————————————————————————————————\n");
 		print_hex((char *)chunk, sizeof(t_chunk));
-		aprintf(2, "————————————————————————————————————————————————————————————————————————————————————\n");
+		aprintf(2, 0, "————————————————————————————————————————————————————————————————————————————————————\n");
 		print_hex((char *)ptr + offset, size);
-		aprintf(2, "————————————————————————————————————————————————————————————————————————————————————\n");
+		aprintf(2, 0, "————————————————————————————————————————————————————————————————————————————————————\n");
 	}
 
 #pragma endregion
@@ -84,18 +84,18 @@
 		if (heap->type == LARGE) {
 			if (GET_HEAD(ptr) == heap->ptr) {
 				// Corruption
-				if (!HAS_MAGIC(ptr)) { aprintf(2, "Pointer %p is corrupted\n", ptr); return (1); }
+				if (!HAS_MAGIC(ptr)) { aprintf(2, 0, "Pointer %p is corrupted\n", ptr); return (1); }
 				return (0);
 			}
-			aprintf(2, "Pointer %p is not at the start of a chunk\n", ptr); return (1);
+			aprintf(2, 0, "Pointer %p is not at the start of a chunk\n", ptr); return (1);
 		}
 
 		// Top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
-		if ((chunk->size & TOP_CHUNK)) { aprintf(2, "Pointer %p is in top chunk\n", ptr); return (1); }
+		if ((chunk->size & TOP_CHUNK)) { aprintf(2, 0, "Pointer %p is in top chunk\n", ptr); return (1); }
 
 		// Corruption
-		if (!HAS_MAGIC(ptr) && !HAS_POISON(ptr)) { aprintf(2, "Pointer %p is not at the start of a chunk\n", ptr); return (1); }
+		if (!HAS_MAGIC(ptr) && !HAS_POISON(ptr)) { aprintf(2, 0, "Pointer %p is not at the start of a chunk\n", ptr); return (1); }
 
 		return (0);
 	}
@@ -108,17 +108,17 @@
 	void show_alloc_mem_ex(void *ptr, size_t offset, size_t length) {
 		ensure_init();
 
-		if (!ptr)						{ aprintf(2, "Pointer NULL is invalid\n"); return ; }
+		if (!ptr)						{ aprintf(2, 0, "Pointer NULL is invalid\n"); return ; }
 
 		// Not aligned
-		if ((uintptr_t)ptr % ALIGNMENT) { aprintf(2, "Pointer %p is not aligned\n", ptr); return ; }
+		if ((uintptr_t)ptr % ALIGNMENT) { aprintf(2, 0, "Pointer %p is not aligned\n", ptr); return ; }
 
 		// malloc(0)
 		if (check_digit(ptr, ZERO_MALLOC_BASE)) {
 			mutex(&g_manager.mutex, MTX_LOCK);
 
-				if (ptr > ZERO_MALLOC_BASE && ptr < (void *)((char *)ZERO_MALLOC_BASE + (g_manager.zero_malloc_counter * ALIGNMENT)))
-					aprintf(2, "Pointer %p is invalid\n", ptr);
+				if (ptr > ZERO_MALLOC_BASE && ptr < (void *)((char *)ZERO_MALLOC_BASE + (g_manager.alloc_zero_counter * ALIGNMENT)))
+					aprintf(2, 0, "Pointer %p is invalid\n", ptr);
 
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 			return ;
@@ -147,7 +147,7 @@
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
-		aprintf(2, "Pointer %p is not allocated\n", ptr); return ;
+		aprintf(2, 0, "Pointer %p is not allocated\n", ptr); return ;
 	}
 
 #pragma endregion

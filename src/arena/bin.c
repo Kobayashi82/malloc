@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 11:09:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:30:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,6 @@
 			t_chunk *chunk = top_chunk;
 			chunk->size = (top_chunk->size & (HEAP_TYPE | PREV_INUSE)) | (size - sizeof(t_chunk));
 			chunk->size &= ~TOP_CHUNK;
-
-			// static int p = 0;
-			// aprintf(g_manager.options.fd_out, "split %d\n", p++);
 
 			top_chunk = GET_NEXT(chunk);
 			top_chunk->size = (top_chunk_available - size) | TOP_CHUNK | ((heap->type == SMALL) ? HEAP_TYPE : 0) | PREV_INUSE;
@@ -132,7 +129,7 @@
 				next->size |= PREV_INUSE;
 
 				ptr = GET_PTR(chunk);
-				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
 				return (ptr);
 			}
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 09:18:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 16:49:11 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,11 @@
 		int				arena_count;				// Current number of arenas
 		t_options		options;					// Options
 		t_arena			arena;						// Main arena
-		size_t			zero_malloc_counter;		// 
+		size_t			alloc_zero_counter;			// 
+		char			*hist_buffer;				// 
+		size_t			hist_size;					// 
+		size_t			hist_pos;					// 
+		pthread_mutex_t	hist_mutex;					// Mutex for history synchronization
 		pthread_mutex_t	mutex;						// Mutex for global synchronization
 	} t_manager;
 

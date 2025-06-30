@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 09:14:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 13:50:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:23:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,6 @@
 	void	*ft_memcpy(void *dst, const void *src, int n);
 
 	// ATOMIC PRINTF
-	int		aprintf(int fd, char const *format, ...);
+	int		aprintf(int fd, int add_alloc_hist, char const *format, ...);
 
 #pragma endregion

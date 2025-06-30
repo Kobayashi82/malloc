@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 10:33:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:42:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 	// 	ensure_init();
 
 	// 	if (alignment < sizeof(void *) || !is_power_of_two(alignment)) {
-	// 		if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
+	// 		if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
 	// 		errno = EINVAL; return (NULL);
 	// 	}
 
@@ -33,13 +33,13 @@
 	// 	if (!size) {
 	// 		mutex(&g_manager.mutex, MTX_LOCK);
 
-	// 			size_t aligned_offset = (g_manager.zero_malloc_counter * alignment);
-	// 			g_manager.zero_malloc_counter++;
+	// 			size_t aligned_offset = (g_manager.alloc_zero_counter * alignment);
+	// 			g_manager.alloc_zero_counter++;
 				
 	// 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
 	// 		ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
-	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [MEMALIGN] Allocated %u bytes\n", ptr, size);
+	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [MEMALIGN] Allocated %u bytes\n", ptr, size);
 	// 		else if (!ptr) errno = ENOMEM;
 
 	// 		return (ptr);
@@ -49,7 +49,7 @@
 	// 		arena = arena_get();
 	// 		tcache = arena;
 	// 		if (!arena) {
-	// 			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to assign arena\n");
+	// 			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
 	// 			return (NULL);
 	// 		}
 	// 	} else arena = tcache;
@@ -58,8 +58,8 @@
 
 	// 		// ptr = allocate_aligned(alignment, size);
 			
-	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [MEMALIGN] Allocated %u bytes\n", ptr, size);
-	// 		else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [MEMALIGN] Allocated %u bytes\n", ptr, size);
+	// 		else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 	// 		if (ptr) SET_MAGIC(ptr);
 	// 		else errno = ENOMEM;

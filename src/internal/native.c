@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:32:32 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 12:46:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:24:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 			}
 
 			if (!real_free_win) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
 				return;
 			}
 
@@ -39,14 +39,14 @@
 			if (!real_free_unix) real_free_unix = dlsym(((void *) -1L), "free");
 
 			if (!real_free_unix) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Delegation to the native free failed\n", ptr);
 				return;
 			}
 
 			real_free_unix(ptr);
 		#endif
 
-		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, "%p\t   [FREE] Delegated to the native free\n", ptr);
+		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, 1, "%p\t   [FREE] Delegated to the native free\n", ptr);
 	}
 
 #pragma endregion
@@ -64,7 +64,7 @@
 			}
 
 			if (!real_realloc_win) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
 				return (NULL);
 			}
 
@@ -74,14 +74,14 @@
 			if (!real_realloc_unix) real_realloc_unix = dlsym(((void *) -1L), "realloc");
 
 			if (!real_realloc_unix) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
+				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Delegation to the native realloc failed\n", ptr);
 				return (NULL);
 			}
 
 			void *new_ptr = real_realloc_unix(ptr, size);
 		#endif
 
-		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, "%p\t[REALLOC] Delegated to the native realloc from %p with %d bytes\n", new_ptr, ptr, size);
+		if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, 1, "%p\t[REALLOC] Delegated to the native realloc from %p with %d bytes\n", new_ptr, ptr, size);
 		return (new_ptr);
 	}
 
@@ -100,7 +100,7 @@
 			}
 
 			if (!real_malloc_usable_size_win) {
-				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to native malloc_usable_size failed\n", ptr);
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Delegation to native malloc_usable_size failed\n", ptr);
 				return (0);
 			}
 
@@ -111,7 +111,7 @@
 				real_malloc_usable_size_unix = dlsym(RTLD_NEXT, "malloc_usable_size");
 			
 			if (!real_malloc_usable_size_unix) {
-				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "%p\t  [ERROR] Delegation to native malloc_usable_size failed\n", ptr);
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Delegation to native malloc_usable_size failed\n", ptr);
 				return (0);
 			}
 

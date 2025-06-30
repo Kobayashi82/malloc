@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 10:04:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 15:11:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@
 	t_heap	*heap_find(t_arena *arena, void *ptr);
 	void	*heap_create(t_arena *arena, int type, size_t size);
 	int		heap_destroy(t_heap *heap);
+	void	heap_hist_extend();
+	void	heap_hist_destroy();
 
 	// Coalescing
 	int		link_chunk(t_chunk *chunk, size_t size, int type, t_arena *arena);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 22:43:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 10:33:04 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:42:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@
 	// 	if (!size) {
 	// 		mutex(&g_manager.mutex, MTX_LOCK);
 
-	// 			size_t aligned_offset = (g_manager.zero_malloc_counter * PAGE_SIZE);
-	// 			g_manager.zero_malloc_counter++;
+	// 			size_t aligned_offset = (g_manager.alloc_zero_counter * PAGE_SIZE);
+	// 			g_manager.alloc_zero_counter++;
 				
 	// 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
 	// 		ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
-	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
+	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
 	// 		else if (!ptr) errno = ENOMEM;
 
 	// 		return (ptr);
@@ -44,7 +44,7 @@
 	// 		arena = arena_get();
 	// 		tcache = arena;
 	// 		if (!arena) {
-	// 			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to assign arena\n");
+	// 			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
 	// 			return (NULL);
 	// 		}
 	// 	} else arena = tcache;
@@ -53,8 +53,8 @@
 
 	// 		// ptr = allocate_aligned(PAGE_SIZE, size);
 			
-	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
-	// 		else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
+	// 		else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 	// 		if (ptr) SET_MAGIC(ptr);
 	// 		else errno = ENOMEM;

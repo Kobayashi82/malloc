@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 14:21:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 16:55:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #pragma region "Main"
 
 	int main() {
-		mallopt(M_DEBUG, 0);
+		mallopt(M_DEBUG, 1);
 
 		char *popo1 = malloc(100);
 		char *popo2 = malloc(100);
@@ -29,6 +29,7 @@
 		malloc_stats();
 		show_alloc_mem_ex(popo1, 0, 0);
 		free(popo1);
+		show_alloc_history();
 		// popo += 8;
 
 	}

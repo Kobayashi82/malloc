@@ -1,21 +1,14 @@
 # TODO
 
-## Today
+## Bins
 
-- [ ] Alloc_hist
-- [X] Perturb
-- [X] Corruption
-- [X] Errno
-- [ ] Free heap
-- [ ] Contador de frees para eliminar heap
-- [ ] heap_find solo busca en la arena actual
-- [X] make(0) cuenta como alloc and free
-- [X] Separación (reallocarray -> realloc)
+- [X] Fastbin (MXFAST) - (no coalescing)
+- [ ] Smallbin - (coalescing)
+- [ ] Unsortedbin
+- [ ] Largebin - (coalescing)
+- [ ] Coalescing
 
-aprintf recibe un argumento de si debe enviar a history allocation.
-Y este ya se encarga de llamar a la función de crear el historial con el buffer
-
-## Allocation Order
+### Allocation Order
 
 - mmap (if too large)
 - fastbin
@@ -26,29 +19,10 @@ Y este ya se encarga de llamar a la función de crear el historial con el buffer
 - repeat if fastbin not empty
 - top chunk
 
-## Global
-
-- [ ] Data-Races
-- [ ] Makefile for Windows
-
-## Chunks
-
-- [ ] Corruption (Magic / Poison)
-- [ ] Perturb
-- [ ] Coalescing
-
-## Bins
-
-- [X] Fastbin (MXFAST) - (no coalescing)
-- [ ] Smallbin - (coalescing)
-- [ ] Unsortedbin
-- [ ] Largebin - (coalescing)
-
 ## Heaps
 
-- [ ] Free heap
-- [ ] Contador de frees para eliminar heap
-- [ ] heap_find solo busca en la arena actual
+- [ ] Free heap (contador de frees para eliminar heap)
+- [ ] heap_find (solo busca en la arena actual)
 - [ ] alloc_aligned()
 
 ## Main
@@ -74,7 +48,12 @@ Y este ya se encarga de llamar a la función de crear el historial con el buffer
 - [X] malloc_stats
 - [X] show_alloc_mem
 - [X] show_alloc_mem_ex
-- [ ] show_alloc_hist
+- [X] show_alloc_hist
+
+## Global
+
+- [ ] Data-Races
+- [ ] Makefile for Windows
 
 ## Documentation
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:02 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 23:29:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:28:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@
 					print_hex5(1,  (uintptr_t)GET_PTR(chunk));
 					write(2, " - ", 3);
 					print_hex5(1,  (uintptr_t)GET_NEXT(chunk));
-					aprintf(2, " : %u bytes\n", GET_SIZE(chunk));
+					aprintf(2, 0, " : %u bytes\n", GET_SIZE(chunk));
 					total += GET_SIZE(chunk);
 				}
 				chunk = GET_NEXT(chunk);
@@ -139,13 +139,13 @@
 		static size_t print_heaps(t_arena *arena, t_heap **heaps, int heaps_count, int tiny_count, int small_count, int large_count) {
 			if (!arena || !heaps) return (0);
 
-			aprintf(2, "————————————\n");
-			aprintf(2, " • Arena #%d\n", arena->id);
-			aprintf(2, "———————————————————————————————————————\n");
-			aprintf(2, " • Allocations: %u\t• Frees: %u\n", arena->alloc_count, arena->free_count);
-			aprintf(2, " • TINY: %u \t\t• SMALL: %u\n", tiny_count, small_count);
-			aprintf(2, " • LARGE: %u\t\t• TOTAL: %u\n", large_count, heaps_count);
-			aprintf(2, "———————————————————————————————————————\n\n");
+			aprintf(2, 0, "————————————\n");
+			aprintf(2, 0, " • Arena #%d\n", arena->id);
+			aprintf(2, 0, "———————————————————————————————————————\n");
+			aprintf(2, 0, " • Allocations: %u\t• Frees: %u\n", arena->alloc_count, arena->free_count);
+			aprintf(2, 0, " • TINY: %u \t\t• SMALL: %u\n", tiny_count, small_count);
+			aprintf(2, 0, " • LARGE: %u\t\t• TOTAL: %u\n", large_count, heaps_count);
+			aprintf(2, 0, "———————————————————————————————————————\n\n");
 
 			size_t arena_total = 0;
 
@@ -157,24 +157,24 @@
 				if (heaps[i]->type == SMALL) type = "SMALL";
 				if (heaps[i]->type == LARGE) type = "LARGE";
 				
-				if (i > 0) aprintf(2, "\n");
+				if (i > 0) aprintf(2, 0, "\n");
 
-				aprintf(2, " %s : ", type);
+				aprintf(2, 0, " %s : ", type);
 				print_hex5(1,  (uintptr_t)heap->ptr);
 				write(2, "\n", 1);
-				aprintf(2, "— — — — — — — — — — — — — — — — —\n");
+				aprintf(2, 0, "— — — — — — — — — — — — — — — — —\n");
 				size_t heap_total = print_heap(heaps[i]);
 				arena_total += heap_total;
 
 				if (heap_total) {
-					aprintf(2, "                    — — — — — — —\n");
-					aprintf(2, "                     %u byte%s\n", heap_total, heap_total == 1 ? "" : "s");
+					aprintf(2, 0, "                    — — — — — — —\n");
+					aprintf(2, 0, "                     %u byte%s\n", heap_total, heap_total == 1 ? "" : "s");
 				}
 			}
 
 			if (arena_total) {
-				aprintf(2, "\n———————————————————————————————————————\n");
-				aprintf(2, " %u byte%s in arena #%d\n\n\n", arena_total, arena_total == 1 ? "" : "s", arena->id);
+				aprintf(2, 0, "\n———————————————————————————————————————\n");
+				aprintf(2, 0, " %u byte%s in arena #%d\n\n\n", arena_total, arena_total == 1 ? "" : "s", arena->id);
 			}
 
 			return (arena_total);
@@ -224,10 +224,10 @@
 			}
 
 			
-			if (!total) aprintf(2, "No memory has been allocated\n");
+			if (!total) aprintf(2, 0, "No memory has been allocated\n");
 			else if (g_manager.arena_count > 0) {
-				aprintf(2, "———————————————————————————————————————————————————————————————\n");
-				aprintf(2, " • %d allocation%s, %d free%s and %u byte%s across %d arena%s\n", alloc_count, alloc_count == 1 ? "" : "s", free_count, free_count == 1 ? "" : "s", total, total == 1 ? "" : "s", g_manager.arena_count, g_manager.arena_count == 1 ? "" : "s");
+				aprintf(2, 0, "———————————————————————————————————————————————————————————————\n");
+				aprintf(2, 0, " • %d allocation%s, %d free%s and %u byte%s across %d arena%s\n", alloc_count, alloc_count == 1 ? "" : "s", free_count, free_count == 1 ? "" : "s", total, total == 1 ? "" : "s", g_manager.arena_count, g_manager.arena_count == 1 ? "" : "s");
 			}
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);

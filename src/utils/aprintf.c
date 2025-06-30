@@ -6,13 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/31 23:43:13 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/28 12:25:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 16:53:37 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "utils.h"
+	#include "arena.h"
 
 	#include <stdarg.h>
 
@@ -93,7 +93,7 @@
 
 	#pragma region "Atomic Printf"
 
-		int aprintf(int fd, char const *format, ...) {
+		int aprintf(int fd, int add_alloc_hist, char const *format, ...) {
 			if (fd < 1) return (0);
 
 			char buffer[4096];
@@ -117,6 +117,17 @@
 
 			if (buf.error && buf.pos > 0) buf.pos = buf.size - 1;
 			if (buf.pos > 0) {
+				if (add_alloc_hist && g_manager.options.DEBUG) {
+					mutex(&g_manager.hist_mutex, MTX_LOCK);
+
+						if (g_manager.hist_size < SIZE_MAX) {
+							if (!g_manager.hist_size || g_manager.hist_pos + buf.pos >= g_manager.hist_size) heap_hist_extend();
+							ft_memcpy(&g_manager.hist_buffer[g_manager.hist_pos], buffer, buf.pos);
+							g_manager.hist_pos += buf.pos;
+						}
+
+					mutex(&g_manager.hist_mutex, MTX_UNLOCK);
+				}
 				int result = write(fd, buffer, buf.pos);
 				return (result == -1 ? -1 : result);
 			}

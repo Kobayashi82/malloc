@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/29 23:33:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 16:55:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,6 @@
 
 	static pthread_t	threads[THREADS];
 	static unsigned int	n_threads;
-
-	// int aprintf(int fd, char const *format, ...);
 
 #pragma endregion
 
@@ -247,6 +245,7 @@
 		free(ptr2);
 
 		printf("\n");
+
 		return (0);
 	}
 

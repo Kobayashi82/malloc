@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 14:14:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:24:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,7 @@
 		mutex(&g_manager.mutex, MTX_LOCK);
 
 			if (g_manager.arena_count) {
-				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, "\t[MALLOPT] Changes are not allowed after the first allocation\n");
+				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t[MALLOPT] Changes are not allowed after the first allocation\n");
 				return (1);
 			}
 
