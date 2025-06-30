@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 11:26:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:18:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,6 @@
 			return (abort_now());
 		}
 
-		// set perturb
-		// get data on chunk (FD, prev_size y si es un chunk grande, BK y demas)
-		// set perturb
-		// volver a poner la data
-
 		switch (type) {
 			case FASTBIN: {
 				int index = (size - 1) / ALIGNMENT;
@@ -43,7 +38,7 @@
 				if (g_manager.options.PERTURB) {
 					void *FD = GET_FD(chunk);
 					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
-					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB, GET_SIZE(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB ^ 255, GET_SIZE(chunk));
 					SET_FD(chunk, FD);
 					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
 				}
@@ -51,10 +46,36 @@
 				return (0);
 			}
 			case SMALLBIN:
+
+				if (g_manager.options.PERTURB) {
+					void *FD = GET_FD(chunk);
+					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB ^ 255, GET_SIZE(chunk));
+					SET_FD(chunk, FD);
+					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+				}
+
 				return (0);
 			case UNSORTEDBIN:
+
+				if (g_manager.options.PERTURB) {
+					void *FD = GET_FD(chunk);
+					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB ^ 255, GET_SIZE(chunk));
+					SET_FD(chunk, FD);
+					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+				}
+
 				return (0);
 			case LARGEBIN:
+				if (g_manager.options.PERTURB) {
+					void *FD = GET_FD(chunk);
+					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB ^ 255, GET_SIZE(chunk));
+					SET_FD(chunk, FD);
+					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+				}
+
 				return (0);
 		}
 

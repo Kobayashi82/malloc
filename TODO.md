@@ -55,12 +55,12 @@ Y este ya se encarga de llamar a la función de crear el historial con el buffer
 
 - [X] free
 - [X] malloc
-- [X] realloc
+- [ ] realloc
 - [X] calloc
 
 ## Extra
 
-- [X] reallocarray
+- [ ] reallocarray
 - [X] aligned_alloc
 - [X] memalign
 - [ ] posix_memalign

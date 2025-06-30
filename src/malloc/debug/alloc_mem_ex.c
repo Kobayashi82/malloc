@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 11:41:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 13:55:19 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 			for (size_t j = 0; j < ALIGNMENT; j++) {
 				if (i + j < length) {
 					if (tmp_ptr[i + j] < 16) aprintf(2, "0");
-					aprintf(2, "%x ", (unsigned int)tmp_ptr[i + j]);
+					aprintf(2, "%X ", (unsigned int)tmp_ptr[i + j]);
 				} else aprintf(2, "   ");
 				if (j == (ALIGNMENT/2 - 1)) aprintf(2, " ");
 			}
@@ -90,19 +90,12 @@
 			aprintf(2, "Pointer %p is not at the start of a chunk\n", ptr); return (1);
 		}
 
-		// Freed
-		if (HAS_POISON(ptr)) { aprintf(2, "Pointer %p is not allocated\n", ptr); return (1); }
-
 		// Top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK)) { aprintf(2, "Pointer %p is in top chunk\n", ptr); return (1); }
 
-		// Middle chunk
-		t_chunk *next_chunk = GET_NEXT(chunk);
-		if (!(next_chunk->size & PREV_INUSE)) { aprintf(2, "Pointer %p is not at the start of a chunk\n", ptr); return (1); }
-
 		// Corruption
-		if (!HAS_MAGIC(ptr)) { aprintf(2, "Pointer %p is corrupted\n", ptr); return (1); }
+		if (!HAS_MAGIC(ptr) && !HAS_POISON(ptr)) { aprintf(2, "Pointer %p is not at the start of a chunk\n", ptr); return (1); }
 
 		return (0);
 	}

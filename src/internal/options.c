@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 11:36:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:14:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@
 	#pragma region "PERTURB"
 
 		unsigned char validate_perturb(int value) {
-			return ((unsigned char)(value & 0xFF));
+			return (ft_max(ft_min(value, 255), 0));
 		}
 
 	#pragma endregion

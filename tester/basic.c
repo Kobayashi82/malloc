@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 11:41:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/06/30 14:21:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@
 		mallopt(M_DEBUG, 0);
 
 		char *popo1 = malloc(100);
+		char *popo2 = malloc(100);
 		strcpy(popo1, "Hello World!");
-		show_alloc_mem_ex(popo1, 0, 0);
 		malloc_stats();
-		// show_alloc_mem();
+		show_alloc_mem_ex(popo1, 0, 0);
 		free(popo1);
 		// popo += 8;
 
