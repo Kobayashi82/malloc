@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 23:09:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 		if (!source || !*source) source = "UNKOWN";
 
 		if (alignment < sizeof(void *) || !is_power_of_two(alignment)) {
-			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+			if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 			errno = EINVAL;
 			return (NULL);
 		}
@@ -36,8 +36,8 @@
 
 			// Logica de allocation
 		
-			if		(ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
-			else if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+			if		(ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
+			else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 			if (ptr) SET_MAGIC(ptr);
 
@@ -66,8 +66,8 @@
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
 		ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
-		if		(ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated 0 bytes\n", ptr, source);
-		else if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated 0 bytes\n");
+		if		(ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated 0 bytes\n", ptr, source);
+		else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated 0 bytes\n");
 
 		if (ptr) {
 			mutex(&tcache->mutex, MTX_LOCK);
@@ -102,8 +102,8 @@
 			if (ptr && (perturb || (!perturb && !is_large && !ft_strcmp(source, "CALLOC"))))
 				ft_memset(ptr, perturb, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
 
-			if		(ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
-			else if (g_manager.options.DEBUG)			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+			if		(ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
+			else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 			if (ptr) {
 				SET_MAGIC(ptr);

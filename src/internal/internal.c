@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 21:56:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 		}
 
 		if (result) {
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Mutex failed\n");
+			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Mutex failed\n");
 			abort();
 		}
 
@@ -93,7 +93,7 @@
 				if (!ret) return (0);
 
 				if (ret != EBUSY) {
-					if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] locking mutex in fork\n");
+					if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] locking mutex in fork\n");
 					return (ret);
 				}
 				
@@ -105,12 +105,12 @@
 				#endif
 			}
 
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] timeout locking mutex in fork\n");
+			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] timeout locking mutex in fork\n");
 			return (ETIMEDOUT);
 		}
 
 		void prepare_fork() {
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Prepare fork\n");
+			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Prepare fork\n");
 
 			int ret = try_lock_timeout(&g_manager.mutex, 1000);
 			if (ret) return;
@@ -137,7 +137,7 @@
 	#pragma region "Parent"
 
 		void parent_fork() {
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Parent fork\n");
+			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Parent fork\n");
 
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
@@ -152,7 +152,7 @@
 	#pragma region "Child"
 
 		void child_fork() {
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Child fork\n");
+			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Child fork\n");
 
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
@@ -174,7 +174,7 @@
 		size_t total_size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 		void *ptr = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (ptr == MAP_FAILED) {
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
+			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
 			abort(); return (NULL);
 		}
 
@@ -189,7 +189,7 @@
 		if (!ptr || !size) return (0);
 
 		if (munmap(ptr, size)) {
-			if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
+			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
 			return (1);
 		}
 
@@ -247,3 +247,10 @@
 	__attribute__((constructor)) static void malloc_initialize() { ensure_init(); }
 
 #pragma endregion
+
+bool print_log(bool error) {
+	if (error) return (g_manager.options.DEBUG || g_manager.options.LOGGING);
+	return (g_manager.options.LOGGING);
+}
+
+bool print_error()	{ return (!g_manager.options.DEBUG && g_manager.options.LOGGING != 2 && g_manager.options.CHECK_ACTION != 2); }

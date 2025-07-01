@@ -48,6 +48,7 @@
 - [X] show_alloc_mem
 - [X] show_alloc_mem_ex
 - [X] show_alloc_hist
+- [ ] Log to stderr y debug and logging=2
 
 ## Global
 

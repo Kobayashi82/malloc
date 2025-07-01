@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 01:41:55 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:43:19 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@
 
 				// Corruption
 				if (!HAS_MAGIC(ptr)) {
-					if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted memory (LARGE)\n", ptr);
-					else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Corrupted memory\n");
+					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted memory (LARGE)\n", ptr);
+					if (print_error())		aprintf(2, 0, "Corrupted memory\n");
 					return (abort_now());
 				}
 
@@ -36,38 +36,38 @@
 				return (0);
 			}
 
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk (LARGE))\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Invalid pointer\n");
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk (LARGE))\n", ptr);
+			if (print_error())				aprintf(2, 0, "Invalid pointer\n");
 			return (abort_now());
 		}
 
 		// Double free
 		if (HAS_POISON(ptr)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Double free (Poison)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Double free\n");
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Double free (Poison)\n", ptr);
+			if (print_error())				aprintf(2, 0, "Double free\n");
 			return (abort_now());
 		}
 
 		// Top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Invalid pointer\n");
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
+			if (print_error())				aprintf(2, 0, "Invalid pointer\n");
 			return (abort_now());
 		}
 
 		// Middle chunk
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunks (not allocated))\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Invalid pointer\n");
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunks (not allocated))\n", ptr);
+			if (print_error())				aprintf(2, 0, "Invalid pointer\n");
 			return (abort_now());
 		}
 
 		// Corruption
 		if (!HAS_MAGIC(ptr)) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted memory\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Corrupted memory\n");
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted memory\n", ptr);
+			if (print_error())				aprintf(2, 0, "Corrupted memory\n");
 			return (abort_now());
 		}
 
@@ -79,13 +79,13 @@
 		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
 		SET_PREV_SIZE(next_chunk, GET_SIZE(chunk));
 		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
-			if (g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
+			if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
 			link_chunk(chunk, chunk_size, FASTBIN, arena);
 		} else {
-			if (g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
+			if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
 			chunk = coalescing_neighbours(chunk, arena, heap);
 			if (!(chunk->size & TOP_CHUNK)) {
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
+				if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
 				link_chunk(chunk, chunk_size, UNSORTEDBIN, arena);
 			}
 		}
@@ -103,7 +103,7 @@
 			}
 		}
 
-		if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t   [FREE] Memory freed of size %d bytes\n", ptr, chunk_size);
+		if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "%p\t   [FREE] Memory freed of size %d bytes\n", ptr, chunk_size);
 
 		return (0);
 	}
@@ -120,8 +120,8 @@
 
 		// Not aligned
 		if ((uintptr_t)ptr % ALIGNMENT) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Invalid pointer\n");
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
+			if (print_error())		aprintf(2, 0, "Invalid pointer\n");
 			abort_now(); return ;
 		}
 
@@ -130,7 +130,7 @@
 			mutex(&g_manager.mutex, MTX_LOCK);
 
 				if (ptr > ZERO_MALLOC_BASE && ptr < (void *)((char *)ZERO_MALLOC_BASE + (g_manager.alloc_zero_counter * ALIGNMENT))) {
-					if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t   [FREE] Memory freed of size 0 bytes\n", ptr);
+					if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t   [FREE] Memory freed of size 0 bytes\n", ptr);
 					mutex(&tcache->mutex, MTX_LOCK);
 
 						tcache->free_count--;
@@ -168,8 +168,8 @@
 
 		// Heap freed
 		if (inactive && (inactive->type != LARGE || GET_HEAD(ptr) == inactive->ptr)) {
-			if		(g_manager.options.DEBUG)				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Double free (inactive)\n", ptr);
-			else if (g_manager.options.CHECK_ACTION != 2)	aprintf(2, 0, "Double free\n");
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Double free (inactive)\n", ptr);
+			if (print_error())		aprintf(2, 0, "Double free\n");
 			abort_now(); return ;
 		}
 

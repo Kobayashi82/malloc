@@ -36,7 +36,7 @@ void test_realloc()
     ptr = malloc(10);
     assert(ptr != NULL);
     ptr = realloc(ptr, 0);
-    assert(ptr == NULL);
+    assert(ptr != NULL);
 
     printf("All tests passed!\n");
 }

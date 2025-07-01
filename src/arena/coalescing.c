@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 00:06:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:43:19 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 		if (!chunk || !size || !arena || chunk->size & TOP_CHUNK) return (1);
 
 		if (!HAS_POISON(GET_PTR(chunk))) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Memory corrupted\n");
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
+			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
 			return (abort_now());
 		}
 
@@ -90,8 +90,8 @@
 		if (!chunk || !arena) return (1);
 
 		if (!HAS_POISON(GET_PTR(chunk))) {
-			if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
-			else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Memory corrupted\n");
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
+			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
 			return (abort_now());
 		}
 
@@ -146,8 +146,8 @@
 		chunk_next = GET_NEXT(chunk);
 		if (chunk_next->size & TOP_CHUNK) {
 			if (!HAS_MAGIC(GET_PTR(chunk_next))) {
-				if		(g_manager.options.DEBUG)					aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
-				else if (g_manager.options.CHECK_ACTION != 2)		aprintf(2, 0, "Memory corrupted\n");
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
+				if (print_error())		aprintf(2, 0, "Memory corrupted\n");
 				abort_now(); return (chunk_final);
 			}
 			unlink_chunk(chunk_final, arena);

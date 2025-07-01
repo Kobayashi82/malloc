@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/31 23:43:13 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 18:48:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:47:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,8 +94,6 @@
 	#pragma region "Atomic Printf"
 
 		int aprintf(int fd, int add_alloc_hist, char const *format, ...) {
-			if (fd < 1) return (0);
-
 			char buffer[4096];
 			t_buffer buf = {
 				.buffer = buffer,
@@ -117,7 +115,7 @@
 
 			if (buf.error && buf.pos > 0) buf.pos = buf.size - 1;
 			if (buf.pos > 0) {
-				if (add_alloc_hist && g_manager.options.DEBUG) {
+				if (add_alloc_hist && g_manager.options.LOGGING) {
 					mutex(&g_manager.hist_mutex, MTX_LOCK);
 
 						if (g_manager.hist_size < SIZE_MAX) {
@@ -125,9 +123,10 @@
 							ft_memcpy(&g_manager.hist_buffer[g_manager.hist_pos], buffer, buf.pos);
 							g_manager.hist_pos += buf.pos;
 						}
-						
+
 					mutex(&g_manager.hist_mutex, MTX_UNLOCK);
 				}
+				if (fd == -1 || (add_alloc_hist && !g_manager.options.DEBUG && !g_manager.options.LOGGING)) return (0);
 				int result = write(fd, buffer, buf.pos);
 				return (result == -1 ? -1 : result);
 			}

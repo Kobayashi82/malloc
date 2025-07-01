@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 22:03:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:40:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@
 		int				ARENA_TEST;					// 
 		int				ARENA_MAX;					// Hard limit for arenas based on CPU count
 		bool			DEBUG;						// 
-		bool			LOGGING;					// 
+		int				LOGGING;					// 
 		char 			LOGFILE[PATH_MAX];			// 
 		int				fd_out;						// 
 	} t_options;
@@ -179,6 +179,8 @@
 	size_t	get_pagesize();
 	int		check_digit(void *ptr1, void *ptr2);
 	int		abort_now();
+	bool	print_log(bool error);
+	bool	print_error();
 
 	// Options
 	void	options_initialize();

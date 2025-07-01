@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   koba.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 23:23:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:45:44 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,37 +156,34 @@
 	#pragma region "Heap"
 
 		static void heap_test() {
-			// printf("\n=== Heap ===\n\n");
+			printf("\n=== Heap ===\n\n");
 
 			// TINY allocation
 			char *tiny = (char *)malloc(TINY_ALLOC);
 			if (tiny) {
 				strcpy(tiny, "TINY");
-			// 	if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, tiny);
-			// } else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", TINY_ALLOC, tiny);
+			} else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
 			free(tiny);
-			// if (tiny && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", tiny);
-			}
+			if (tiny && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", tiny);
 
 			// MEDIUM allocation
 			char *small = (char *)malloc(MEDIUM_ALLOC);
 			if (small) {
 				strcpy(small, "MEDIUM");
-			// 	if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, small);
-			// } else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t\t(%p)\n", MEDIUM_ALLOC, small);
+			} else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
 			free(small);
-			// if (small && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", small);
-			}
+			if (small && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", small);
 
 			// LARGE allocation
 			char *large = (char *)malloc(LARGE_ALLOC);
 			if (large) {
 				strcpy(large, "LARGE");
-			// 	if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t(%p)\n", LARGE_ALLOC, large);
-			// } else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
+				if (!DEBUG_MODE) printf("[MALLOC]\tAllocated (%d)\t\t\t(%p)\n", LARGE_ALLOC, large);
+			} else if (!DEBUG_MODE) printf("[ERROR]\tMalloc failed\n");
 			free(large);
-			// if (large && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", large);
-			}
+			if (large && !DEBUG_MODE) printf("[FREE]\t\tMemory freed\t\t\t\t(%p)\n", large);
 		}
 
 	#pragma endregion
@@ -223,34 +220,19 @@
 		mallopt(M_ARENA_TEST, 20);		// 
 		mallopt(M_ARENA_MAX, 0);		// 
 
-		char *ptr1 = malloc(16);
-		char *ptr2 = malloc(16);
-		char *ptr3 = malloc(16);
-		char *ptr4 = malloc(16);
-		char *ptr5 = malloc(16);
-		char *ptr6 = malloc(16);
-		heap_test();
-		heap_test();
 		heap_test();
 
-		free(ptr1);
-		free(ptr2);
-		free(ptr3);
-		free(ptr4);
-		free(ptr5);
-		free(ptr6);
+		realloc_test();
 
-		// realloc_test();
+		printf("\n=== Threads ===\n\n");
 
-		// printf("\n=== Threads ===\n\n");
-
-		// threads_create();
+		threads_create();
 
 		// fork_test();					// Fork with threads
 
 		// threads_join();
 
-		// fork_test();
+		fork_test();
 
 		// char *ptr = malloc(1);
 		// size_t size = malloc_usable_size(ptr);
@@ -262,7 +244,7 @@
 
 		// free(ptr2);
 
-		// printf("\n");
+		printf("\n");
 
 		return (0);
 	}

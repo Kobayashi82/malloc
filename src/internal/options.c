@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 11:52:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:46:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@
 	#pragma region "LOGGING"
 
 		static int validate_logging(int value) {
-			if (value <= 0 || value > 1) return (0);
+			if (value <= 0 || value > 2) return (0);
 
 			g_manager.options.LOGGING = value;
 
@@ -186,14 +186,14 @@
 		else							g_manager.options.ARENA_MAX = 0;
 
 		var = getenv("MALLOC_DEBUG");
-		if (var && ft_isdigit_s(var))	g_manager.options.DEBUG = validate_debug(ft_atoi(var));
+		if (var && ft_isdigit_s(var))	validate_debug(ft_atoi(var));
 		else							g_manager.options.DEBUG = 0;
 
 		var = getenv("MALLOC_LOGGING");
-		if (var && ft_isdigit_s(var))	g_manager.options.LOGGING = validate_logging(ft_atoi(var));
+		if (var && ft_isdigit_s(var))	validate_logging(ft_atoi(var));
 		else							g_manager.options.LOGGING = 0;
 
-		if (g_manager.options.DEBUG && g_manager.options.LOGGING) {
+		if (g_manager.options.LOGGING && g_manager.options.LOGGING != 2) {
 			var = getenv("MALLOC_LOGFILE");
 			if (var)					validate_logfile(var);
 			else						validate_logfile("auto");
@@ -210,7 +210,7 @@
 		mutex(&g_manager.mutex, MTX_LOCK);
 
 			if (g_manager.arena_count) {
-				if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "\t[MALLOPT] Changes are not allowed after the first allocation\n");
+				if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t[MALLOPT] Changes are not allowed after the first allocation\n");
 				errno = EINVAL;
 				return (0);
 			}
@@ -230,7 +230,7 @@
 		}
 
 		if (param == M_DEBUG || param == M_LOGGING) {
-			if (g_manager.options.DEBUG && g_manager.options.LOGGING && !*g_manager.options.LOGFILE) {
+			if (g_manager.options.LOGGING && g_manager.options.LOGGING != 2 && !*g_manager.options.LOGFILE) {
 				char *var = getenv("MALLOC_LOGFILE");
 				if (var)	validate_logfile(var);
 			}

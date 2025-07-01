@@ -24,7 +24,7 @@ normal_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}                 Malloc Tester                 ${NC}"
 	echo -e " ${GREEN}===============================================${NC}"
-	clang -g -o test test.c
+	clang -g -o test tests/koba.c
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -36,7 +36,7 @@ debug_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}             Malloc Tester (DEBUG)             ${NC}"
 	echo -e " ${GREEN}===============================================${NC}"
-	clang -g -o test test.c -DDEBUG_MODE
+	clang -g -o test tests/koba.c -DDEBUG_MODE
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -52,7 +52,7 @@ leaks_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}             Malloc Tester (LEAKS)             ${NC}"
 	echo -e " ${GREEN}===============================================${NC}\n"
-	clang -g -o test test.c
+	clang -g -o test tests/koba.c
 	(
 		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
 		export LD_PRELOAD="libft_malloc.so"
@@ -65,8 +65,47 @@ basic_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}              Malloc Tester (BASIC)            ${NC}"
 	echo -e " ${GREEN}===============================================${NC}\n"
-	clang -g -Wno-free-nonheap-object -o test basic.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR} -pthread
+	clang -g -Wno-free-nonheap-object -o test tests/basic.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR} -pthread
 	./test
+	echo
+}
+
+complex_test() {
+	echo -e " ${GREEN}===============================================${NC}"
+	echo -e "${YELLOW}              Malloc Tester (COMPLEX)          ${NC}"
+	echo -e " ${GREEN}===============================================${NC}\n"
+	clang -g -o test tests/complex.c
+	(
+		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+		export LD_PRELOAD="libft_malloc.so"
+		./test
+	)
+	echo
+}
+
+realloc_test() {
+	echo -e " ${GREEN}===============================================${NC}"
+	echo -e "${YELLOW}              Malloc Tester (REALLOC)          ${NC}"
+	echo -e " ${GREEN}===============================================${NC}\n"
+	clang -g -o test tests/realloc.c
+	(
+		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+		export LD_PRELOAD="libft_malloc.so"
+		./test
+	)
+	echo
+}
+
+speed_test() {
+	echo -e " ${GREEN}===============================================${NC}"
+	echo -e "${YELLOW}              Malloc Tester (SPEED)            ${NC}"
+	echo -e " ${GREEN}===============================================${NC}\n"
+	clang -g -o test tests/speed.c
+	(
+		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+		export LD_PRELOAD="libft_malloc.so"
+		./test
+	)
 	echo
 }
 
@@ -74,6 +113,9 @@ case "$1" in
 	"debug")					debug_test;;
 	"leak"|"leaks"|"valgrind")	leaks_test;;
 	"basic")					basic_test;;
+	"complex")					complex_test;;
+	"realloc")					realloc_test;;
+	"speed")					speed_test;;
 	*)							normal_test;;
 esac
 

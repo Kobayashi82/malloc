@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 22:43:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 14:42:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 	// 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
 	// 		ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
-	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
+	// 		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
 	// 		else if (!ptr) errno = ENOMEM;
 
 	// 		return (ptr);
@@ -44,7 +44,7 @@
 	// 		arena = arena_get();
 	// 		tcache = arena;
 	// 		if (!arena) {
-	// 			if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
+	// 			if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
 	// 			return (NULL);
 	// 		}
 	// 	} else arena = tcache;
@@ -53,8 +53,8 @@
 
 	// 		// ptr = allocate_aligned(PAGE_SIZE, size);
 			
-	// 		if (ptr && g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
-	// 		else if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+	// 		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
+	// 		else if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 	// 		if (ptr) SET_MAGIC(ptr);
 	// 		else errno = ENOMEM;

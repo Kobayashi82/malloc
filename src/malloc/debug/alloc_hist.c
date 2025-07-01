@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:16:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 18:50:27 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 			g_manager.hist_size = PAGE_SIZE;
 			void *ptr = mmap(NULL, g_manager.hist_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 			if (ptr == MAP_FAILED) {
-				if (g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, 0, "\t\t  [ERROR] Failed to create heap for allocation history\n");
+				if (print_log(0))		aprintf(g_manager.options.fd_out, 0, "\t\t  [ERROR] Failed to create heap for allocation history\n");
 				g_manager.hist_size = SIZE_MAX;
 				return ;
 			}
@@ -33,16 +33,16 @@
 			g_manager.hist_size *= 2;
 			void *ptr = mmap(NULL, g_manager.hist_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 			if (ptr == MAP_FAILED) {
-				if (g_manager.options.DEBUG)		aprintf(g_manager.options.fd_out, 0, "\t\t  [ERROR] Failed to create heap for allocation history\n");
+				if (print_log(0))		aprintf(g_manager.options.fd_out, 0, "\t\t  [ERROR] Failed to create heap for allocation history\n");
 				g_manager.hist_size = SIZE_MAX;
 				if (munmap(g_manager.hist_buffer, g_manager.hist_size))
-					if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory for allocation history\n", g_manager.hist_buffer);
+					if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory for allocation history\n", g_manager.hist_buffer);
 				return ;
 			}
 
 			ft_memcpy(ptr, g_manager.hist_buffer, g_manager.hist_pos);
 			if (munmap(g_manager.hist_buffer, old_size))
-				if (g_manager.options.DEBUG)	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory for allocation history\n", g_manager.hist_buffer);
+				if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory for allocation history\n", g_manager.hist_buffer);
 
 			g_manager.hist_buffer = ptr;
 		}
@@ -57,7 +57,7 @@
 
 			if (g_manager.hist_buffer && g_manager.hist_size && g_manager.hist_size < SIZE_MAX) {
 				if (munmap(g_manager.hist_buffer, g_manager.hist_size))
-					if (g_manager.options.DEBUG) aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory for allocation history\n", g_manager.hist_buffer);
+					if (print_log(0)) 	aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory for allocation history\n", g_manager.hist_buffer);
 				g_manager.hist_buffer = NULL;
 				g_manager.hist_size = 0;
 				g_manager.hist_pos = 0;
@@ -72,7 +72,7 @@
 
 	__attribute__((visibility("default")))
 	void show_alloc_history() {
-		if (g_manager.options.DEBUG) {
+		if (print_log(0)) {
 			mutex(&g_manager.hist_mutex, MTX_LOCK);
 
 				if (g_manager.hist_buffer && g_manager.hist_size && g_manager.hist_size < SIZE_MAX)
