@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 21:57:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 11:52:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,14 +219,14 @@
 
 		int result = 0;
 		switch (param) {
-			case M_MXFAST:			result = validate_mxfast(value);		break ;
-			case M_MIN_USAGE:		result = validate_min_usage(value);		break ;
-			case M_CHECK_ACTION:	result = validate_check_action(value);	break ;
-			case M_PERTURB:			result = validate_perturb(value);		break ;
-			case M_ARENA_TEST:		result = validate_arena_test(value);	break ;
-			case M_ARENA_MAX:		result = validate_arena_max(value);		break ;
-			case M_DEBUG:			result = validate_debug(value);			break ;
-			case M_LOGGING:			result = validate_logging(value);		break ;
+			case M_MXFAST:			result = validate_mxfast(value);		break;
+			case M_MIN_USAGE:		result = validate_min_usage(value);		break;
+			case M_CHECK_ACTION:	result = validate_check_action(value);	break;
+			case M_PERTURB:			result = validate_perturb(value);		break;
+			case M_ARENA_TEST:		result = validate_arena_test(value);	break;
+			case M_ARENA_MAX:		result = validate_arena_max(value);		break;
+			case M_DEBUG:			result = validate_debug(value);			break;
+			case M_LOGGING:			result = validate_logging(value);		break;
 		}
 
 		if (param == M_DEBUG || param == M_LOGGING) {

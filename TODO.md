@@ -45,7 +45,6 @@
 ## Debug
 
 - [X] mallopt
-- [X] malloc_stats
 - [X] show_alloc_mem
 - [X] show_alloc_mem_ex
 - [X] show_alloc_hist

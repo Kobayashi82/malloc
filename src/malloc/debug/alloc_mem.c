@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   malloc_stats.c                                     :+:      :+:    :+:   */
+/*   alloc_mem.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:02 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 17:51:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 12:20:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,17 +93,17 @@
 
 #pragma region "Print"
 
-	#pragma region "Print HEX5"
+	#pragma region "Print HEX8"
 
-		static void print_hex5(int fd, uintptr_t v) {
-			const char	*hex = "0123456789abcdef";
-			char		buf[7];
+		static void print_hex8(int fd, uintptr_t v) {
+			const char *hex = "0123456789ABCDEF";
+			char buf[10];
 
 			buf[0] = '0';
 			buf[1] = 'x';
-			for (int i = 0; i < 5; ++i)
-				buf[2 + i] = hex[(v >> ((4 - i) * 4)) & 0xF];
-			write(fd, buf, 7);
+			for (int i = 0; i < 8; ++i)
+				buf[2 + i] = hex[(v >> ((7 - i) * 4)) & 0xF];
+			write(fd, buf, 10);
 		}
 
 	#pragma endregion
@@ -117,14 +117,16 @@
 			size_t	total = 0;
 
 			while (chunk) {
-				if (IS_TOPCHUNK(chunk)) break;
-				if (!IS_FREE(chunk)) {
+				if (IS_TOPCHUNK(chunk) && heap->type != LARGE) break;
+				if (heap->type == LARGE || !IS_FREE(chunk)) {
 					write(2, " ", 1);
-					print_hex5(1,  (uintptr_t)GET_PTR(chunk));
+					print_hex8(1,  (uintptr_t)GET_PTR(chunk));
 					write(2, " - ", 3);
-					print_hex5(1,  (uintptr_t)GET_NEXT(chunk));
+					if (heap->type == LARGE)	print_hex8(1,  (uintptr_t)(char*)GET_PTR(chunk) + GET_SIZE(chunk) - 1);
+					else						print_hex8(1,  (uintptr_t)((char *)GET_NEXT(chunk) - 1));
 					aprintf(2, 0, " : %u bytes\n", GET_SIZE(chunk));
 					total += GET_SIZE(chunk);
+					if (heap->type == LARGE) break;
 				}
 				chunk = GET_NEXT(chunk);
 			}
@@ -141,11 +143,11 @@
 
 			aprintf(2, 0, "————————————\n");
 			aprintf(2, 0, " • Arena #%d\n", arena->id);
-			aprintf(2, 0, "———————————————————————————————————————\n");
+			aprintf(2, 0, "—————————————————————————————————————————\n");
 			aprintf(2, 0, " • Allocations: %u\t• Frees: %u\n", arena->alloc_count, arena->free_count);
 			aprintf(2, 0, " • TINY: %u \t\t• SMALL: %u\n", tiny_count, small_count);
 			aprintf(2, 0, " • LARGE: %u\t\t• TOTAL: %u\n", large_count, heaps_count);
-			aprintf(2, 0, "———————————————————————————————————————\n\n");
+			aprintf(2, 0, "—————————————————————————————————————————\n\n");
 
 			size_t arena_total = 0;
 
@@ -160,20 +162,20 @@
 				if (i > 0) aprintf(2, 0, "\n");
 
 				aprintf(2, 0, " %s : ", type);
-				print_hex5(1,  (uintptr_t)heap->ptr);
+				print_hex8(1,  (uintptr_t)heap->ptr);
 				write(2, "\n", 1);
-				aprintf(2, 0, "— — — — — — — — — — — — — — — — —\n");
+				aprintf(2, 0, "— — — — — — — — — — — — — — — — — — — — —\n");
 				size_t heap_total = print_heap(heaps[i]);
 				arena_total += heap_total;
 
 				if (heap_total) {
-					aprintf(2, 0, "                    — — — — — — —\n");
-					aprintf(2, 0, "                     %u byte%s\n", heap_total, heap_total == 1 ? "" : "s");
+					aprintf(2, 0, "                          — — — — — — — —\n");
+					aprintf(2, 0, "                           %u byte%s\n", heap_total, heap_total == 1 ? "" : "s");
 				}
 			}
 
 			if (arena_total) {
-				aprintf(2, 0, "\n———————————————————————————————————————\n");
+				aprintf(2, 0, "\n——————————————————————————————————————————\n");
 				aprintf(2, 0, " %u byte%s in arena #%d\n\n\n", arena_total, arena_total == 1 ? "" : "s", arena->id);
 			}
 
@@ -187,10 +189,7 @@
 #pragma region "Show Alloc Mem"
 
 	__attribute__((visibility("default")))
-	void show_alloc_mem() { malloc_stats(); }
-
-	__attribute__((visibility("default")))
-	void malloc_stats() {
+	void show_alloc_mem() {
 	
 		mutex(&g_manager.mutex, MTX_LOCK);
 
@@ -239,7 +238,6 @@
 
 	// Shows a detailed map of all current allocations.
 	//
-	//   void malloc_stats(void);
 	//   void show_alloc_mem(void);
 	//
 	//   • On success: prints a detailed report of all current allocations.

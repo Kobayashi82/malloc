@@ -7,11 +7,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RED='\033[0;31m'; BROWN='\033[0;33m'; YELLOW='\033[1;33m'; GREEN='\033[0;32m'; BLUE='\033[0;34m'; CYAN='\033[0;36m'; MAGENTA='\033[1;35m'; GREENB='\033[1;32m'; NC='\033[0m'
 
 # ────────────── Compilation ──────────────
-tests=(test0 test1 test2 test3 test4)
+tests=(test0 test1 test2 test3 test4 test5)
 for t in "${tests[@]}"; do
 	file="${SCRIPT_DIR}/tests/${t}.c"
 	[[ -f "$file" ]] || { echo -e "${RED}Missing $file${NC}"; exit 1; }
-	clang "$file" -o "${SCRIPT_DIR}/tests/$t" || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
+	
+	if [[ "$t" == "test5" ]]; then
+		clang "$file" -o "${SCRIPT_DIR}/tests/$t" -L"${SCRIPT_DIR}/../../build/lib" -I"${SCRIPT_DIR}/../../inc" -lft_malloc || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
+	else
+		clang "$file" -o "${SCRIPT_DIR}/tests/$t" || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
+	fi
 done
 echo
 
@@ -98,62 +103,6 @@ BASE_PAGES=${C_PAGES[test0]}
 BASE_MIN=${C_MIN[test0]}
 
 # ==================================================================================================
-#                                          CUSTOM MALLOC
-# ==================================================================================================
-
-echo -e "\t\t\t\t   ${GREENB}CUSTOM MALLOC${NC}"
-echo
-echo -en "${CYAN}"
-printf "%-5s %12s %10s %10s | %12s %10s %10s\n" "TEST" "Memory (KB)" "Pages" "Minor" "Memory (KB)" "Pages" "Minor"
-echo -en "${CYAN}"
-printf -- "------------------------------------------------------------------------------\n"
-echo -en "${NC}"
-printf "%-5s ${GREEN}%12d${NC} ${YELLOW}%10d${NC} ${BROWN}%10d${NC} |${GREEN}%13s${NC} ${YELLOW}%10s${NC} ${BROWN}%10s${NC}\n" "test0" "${C_MEM[test0]}" "${C_PAGES[test0]}" "${C_MIN[test0]}" "-" "-" "-"
-
-for t in test1 test2 test3 test4; do
-	delta_mem=$(( C_MEM[$t] - C_MEM[test0] ))
-	delta_pages=$(( C_PAGES[$t] - C_PAGES[test0] ))
-	delta_min=$(( C_MIN[$t] - C_MIN[test0] ))
-	
-	printf "%-5s ${GREEN}%12d${NC} ${YELLOW}%10d${NC} ${BROWN}%10d${NC} | ${GREEN}%+12d${NC} ${YELLOW}%+10d${NC} ${BROWN}%+10d${NC}\n" "$t" "${C_MEM[$t]}" "${C_PAGES[$t]}" "${C_MIN[$t]}" "$delta_mem" "$delta_pages" "$delta_min"
-done
-echo
-
-# ────────────── Score ────────────────────
-delta_pages_test1=$(( C_PAGES[test1] - C_PAGES[test0] ))
-score1=$(rate_pages "$delta_pages_test1")
-color1=$(get_color $score1 5)
-echo -e "Memory score: ${color1}${score1}/5${NC} (${delta_pages_test1} pages)"
-
-free_score=$(rate_free "${C_MIN[test2]}" "${C_MIN[test0]}" "${C_MIN[test1]}")
-color_free=$(get_color $free_score 5)
-delta_test2=$(( C_MIN[test2] - C_MIN[test0] ))
-if (( delta_test2 > 0 )); then
-	delta_str="+${delta_test2}"
-elif (( delta_test2 == 0 )); then
-	delta_str="+0"
-else
-	delta_str="${delta_test2}"
-fi
-echo -e "Free quality: ${color_free}${free_score}/5${NC} (${delta_str} pages)"
-
-# Realloc status
-if (( C_REALLOC[test3] == 1 )); then
-	echo -e "Realloc:      ${GREEN}✓${NC}"
-else
-	echo -e "Realloc:      ${RED}X${NC}"
-fi
-
-# Abort test status
-if (( C_ABORT[test4] == 1 )); then
-	echo -e "Error Handle: ${RED}X${NC}"
-else
-	echo -e "Error Handle: ${GREEN}✓${NC}"
-fi
-
-echo
-
-# ==================================================================================================
 #                                          NATIVE MALLOC
 # ==================================================================================================
 
@@ -161,9 +110,7 @@ echo -e "\t\t\t\t   ${MAGENTA}NATIVE MALLOC${NC}"
 echo
 echo -en "${CYAN}"
 printf "%-5s %12s %10s %10s | %12s %10s %10s\n" "TEST" "Memory (KB)" "Pages" "Minor" "Memory (KB)" "Pages" "Minor"
-echo -en "${CYAN}"
-printf -- "------------------------------------------------------------------------------\n"
-echo -en "${NC}"
+echo -e "${CYAN}------------------------------------------------------------------------------${NC}"
 printf "%-5s ${GREEN}%12d${NC} ${YELLOW}%10d${NC} ${BROWN}%10d${NC} |${GREEN}%13s${NC} ${YELLOW}%10s${NC} ${BROWN}%10s${NC}\n" "test0" "${N_MEM[test0]}" "${N_PAGES[test0]}" "${N_MIN[test0]}" "-" "-" "-"
 
 for t in test1 test2 test3 test4; do
@@ -209,4 +156,65 @@ fi
 
 echo
 
-rm -f "${SCRIPT_DIR}/tests/test0" "${SCRIPT_DIR}/tests/test1" "${SCRIPT_DIR}/tests/test2" "${SCRIPT_DIR}/tests/test3" "${SCRIPT_DIR}/tests/test4"
+# ==================================================================================================
+#                                          CUSTOM MALLOC
+# ==================================================================================================
+
+echo -e "\t\t\t\t   ${GREENB}CUSTOM MALLOC${NC}"
+echo
+echo -en "${CYAN}"
+printf "%-5s %12s %10s %10s | %12s %10s %10s\n" "TEST" "Memory (KB)" "Pages" "Minor" "Memory (KB)" "Pages" "Minor"
+echo -e "${CYAN}------------------------------------------------------------------------------${NC}"
+printf "%-5s ${GREEN}%12d${NC} ${YELLOW}%10d${NC} ${BROWN}%10d${NC} |${GREEN}%13s${NC} ${YELLOW}%10s${NC} ${BROWN}%10s${NC}\n" "test0" "${C_MEM[test0]}" "${C_PAGES[test0]}" "${C_MIN[test0]}" "-" "-" "-"
+
+for t in test1 test2 test3 test4; do
+	delta_mem=$(( C_MEM[$t] - C_MEM[test0] ))
+	delta_pages=$(( C_PAGES[$t] - C_PAGES[test0] ))
+	delta_min=$(( C_MIN[$t] - C_MIN[test0] ))
+	
+	printf "%-5s ${GREEN}%12d${NC} ${YELLOW}%10d${NC} ${BROWN}%10d${NC} | ${GREEN}%+12d${NC} ${YELLOW}%+10d${NC} ${BROWN}%+10d${NC}\n" "$t" "${C_MEM[$t]}" "${C_PAGES[$t]}" "${C_MIN[$t]}" "$delta_mem" "$delta_pages" "$delta_min"
+done
+echo
+
+# ────────────── Score ────────────────────
+delta_pages_test1=$(( C_PAGES[test1] - C_PAGES[test0] ))
+score1=$(rate_pages "$delta_pages_test1")
+color1=$(get_color $score1 5)
+echo -e "Memory score: ${color1}${score1}/5${NC} (${delta_pages_test1} pages)"
+
+free_score=$(rate_free "${C_MIN[test2]}" "${C_MIN[test0]}" "${C_MIN[test1]}")
+color_free=$(get_color $free_score 5)
+delta_test2=$(( C_MIN[test2] - C_MIN[test0] ))
+if (( delta_test2 > 0 )); then
+	delta_str="+${delta_test2}"
+elif (( delta_test2 == 0 )); then
+	delta_str="+0"
+else
+	delta_str="${delta_test2}"
+fi
+echo -e "Free quality: ${color_free}${free_score}/5${NC} (${delta_str} pages)"
+
+# Realloc status
+if (( C_REALLOC[test3] == 1 )); then
+	echo -e "Realloc:      ${GREEN}✓${NC}"
+else
+	echo -e "Realloc:      ${RED}X${NC}"
+fi
+
+# Abort test status
+if (( C_ABORT[test4] == 1 )); then
+	echo -e "Error Handle: ${RED}X${NC}"
+else
+	echo -e "Error Handle: ${GREEN}✓${NC}"
+fi
+
+# Show Alloc Mem
+echo
+echo -e "  ${CYAN}SHOW_ALLOC_MEM${YELLOW}${NC}"
+echo -e "${CYAN}------------------${NC}"
+echo
+
+"${SCRIPT_DIR}/tests/test5"
+echo
+
+rm -f "${SCRIPT_DIR}/tests/test0" "${SCRIPT_DIR}/tests/test1" "${SCRIPT_DIR}/tests/test2" "${SCRIPT_DIR}/tests/test3" "${SCRIPT_DIR}/tests/test4" "${SCRIPT_DIR}/tests/test5"

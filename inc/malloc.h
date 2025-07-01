@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:20:00 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 19:23:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 11:45:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@
 
 	// Debug
 	int		mallopt(int param, int value);
-	void	malloc_stats();
 	void	show_alloc_mem();
 	void	show_alloc_mem_ex(void *ptr, size_t offset, size_t length);
 	void	show_alloc_history();
