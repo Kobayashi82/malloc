@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 18:57:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 21:39:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,20 +183,14 @@
 
 #pragma region "Info"
 
-	// MINSIZE = 32 bits = 16 y 64 bits = 24
+	// MINSIZE = 32 bits = 32 y 64 bits = 64
 
 	// Free
 	//
 	// Si fue mmap'd → munmap
 	// Fastbin (pequeños, sin coalescing)
 	// Otros chunks → coalescing (left and right) + unsortedbin
-	//
-	// Free Heap
-	//
-	// contador de frees en heap (cuando vacio)
-	// En free a nivel de arena subir contador en heaps (cuando vacio)
-	// resetear contador si malloc en el heap
-	//
+
 	// Malloc
 	//
 	// Si large → mmap?
@@ -207,6 +201,5 @@
 	// Si large → buscar en largebin y superiores (split si > MINSIZE)
 	// Si quedan fastbins → consolidar y repetir
 	// Split top chunk
-	//
 
 #pragma endregion

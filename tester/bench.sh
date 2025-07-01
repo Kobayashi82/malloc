@@ -187,14 +187,6 @@ echo
 printf "%-30s %15s %15s %10s\n" "METRIC" "NATIVE" "CUSTOM" "DIFFERENCE"
 echo "$(printf '=%.0s' {1..75})"
 
-NATIVE_USER=$(extract_metric "$NATIVE_OUTPUT" "User time")
-CUSTOM_USER=$(extract_metric "$CUSTOM_OUTPUT" "User time")
-DIFF_USER=$(calculate_diff "$NATIVE_USER" "$CUSTOM_USER")
-
-NATIVE_SYSTEM=$(extract_metric "$NATIVE_OUTPUT" "System time")
-CUSTOM_SYSTEM=$(extract_metric "$CUSTOM_OUTPUT" "System time")
-DIFF_SYSTEM=$(calculate_diff "$NATIVE_SYSTEM" "$CUSTOM_SYSTEM")
-
 NATIVE_ELAPSED=$(time_to_seconds "$(extract_time "$NATIVE_OUTPUT")")
 CUSTOM_ELAPSED=$(time_to_seconds "$(extract_time "$CUSTOM_OUTPUT")")
 DIFF_ELAPSED=$(calculate_diff "$NATIVE_ELAPSED" "$CUSTOM_ELAPSED")
@@ -216,41 +208,11 @@ NATIVE_VOLUNTARY=$(extract_metric "$NATIVE_OUTPUT" "Voluntary context switches")
 CUSTOM_VOLUNTARY=$(extract_metric "$CUSTOM_OUTPUT" "Voluntary context switches")
 DIFF_VOLUNTARY=$(calculate_diff "$NATIVE_VOLUNTARY" "$CUSTOM_VOLUNTARY")
 
-show_comparison "User time" "$NATIVE_USER" "$CUSTOM_USER" "s" "$DIFF_USER"
-show_comparison "System time" "$NATIVE_SYSTEM" "$CUSTOM_SYSTEM" "s" "$DIFF_SYSTEM"
 show_comparison "Total time" "$NATIVE_ELAPSED" "$CUSTOM_ELAPSED" "s" "$DIFF_ELAPSED"
-show_comparison "Maximum memory" "$NATIVE_MEMORY" "$CUSTOM_MEMORY" "KB" "KB"
+show_comparison "Total memory" "$NATIVE_MEMORY" "$CUSTOM_MEMORY" "KB" "KB"
 show_comparison "Total pages" "$NATIVE_PAGES" "$CUSTOM_PAGES" "" "PAGE"
 show_comparison "Minor page faults" "$NATIVE_MINOR" "$CUSTOM_MINOR" "" "PAGE"
 show_comparison "Major page faults" "$NATIVE_MAJOR" "$CUSTOM_MAJOR" "" "PAGE"
 show_comparison "Voluntary context switches" "$NATIVE_VOLUNTARY" "$CUSTOM_VOLUNTARY" "" "$DIFF_VOLUNTARY"
-
-echo
-
-if [ "$DIFF_ELAPSED" != "N/A" ] && [ -n "$DIFF_ELAPSED" ]; then
-    is_fast=$(echo "$DIFF_ELAPSED < -5" | bc -l 2>/dev/null)
-    is_slow=$(echo "$DIFF_ELAPSED > 10" | bc -l 2>/dev/null)
-    
-    if [ "$is_fast" = "1" ]; then
-        echo -e "${GREEN}✓ Your malloc is significantly faster${NC}"
-    elif [ "$is_slow" = "1" ]; then
-        echo -e "${RED}✗ Your malloc is notably slower${NC}"
-    else
-        echo -e "${YELLOW}≈ Similar performance in execution time${NC}"
-    fi
-fi
-
-if [ "$DIFF_MEMORY" != "N/A" ] && [ -n "$DIFF_MEMORY" ]; then
-    is_efficient=$(echo "$DIFF_MEMORY < -10" | bc -l 2>/dev/null)
-    is_wasteful=$(echo "$DIFF_MEMORY > 20" | bc -l 2>/dev/null)
-    
-    if [ "$is_efficient" = "1" ]; then
-        echo -e "${GREEN}✓ Your malloc uses less memory${NC}"
-    elif [ "$is_wasteful" = "1" ]; then
-        echo -e "${RED}✗ Your malloc uses considerably more memory${NC}"
-    else
-        echo -e "${YELLOW}≈ Similar memory usage${NC}"
-    fi
-fi
 
 echo
