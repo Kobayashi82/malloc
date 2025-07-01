@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:40:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 18:56:59 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@
 	#define IS_FREE(chunk)				(((GET_NEXT(chunk))->size & PREV_INUSE) == 0)
 
 	// ALIGMENTS
-	#define ZERO_MALLOC_BASE			(void *)0x100000000000					// 
+	#define ZERO_MALLOC_BASE			(void *)0x100000000000			// 
 	#define PAGE_SIZE					get_pagesize()					// 4096 bytes
 	#define ALIGNMENT					(uint8_t)(ARCHITECTURE / 4)		// 8 or 16 bytes
 	#define IS_ALIGNED(ptr)				(((uintptr_t)GET_HEAD(ptr) & (ALIGNMENT - 1)) == 0)
@@ -90,6 +90,10 @@
 	#define SMALL_CHUNK					2048
 	#define SMALL_BLOCKS				100
 	#define SMALL_SIZE					(((SMALL_BLOCKS * SMALL_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+
+	#define FREE_PERCENT				10.0f							// 
+	#define CHUNK_PERCENT				40.0f							// 
+	#define FRAG_PERCENT				90.0f							// 
 
 #pragma endregion
 
@@ -116,6 +120,7 @@
 		void			*ptr;						// Pointer to the heap
 		size_t			size;						// Size of the heap
 		size_t			free;						// Memory available for allocation in the heap
+		uint16_t		free_chunks;				// 
 		bool			active;						// Set to false when freed
 		int				type;						// Type of the heap
 		t_chunk			*top_chunk;					// Pointer to the top chunk

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:43:19 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 18:57:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,10 @@
 
 #pragma region "Link Chunk"
 
-	int link_chunk(t_chunk *chunk, size_t size, int type, t_arena *arena) {
-		if (!chunk || !size || !arena || chunk->size & TOP_CHUNK) return (1);
+	int link_chunk(t_chunk *chunk, size_t size, int type, t_arena *arena, t_heap *heap) {
+		if (!chunk || !size || !arena || !heap || chunk->size & TOP_CHUNK) return (1);
+
+		heap->free_chunks++;
 
 		if (!HAS_POISON(GET_PTR(chunk))) {
 			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
@@ -86,9 +88,10 @@
 
 #pragma region "Unlink Chunk"
 
-	int unlink_chunk(t_chunk *chunk, t_arena *arena) {
-		if (!chunk || !arena) return (1);
+	int unlink_chunk(t_chunk *chunk, t_arena *arena, t_heap *heap) {
+		if (!chunk || !arena || !heap) return (1);
 
+		if (heap->free_chunks > 0) heap->free_chunks--;
 		if (!HAS_POISON(GET_PTR(chunk))) {
 			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
 			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
@@ -133,7 +136,7 @@
 		// Coalescing Left (If not USED and FASTBIN)
 		if (!(chunk->size & PREV_INUSE) && GET_PREV_SIZE(chunk) + sizeof(t_chunk) > (size_t)g_manager.options.MXFAST) {
 			chunk_prev = GET_PREV(chunk);
-			unlink_chunk(chunk_prev, arena);
+			unlink_chunk(chunk_prev, arena, heap);
 			chunk_prev->size = (chunk_prev->size & (HEAP_TYPE | PREV_INUSE)) | (GET_PREV_SIZE(chunk) + GET_SIZE(chunk) + sizeof(t_chunk));
 			chunk_next = GET_NEXT(chunk_prev);
 			SET_PREV_SIZE(chunk_next, GET_SIZE(chunk_prev));
@@ -150,14 +153,14 @@
 				if (print_error())		aprintf(2, 0, "Memory corrupted\n");
 				abort_now(); return (chunk_final);
 			}
-			unlink_chunk(chunk_final, arena);
+			unlink_chunk(chunk_final, arena, heap);
 			chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | TOP_CHUNK | (GET_SIZE(chunk_next) + GET_SIZE(chunk_final) + sizeof(t_chunk));
 			heap->top_chunk = chunk_final;
 			SET_MAGIC(GET_PTR(chunk_final));
 		} else {
 			t_chunk *chunk_next_next = GET_NEXT(chunk_next);
 			if (!(chunk_next_next->size & PREV_INUSE) && GET_PREV_SIZE(chunk_next_next) + sizeof(t_chunk) > (size_t)g_manager.options.MXFAST) {
-				unlink_chunk(chunk_next, arena);
+				unlink_chunk(chunk_next, arena, heap);
 				SET_PREV_SIZE(chunk_next_next, GET_SIZE(chunk_final) + GET_SIZE(chunk_next) + sizeof(t_chunk));
 				chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | GET_PREV_SIZE(chunk_next_next);
 

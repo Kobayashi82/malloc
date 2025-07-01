@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 19:43:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,12 +71,17 @@
 		
 					for (int i = 0; i < heap_header->used; i++) {
 						if (heap->active && heap->type == type) {
-							size_t	free_size = GET_SIZE(heap->top_chunk);
-							bool	available = free_size >= size;
-							int		usage = ((heap->size - free_size) * 100) / heap->size;
+							size_t free_size = GET_SIZE(heap->top_chunk);
+							float usage = ((float)(heap->size - heap->free) / (float)heap->size) * 100.0f;
+							float frag_percent = (heap->free_chunks > 1) ? (1.0f - (1.0f / (float)heap->free_chunks)) * 100.0f : 0.0f;
+							bool available = free_size >= size;
 
-							if (available && usage > g_manager.options.MIN_USAGE) { best_heap = heap; found = true; break; }
-							if (available && usage > best_usage) { best_usage = usage; best_heap = heap; }
+							if (available && usage > (float)g_manager.options.MIN_USAGE && frag_percent < (float)FRAG_PERCENT) { 
+								best_heap = heap; found = true; break; 
+							}
+							if (available && usage > best_usage && frag_percent < (float)FRAG_PERCENT) { 
+								best_usage = usage; best_heap = heap; 
+							}
 						}
 						heap = (t_heap *)((char *)heap + ALIGN(sizeof(t_heap)));
 					}
@@ -134,9 +139,10 @@
 				t_heap *heap = heap_find(arena, GET_PTR(chunk));
 				if (heap && heap->active) {
 					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
-				}
+					if (heap->free_chunks > 0) heap->free_chunks--;
 
-				return (ptr);
+					return (ptr);
+				}
 			}
 
 			return (ptr);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 19:44:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,28 @@
 
 #pragma endregion
 
-#pragma region "Count"
+#pragma region "Can Remove"
 
-	int heap_count(t_arena *arena, int type) {
-		if (!arena || !arena->heap_header) return (0);
-
-		int total = 0;
+	int heap_can_removed(t_arena *arena, t_heap *src_heap) {
+		if (!arena) return (0);
 
 		t_heap_header *heap_header = arena->heap_header;
 		while (heap_header) {
 			t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 
 			for (int i = 0; i < heap_header->used; ++i) {
-				if (heap->active && heap->type == type) total++;
+				if (heap->active && heap->type == src_heap->type && heap != src_heap) {
+					float free_percent = ((float)heap->free / (float)heap->size) * 100.0f;
+					float frag_percent = (heap->free_chunks > 1) ? (1.0f - (1.0f / (float)heap->free_chunks)) * 100.0f : 0.0f;
+					if (free_percent >= (float)FREE_PERCENT && frag_percent <= (float)FRAG_PERCENT) return (1);
+				}
 				heap = (t_heap *)((char *)heap + ALIGN(sizeof(t_heap)));
 			}
 
 			heap_header = heap_header->next;
 		}
 
-		return (total);
+		return (0);
 	}
 
 #pragma endregion
@@ -83,7 +85,7 @@
 
 		// static int popo = 0;
 		// if (type == TINY) {
-		// 	aprintf(2, 0, "Arenas: %d Creadas: %d\n", g_manager.arena_count, popo++);
+		// 	aprintf(2, 0, "Creadas: %d\n", popo++);
 		// }
 
 		t_heap	*heap = NULL;
@@ -105,6 +107,7 @@
 				heap->free = size;
 				heap->type = type;
 				heap->active = true;
+				heap->free_chunks = 1;
 				heap->top_chunk = ptr;
 			} else {
 				t_heap_header *heap_header = (t_heap_header *)((char *)arena + ALIGN(sizeof(t_arena)));
@@ -119,6 +122,7 @@
 				heap->free = size;
 				heap->type = type;
 				heap->active = true;
+				heap->free_chunks = 1;
 				heap->top_chunk = ptr;
 			}
 		} else {
@@ -144,6 +148,7 @@
 				heap->free = size;
 				heap->type = type;
 				heap->active = true;
+				heap->free_chunks = 1;
 				heap->top_chunk = ptr;
 			} else {
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
@@ -153,6 +158,7 @@
 				heap->size = size;
 				heap->free = size;
 				heap->type = type;
+				heap->free_chunks = 1;
 				heap->active = true;
 				heap->top_chunk = ptr;
 			}
@@ -176,6 +182,11 @@
 	int heap_destroy(t_heap *heap) {
 		if (!heap) return (1);
 
+		// static int popo = 0;
+		// if (heap->type == TINY) {
+		// 	aprintf(2, 0, "Eliminadas: %d\n", popo++);
+		// }
+
 		int result = 0;
 		if (munmap(heap->ptr, heap->size)) {
 			result = 1;
@@ -192,3 +203,9 @@
 	}
 
 #pragma endregion
+
+// Arena:						568
+// Heap_Header:					16
+// Heap:						48
+
+// aprintf(2, 0, "heap: %u\n", ALIGN(sizeof(t_heap)));

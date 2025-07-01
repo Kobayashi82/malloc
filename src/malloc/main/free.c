@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:43:19 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/01 20:14:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,23 +80,23 @@
 		SET_PREV_SIZE(next_chunk, GET_SIZE(chunk));
 		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
 			if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
-			link_chunk(chunk, chunk_size, FASTBIN, arena);
+			link_chunk(chunk, chunk_size, FASTBIN, arena, heap);
 		} else {
 			if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
 			chunk = coalescing_neighbours(chunk, arena, heap);
 			if (!(chunk->size & TOP_CHUNK)) {
 				if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
-				link_chunk(chunk, chunk_size, UNSORTEDBIN, arena);
+				link_chunk(chunk, chunk_size, UNSORTEDBIN, arena, heap);
 			}
 		}
 
 		arena->free_count++;
 
 		if (heap->free >= heap->size) {
-			if (heap_count(arena, heap->type) > 1) {
+			if (heap_can_removed(arena, heap)) {
 				t_chunk *chunk = heap->ptr;
 				while (!IS_TOPCHUNK(chunk)) {
-					unlink_chunk(chunk, arena);
+					unlink_chunk(chunk, arena, heap);
 					chunk = GET_NEXT(chunk);
 				}
 				heap_destroy(heap);
@@ -165,6 +165,9 @@
 			}
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);
+
+		// stress-ng --malloc 4 --malloc-bytes 1G --verify --timeout 60s
+		// git clone https://github.com/redis/redis
 
 		// Heap freed
 		if (inactive && (inactive->type != LARGE || GET_HEAD(ptr) == inactive->ptr)) {
