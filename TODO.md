@@ -1,14 +1,14 @@
 # TODO
 
-## Bins
-
 - [X] Fastbin (MXFAST) - (no coalescing)
 - [ ] Smallbin - (coalescing)
 - [ ] Unsortedbin
 - [ ] Largebin - (coalescing)
 - [ ] Coalescing
-
-### Allocation Order
+- [ ] alloc_aligned()
+- [ ] heap_find (solo busca en la arena actual)
+- [ ] Data-Races
+- [ ] Makefile for Windows
 
 - mmap (if too large)
 - fastbin
@@ -18,12 +18,6 @@
 - largebin
 - repeat if fastbin not empty
 - top chunk
-
-## Heaps
-
-- [ ] Free heap (contador de frees para eliminar heap)
-- [ ] heap_find (solo busca en la arena actual)
-- [ ] alloc_aligned()
 
 ## Main
 
@@ -48,11 +42,6 @@
 - [X] show_alloc_mem
 - [X] show_alloc_mem_ex
 - [X] show_alloc_hist
-
-## Global
-
-- [ ] Data-Races
-- [ ] Makefile for Windows
 
 ## Documentation
 
