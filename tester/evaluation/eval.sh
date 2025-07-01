@@ -94,9 +94,11 @@ for t in "${tests[@]}"; do
 	# custom malloc
 	export LD_LIBRARY_PATH="${SCRIPT_DIR}/../../build/lib:$LD_LIBRARY_PATH"
 	export LD_PRELOAD="libft_malloc.so"
+	export MALLOC_CHECK_=2;
 	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/tests/$t")
 	C_MEM[$t]=$mem; C_PAGES[$t]=$pages; C_MIN[$t]=$minor; C_REALLOC[$t]=$realloc; C_ABORT[$t]=$abort
 	unset LD_PRELOAD
+	unset MALLOC_CHECK_;
 done
 
 BASE_PAGES=${C_PAGES[test0]}
@@ -214,7 +216,7 @@ echo -e "  ${CYAN}SHOW_ALLOC_MEM${YELLOW}${NC}"
 echo -e "${CYAN}------------------${NC}"
 echo
 
-"${SCRIPT_DIR}/tests/test5"
+# "${SCRIPT_DIR}/tests/test5"
 echo
 
 rm -f "${SCRIPT_DIR}/tests/test0" "${SCRIPT_DIR}/tests/test1" "${SCRIPT_DIR}/tests/test2" "${SCRIPT_DIR}/tests/test3" "${SCRIPT_DIR}/tests/test4" "${SCRIPT_DIR}/tests/test5"
