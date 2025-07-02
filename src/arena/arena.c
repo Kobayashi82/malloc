@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 08:27:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,16 +59,7 @@
 			static int CPUs = 0;
 
 			if (!CPUs) {
-				int cores = 1;
-
-				#ifdef _WIN32
-					SYSTEM_INFO sysinfo;
-					GetSystemInfo(&sysinfo);
-					cores = (int)sysinfo.dwNumberOfProcessors;
-				#else
-					cores = (int)sysconf(_SC_NPROCESSORS_ONLN);
-				#endif
-
+				int cores = (int)sysconf(_SC_NPROCESSORS_ONLN);
 				CPUs = (cores <= 0 ? 1 : cores);
 			}
 

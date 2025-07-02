@@ -8,7 +8,6 @@
 - [ ] alloc_aligned()
 - [ ] heap_find (solo busca en la arena actual)
 - [ ] Data-Races
-- [ ] Makefile for Windows
 
 - mmap (if too large)
 - fastbin

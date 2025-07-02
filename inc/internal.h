@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 18:56:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 08:23:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,6 @@
 	#include <dlfcn.h>
 	#include <fcntl.h>
 	#include <sys/mman.h>
-
-	#ifdef _WIN32
-		#include <windows.h>
-	#endif
 
 #pragma endregion
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 08:28:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,17 +51,9 @@
 	size_t get_pagesize() {
 		static size_t pagesize = 0;
 
-		if (!pagesize) {
-			#ifdef _WIN32
-				SYSTEM_INFO info;
-				GetSystemInfo(&info);
-				pagesize = (size_t)info.dwPageSize;
-			#else
-				pagesize = (size_t)sysconf(_SC_PAGESIZE);
-			#endif
-		}
-
+		if (!pagesize) pagesize = (size_t)sysconf(_SC_PAGESIZE);
 		if (!pagesize) pagesize = 4096;
+
 		return (pagesize);
 	}
 
@@ -97,12 +89,7 @@
 					return (ret);
 				}
 				
-				// Wait 1ms before next try
-				#ifdef _WIN32
-					Sleep(1);
-				#else
-					usleep(1000);
-				#endif
+				usleep(1000);
 			}
 
 			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] timeout locking mutex in fork\n");
