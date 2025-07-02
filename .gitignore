@@ -6,8 +6,8 @@
 !doc
 !doc/**
 doc/malloc\ 6.2.pdf
-doc/Evaliation.pdf
-doc/Evaliation.md
+doc/Evaluation.pdf
+doc/Evaluation.md
 !inc
 !inc/**
 !src
@@ -17,7 +17,5 @@ doc/Evaliation.md
 !README.md
 !tester
 !tester/**
-!evaluation
-!evaluation/**
 !TODO.md
 !LICENSE
