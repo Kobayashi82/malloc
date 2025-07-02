@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 22:43:25 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:49:38 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 22:11:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 
 		void	*ptr = NULL;
 
+		if (size > SIZE_MAX - sizeof(t_chunk)) { errno = ENOMEM; return (NULL); }
 		size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 
 		ptr = allocate_aligned("PVCALLOC", PAGE_SIZE, size);

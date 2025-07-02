@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 16:03:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 21:06:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,13 @@
 		if (heap->free >= heap->size) {
 			if (heap_can_removed(arena, heap)) {
 				t_chunk *chunk = heap->ptr;
+				bool cancel = false;
 				while (!IS_TOPCHUNK(chunk)) {
-					unlink_chunk(chunk, arena, heap);
+					cancel = unlink_chunk(chunk, arena, heap);
+					if (cancel) break;
 					chunk = GET_NEXT(chunk);
 				}
-				heap_destroy(heap);
+				if (!cancel) heap_destroy(heap);
 			}
 		}
 
@@ -165,6 +167,7 @@
 
 		// stress-ng --malloc 4 --malloc-bytes 1G --verify --timeout 60s
 		// git clone https://github.com/redis/redis
+		// ffmpeg -f lavfi -i testsrc=duration=10:size=1920x1080 -c:v libx264 test.mp4
 
 		// Heap freed
 		if (inactive && (inactive->type != LARGE || GET_HEAD(ptr) == inactive->ptr)) {

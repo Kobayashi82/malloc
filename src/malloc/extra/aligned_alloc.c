@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:50:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 21:34:37 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@
 		ensure_init();
 
 		if (alignment < sizeof(void *) || !is_power_of_two(alignment) || size % alignment) {
-			if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
+			if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
 			errno = EINVAL; return (NULL);
 		}
 
-		void	*ptr = NULL;
+		void *ptr = NULL;
 
 		if (!size) {
 			mutex(&g_manager.mutex, MTX_LOCK);
@@ -46,8 +46,8 @@
 
 		ptr = allocate_aligned("ALIGNED_ALLOC", alignment, size);
 		
-		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [ALIGNED_ALLOC] Allocated %u bytes\n", ptr, size);
-		else if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+		if (ptr && print_log(0))		aprintf(g_manager.options.fd_out, 1, "%p\t [ALIGNED_ALLOC] Allocated %u bytes\n", ptr, size);
+		else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 		if (ptr) SET_MAGIC(ptr);
 		else errno = ENOMEM;

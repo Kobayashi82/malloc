@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:47:53 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 21:49:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@
 	int posix_memalign(void **memptr, size_t alignment, size_t size) {
 		ensure_init();
 
-		if (alignment < sizeof(void *) || !is_power_of_two(alignment)) {
+		void **validate_ptr = memptr;
+		if (!validate_ptr || alignment < sizeof(void *) || !is_power_of_two(alignment)) {
 			if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
 			return (EINVAL);
 		}

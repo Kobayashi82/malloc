@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:46:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 22:11:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 
 	void *allocate_aligned(char *source, size_t alignment, size_t size) {
 		if (!source || !*source) source = "UNKOWN";
+
+		if (size > SIZE_MAX - sizeof(t_chunk)) { errno = ENOMEM; return (NULL); }
 
 		if (alignment < sizeof(void *) || !is_power_of_two(alignment)) {
 			if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
@@ -191,6 +193,7 @@
 	void *allocate(char *source, size_t size, unsigned char perturb) {
 		if (!source || !*source) source = "UNKOWN";
 
+		if (size > SIZE_MAX - sizeof(t_chunk)) { errno = ENOMEM; return (NULL); }
 		if (!size)			return (allocate_zero(source));
 		if (!arena_find())	return (NULL);
 
