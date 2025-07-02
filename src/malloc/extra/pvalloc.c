@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 22:43:25 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 10:09:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 12:50:36 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,38 +18,38 @@
 
 #pragma region "Memalign"
 
-	__attribute__((visibility("default")))
-	void *pvalloc(size_t size) {
-		ensure_init();
+	// __attribute__((visibility("default")))
+	// void *pvalloc(size_t size) {
+	// 	ensure_init();
 
-		t_arena	*arena;
-		void	*ptr = NULL;
+	// 	t_arena	*arena;
+	// 	void	*ptr = NULL;
 
-		size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+	// 	size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 
-		if (!tcache) {
-			arena = arena_get();
-			tcache = arena;
-			if (!arena) {
-				if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
-				return (NULL);
-			}
-		} else arena = tcache;
+	// 	if (!tcache) {
+	// 		arena = arena_get();
+	// 		tcache = arena;
+	// 		if (!arena) {
+	// 			if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
+	// 			return (NULL);
+	// 		}
+	// 	} else arena = tcache;
 
-		mutex(&arena->mutex, MTX_LOCK);
+	// 	mutex(&arena->mutex, MTX_LOCK);
 
-			ptr = allocate_aligned("PVCALLOC", PAGE_SIZE, size);
+	// 		ptr = allocate_aligned("PVCALLOC", PAGE_SIZE, size);
 
-			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [PVALLOC] Allocated %u bytes\n", ptr, size);
-			else if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+	// 		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [PVALLOC] Allocated %u bytes\n", ptr, size);
+	// 		else if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
-			if (ptr) SET_MAGIC(ptr);
-			else errno = ENOMEM;
+	// 		if (ptr) SET_MAGIC(ptr);
+	// 		else errno = ENOMEM;
 
-		mutex(&arena->mutex, MTX_UNLOCK);
+	// 	mutex(&arena->mutex, MTX_UNLOCK);
 
-		return (ptr);
-	}
+	// 	return (ptr);
+	// }
 
 #pragma endregion
 

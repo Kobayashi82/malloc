@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 21:39:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 13:10:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,10 @@
 		if (!HAS_POISON(GET_PTR(chunk))) {
 			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
 			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+			mutex(&arena->mutex, MTX_UNLOCK);
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+			show_alloc_mem_ex(GET_PTR(chunk), 0, 0);
 			return (abort_now());
 		}
 
