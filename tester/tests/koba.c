@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:45:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 13:58:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,9 +216,10 @@
 #pragma region "Main"
 
 	int main() {
-		mallopt(M_DEBUG, DEBUG_MODE);	// 
-		mallopt(M_ARENA_TEST, 20);		// 
-		mallopt(M_ARENA_MAX, 0);		// 
+		mallopt(M_DEBUG, DEBUG_MODE);				// 
+		mallopt(M_LOGGING, DEBUG_MODE ? 2 : 0);		// 
+		mallopt(M_ARENA_TEST, 20);					// 
+		mallopt(M_ARENA_MAX, 0);					// 
 
 		heap_test();
 

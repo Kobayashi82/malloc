@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:48:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 16:03:19 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@
 					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
 				}
 
+				if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
+
 				return (0);
 			}
 			case SMALLBIN:
@@ -67,6 +69,8 @@
 					SET_FD(chunk, FD);
 					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
 				}
+
+				if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
 
 				return (0);
 			case LARGEBIN:
@@ -132,6 +136,8 @@
 		t_chunk *chunk_prev = NULL;
 		t_chunk *chunk_next = NULL;
 		t_chunk *chunk_final = NULL;
+
+		if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
 
 		// Coalescing Left (If not USED and FASTBIN)
 		if (!(chunk->size & PREV_INUSE) && GET_PREV_SIZE(chunk) + sizeof(t_chunk) > (size_t)g_manager.options.MXFAST) {

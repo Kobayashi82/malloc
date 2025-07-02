@@ -6,13 +6,82 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 22:46:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 16:32:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
+
+#pragma endregion
+
+#pragma region "Usable PTR"
+
+	static int usable_ptr(void *ptr, t_heap *heap) {
+		if (!ptr || !heap) return (1);
+
+		// Not aligned
+		if (!IS_ALIGNED(ptr)) {
+			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
+			if (print_error())			aprintf(2, 0, "Invalid pointer\n");
+			abort_now();
+			return (1);
+		}
+
+		// Heap freed
+		if (!heap->active) {
+			if (heap->type == LARGE && GET_PTR(heap->ptr) == ptr) {
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
+				if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+			} else {
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+			}
+			abort_now();
+			return (1);
+		}
+
+		// LARGE
+		if (heap->type == LARGE) {
+				if (GET_HEAD(ptr) != heap->ptr) {
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+				abort_now();
+				return (1);
+			}
+		}
+
+		// Double free
+		if (HAS_POISON(ptr)) {
+			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
+			if (print_error())			aprintf(2, 0, "Invalid pointer\n");
+			abort_now();
+			return (1);
+		}
+
+		// In top chunk
+		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
+		if ((chunk->size & TOP_CHUNK) && heap->type != LARGE) {
+			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
+			if (print_error())			aprintf(2, 0, "Invalid pointer\n");
+			abort_now();
+			return (1);
+		}
+
+		// In middle chunk
+		if (heap->type != LARGE) {
+			t_chunk *next_chunk = GET_NEXT(chunk);
+			if (!(next_chunk->size & PREV_INUSE)) {
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+				abort_now();
+				return (1);
+			}
+		}
+
+		return(0);
+	}
 
 #pragma endregion
 
@@ -28,26 +97,57 @@
 		
 		void	*new_ptr = NULL;
 		bool	is_new = false;
+		t_heap	*heap = NULL;
 
 		mutex(&tcache->mutex, MTX_LOCK);
 
 			// tiene que buscar en todas las arenas
-			if (!heap_find(tcache, ptr)) {
+			heap = heap_find(tcache, ptr);
+			if (!heap) {
 				mutex(&tcache->mutex, MTX_UNLOCK);
 				return (native_realloc(ptr, size));
 			}
 
-			// Expandir chunk
-			// Free old chunk if apply
+			if (usable_ptr(ptr, heap)) {
+				mutex(&tcache->mutex, MTX_UNLOCK);
+				return (NULL);
+			}
+
+			size_t size_aligned = ALIGN(size + sizeof(t_chunk));
+
+			t_chunk *chunk = GET_HEAD(ptr);
+			size_t	chunk_size = GET_SIZE(chunk);
+			if (ALIGN(size) <= chunk_size) {
+				if (heap->type == LARGE) new_ptr = ptr;
+				else {
+					size_t remaining = chunk_size - ALIGN(size);
+					if (remaining >= sizeof(t_chunk) + ((heap->type == TINY) ? 48 : TINY_CHUNK)) {
+						chunk->size = (chunk->size & (HEAP_TYPE | PREV_INUSE)) | ALIGN(size);
+						t_chunk *new_chunk = (t_chunk *)((char *)chunk + ALIGN(size) + sizeof(t_chunk));
+						SET_PREV_SIZE(new_chunk, ALIGN(size));
+						SET_POISON(GET_PTR(new_chunk));
+						new_chunk->size = (remaining - sizeof(t_chunk)) | ((heap->type == SMALL) ? HEAP_TYPE : 0) | PREV_INUSE;
+						t_chunk *next_chunk = GET_NEXT(new_chunk);
+						SET_PREV_SIZE(next_chunk, remaining - sizeof(t_chunk));
+						next_chunk->size &= ~PREV_INUSE;
+						link_chunk(new_chunk, remaining - sizeof(t_chunk), heap->type, tcache, heap);
+						new_ptr = ptr;
+					} else new_ptr = ptr;
+				}
+			} else if (heap->type != LARGE) {
+				// extend
+			}
 
 		mutex(&tcache->mutex, MTX_UNLOCK);
 
-		// Si no se puede expandir
-		new_ptr = allocate("REALLOC", size, 0);
-		if (new_ptr) {
-			is_new = true;
-			size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
-			ft_memcpy(new_ptr, ptr, (size < copy_size) ? size : copy_size);
+		if (!new_ptr) {
+			// Si no se puede expandir
+			new_ptr = allocate("REALLOC", size_aligned, 0);
+			if (new_ptr) {
+				is_new = true;
+				size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
+				ft_memcpy(new_ptr, ptr, (size < copy_size) ? size : copy_size);
+			}
 		}
 
 		if (is_new) free(ptr);
