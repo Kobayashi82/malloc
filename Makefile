@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/01 11:46:22 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/02 07:55:46 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,26 +33,6 @@ BG_CYAN				= \033[40m
 FG_YELLOW			= \033[89m
 COUNTER 			= 0
 
-# ─────────── #
-# ── FLAGS ── #
-# ─────────── #
-
-CC			= clang
-
-# Detect OS for different compilation flags
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
-	# macOS flags
-	FLAGS		= -Wall -Wextra -Werror -fPIC
-	SHARED_FLAG	= -dynamiclib
-	LIB_EXT		= .dylib
-else
-	# Linux flags
-	FLAGS		= -Wall -Wextra -Werror -fPIC # -fvisibility=hidden
-	SHARED_FLAG	= -shared
-	LIB_EXT		= .so
-endif
-
 # ────────── #
 # ── NAME ── #
 # ────────── #
@@ -65,6 +45,23 @@ endif
 
 NAME		= malloc
 LIB_NAME	= libft_$(NAME)_$(HOSTTYPE)$(LIB_EXT)
+
+# ─────────── #
+# ── FLAGS ── #
+# ─────────── #
+
+CC			= clang
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	FLAGS		= -Wall -Wextra -Werror -fPIC
+	SHARED_FLAG	= -dynamiclib
+	LIB_EXT		= .dylib
+else
+	FLAGS		= -Wall -Wextra -Werror -fPIC -fvisibility=hidden
+	SHARED_FLAG	= -shared
+	LIB_EXT		= .so
+endif
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -123,6 +120,11 @@ $(LIB_DIR)/$(LIB_NAME): $(OBJS)
 	@cd $(LIB_DIR) && ln -sf $(LIB_NAME) libft_$(NAME)$(LIB_EXT)
 
 	@$(MAKE) -s _progress; printf "\n"
+
+	@if [ -f ./tester/load.sh ]; then chmod +x ./tester/load.sh; fi
+	@if [ -f ./tester/unload.sh ]; then chmod +x ./tester/unload.sh; fi
+	@printf " $(CYAN)To load the library run: $(YELLOW)source ./tester/load.sh$(NC)\n\n"
+
 	@$(MAKE) -s _show_cursor
 
 # ───────────── #

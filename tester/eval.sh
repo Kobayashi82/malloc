@@ -9,13 +9,13 @@ RED='\033[0;31m'; BROWN='\033[0;33m'; YELLOW='\033[1;33m'; GREEN='\033[0;32m'; B
 # ────────────── Compilation ──────────────
 tests=(test0 test1 test2 test3 test4 test5)
 for t in "${tests[@]}"; do
-	file="${SCRIPT_DIR}/tests/${t}.c"
+	file="${SCRIPT_DIR}/eval_tests/${t}.c"
 	[[ -f "$file" ]] || { echo -e "${RED}Missing $file${NC}"; exit 1; }
 	
 	if [[ "$t" == "test5" ]]; then
-		clang "$file" -o "${SCRIPT_DIR}/tests/$t" -L"${SCRIPT_DIR}/../../build/lib" -I"${SCRIPT_DIR}/../../inc" -lft_malloc || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
+		clang "$file" -o "${SCRIPT_DIR}/eval_tests/$t" -L"${SCRIPT_DIR}/../build/lib" -I"${SCRIPT_DIR}/../inc" -lft_malloc || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
 	else
-		clang "$file" -o "${SCRIPT_DIR}/tests/$t" || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
+		clang "$file" -o "${SCRIPT_DIR}/eval_tests/$t" || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
 	fi
 done
 echo
@@ -89,13 +89,13 @@ get_color() {
 declare -A N_MEM N_PAGES N_MIN N_REALLOC N_ABORT C_MEM C_PAGES C_MIN C_REALLOC C_ABORT
 for t in "${tests[@]}"; do
 	# native malloc
-	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/tests/$t")
+	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/eval_tests/$t")
 	N_MEM[$t]=$mem; N_PAGES[$t]=$pages; N_MIN[$t]=$minor; N_REALLOC[$t]=$realloc; N_ABORT[$t]=$abort
 	# custom malloc
-	export LD_LIBRARY_PATH="${SCRIPT_DIR}/../../build/lib:$LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH="${SCRIPT_DIR}/../build/lib:$LD_LIBRARY_PATH"
 	export LD_PRELOAD="libft_malloc.so"
 	export MALLOC_CHECK_=2;
-	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/tests/$t")
+	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/eval_tests/$t")
 	C_MEM[$t]=$mem; C_PAGES[$t]=$pages; C_MIN[$t]=$minor; C_REALLOC[$t]=$realloc; C_ABORT[$t]=$abort
 	unset LD_PRELOAD
 	unset MALLOC_CHECK_;
@@ -216,7 +216,7 @@ echo -e "  ${CYAN}SHOW_ALLOC_MEM${YELLOW}${NC}"
 echo -e "${CYAN}------------------${NC}"
 echo
 
-# "${SCRIPT_DIR}/tests/test5"
+# "${SCRIPT_DIR}/eval_tests/test5"
 echo
 
-rm -f "${SCRIPT_DIR}/tests/test0" "${SCRIPT_DIR}/tests/test1" "${SCRIPT_DIR}/tests/test2" "${SCRIPT_DIR}/tests/test3" "${SCRIPT_DIR}/tests/test4" "${SCRIPT_DIR}/tests/test5"
+rm -f "${SCRIPT_DIR}/eval_tests/test0" "${SCRIPT_DIR}/eval_tests/test1" "${SCRIPT_DIR}/eval_tests/test2" "${SCRIPT_DIR}/eval_tests/test3" "${SCRIPT_DIR}/eval_tests/test4" "${SCRIPT_DIR}/eval_tests/test5"
