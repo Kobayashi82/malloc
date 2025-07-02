@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 08:23:49 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 09:13:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,7 @@
 
 	typedef struct s_heap {
 		void			*ptr;						// Pointer to the heap
+		size_t			padding;					// 
 		size_t			size;						// Size of the heap
 		size_t			free;						// Memory available for allocation in the heap
 		uint16_t		free_chunks;				// 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 19:44:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 10:04:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,12 +70,12 @@
 
 #pragma region "Create"
 
-	void *heap_create(t_arena *arena, int type, size_t size) {
+	void *heap_create(t_arena *arena, int type, size_t size, size_t alignment) {
 		if (!arena || !size || type < TINY || type > LARGE) return (NULL);
 
 		if		(type == TINY)	size = TINY_SIZE;
 		else if (type == SMALL)	size = SMALL_SIZE;
-		else					size = (size + sizeof(t_chunk) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+		else					size = (alignment + size + sizeof(t_chunk) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 
 		void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (ptr == MAP_FAILED) {
@@ -92,6 +92,8 @@
 
 		// buscar en las lista si hay un heap con el mismo puntero y longitud igual o menor y usar ese si esta inactivo
 
+		size_t padding = (alignment >= sizeof(t_chunk)) ? alignment - sizeof(t_chunk) : 0;
+
 		if (!arena->heap_header) {
 			if (arena == &g_manager.arena) {
 				t_heap_header *heap_header = internal_alloc(PAGE_SIZE);
@@ -102,13 +104,14 @@
 				heap_header->next = NULL;
 
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
-				heap->ptr = ptr;
-				heap->size = size;
-				heap->free = size;
+				heap->ptr = (void *)((char *)ptr + padding);
+				heap->padding = alignment;
+				heap->size = size - alignment;
+				heap->free = size - alignment;
 				heap->type = type;
 				heap->active = true;
 				heap->free_chunks = 1;
-				heap->top_chunk = ptr;
+				heap->top_chunk = heap->ptr;
 			} else {
 				t_heap_header *heap_header = (t_heap_header *)((char *)arena + ALIGN(sizeof(t_arena)));
 				arena->heap_header = heap_header;
@@ -117,13 +120,14 @@
 				heap_header->next = NULL;
 
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
-				heap->ptr = ptr;
-				heap->size = size;
-				heap->free = size;
+				heap->ptr = (void *)((char *)ptr + padding);
+				heap->padding = alignment;
+				heap->size = size - alignment;
+				heap->free = size - alignment;
 				heap->type = type;
 				heap->active = true;
 				heap->free_chunks = 1;
-				heap->top_chunk = ptr;
+				heap->top_chunk = heap->ptr;
 			}
 		} else {
 			bool found = false;
@@ -143,31 +147,32 @@
 				new_heap_header->next = NULL;
 
 				heap = (t_heap *)((char *)new_heap_header + ALIGN(sizeof(t_heap_header)));
-				heap->ptr = ptr;
-				heap->size = size;
-				heap->free = size;
+				heap->ptr = (void *)((char *)ptr + padding);
+				heap->padding = alignment;
+				heap->size = size - alignment;
+				heap->free = size - alignment;
 				heap->type = type;
 				heap->active = true;
 				heap->free_chunks = 1;
-				heap->top_chunk = ptr;
+				heap->top_chunk = heap->ptr;
 			} else {
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 				heap = (t_heap *)((char *)heap + ((ALIGN(sizeof(t_heap)) * heap_header->used)));
 				heap_header->used++;
-				heap->ptr = ptr;
-				heap->size = size;
-				heap->free = size;
+				heap->ptr = (void *)((char *)ptr + padding);
+				heap->padding = alignment;
+				heap->size = size - alignment;
+				heap->free = size - alignment;
 				heap->type = type;
 				heap->free_chunks = 1;
 				heap->active = true;
-				heap->top_chunk = ptr;
+				heap->top_chunk = heap->ptr;
 			}
 		}
 
-		t_chunk *chunk = (t_chunk *)ptr;
-		chunk->size = (size - sizeof(t_chunk)) | PREV_INUSE | (type == SMALL ? HEAP_TYPE : 0) | TOP_CHUNK | (type == LARGE ? MMAP_CHUNK : 0);
-
-		if (type != LARGE) SET_MAGIC(GET_PTR(chunk));
+		t_chunk *chunk = heap->ptr;
+		chunk->size = (heap->size - sizeof(t_chunk)) | PREV_INUSE | (type == SMALL ? HEAP_TYPE : 0) | TOP_CHUNK | (type == LARGE ? MMAP_CHUNK : 0);
+		SET_MAGIC(GET_PTR(chunk));
 		if (print_log(0) && type != LARGE) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Heap of size %s (%d) allocated\n", heap->ptr, (type == TINY ? "TINY" : "SMALL"), heap->size);
 
 		if (heap && type == LARGE) return (GET_PTR(heap->ptr));
@@ -188,7 +193,7 @@
 		// }
 
 		int result = 0;
-		if (munmap(heap->ptr, heap->size)) {
+		if (munmap(heap->ptr - heap->padding, heap->size)) {
 			result = 1;
 			if (print_log(0) && heap->type == LARGE)		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory of size %d bytes\n", heap->ptr, heap->size);
 			if (print_log(0) && heap->type != LARGE)		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to detroy heap of size %s (%d)\n", heap->ptr, (heap->type == TINY ? "TINY" : "SMALL"), heap->size);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 19:43:27 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 09:11:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@
 
 			if (!heap_header) {
 				created = true;
-				heap = (t_heap *)heap_create(arena, type, heap_size);
+				heap = (t_heap *)heap_create(arena, type, heap_size, 0);
 				if (!heap) return (ptr);
 				best_heap = heap;
 			}
@@ -92,7 +92,7 @@
 				// Create heap (no best heap found)
 				if (!best_heap) {
 					created = true;
-					best_heap = (t_heap *)heap_create(arena, type, heap_size);
+					best_heap = (t_heap *)heap_create(arena, type, heap_size, 0);
 					if (!best_heap) return (ptr);
 				}
 			}
@@ -100,7 +100,7 @@
 			// Split top chunk
 			t_chunk	*chunk = split_top_chunk(best_heap, size);
 			if (!chunk && !created) {
-				best_heap = (t_heap *)heap_create(arena, type, heap_size);
+				best_heap = (t_heap *)heap_create(arena, type, heap_size, 0);
 				if (!best_heap) return (ptr);
 				chunk = split_top_chunk(best_heap, size);
 				if (!chunk) return (ptr);
@@ -169,7 +169,7 @@
 	void *find_memory(t_arena *arena, size_t size) {
 		if (!arena || !size) return (NULL);
 
-		if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK) return (heap_create(arena, LARGE, size));
+		if (ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK) return (heap_create(arena, LARGE, size, 0));
 
 		void *ptr = NULL;
 

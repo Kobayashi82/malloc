@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 19:44:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 09:12:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 	int		heap_count(t_arena *arena, int type);
 	int		heap_can_removed(t_arena *arena, t_heap *src_heap);
 	t_heap	*heap_find(t_arena *arena, void *ptr);
-	void	*heap_create(t_arena *arena, int type, size_t size);
+	void	*heap_create(t_arena *arena, int type, size_t size, size_t alignment);
 	int		heap_destroy(t_heap *heap);
 	void	heap_hist_extend();
 	void	heap_hist_destroy();

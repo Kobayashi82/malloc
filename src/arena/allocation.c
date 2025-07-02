@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:41:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 10:07:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,20 @@
 
 		mutex(&tcache->mutex, MTX_LOCK);
 
+			bool is_large = ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK;
+			unsigned char perturb = 0;
+
+			if (is_large) {
+				ptr = heap_create(tcache, LARGE, size, alignment);
+			} else {
+				// TINY and SMALL
+			}
+			
 			// Logica de allocation
-		
+
+			if (g_manager.options.PERTURB && !is_large) perturb = g_manager.options.PERTURB;
+			if (ptr && perturb) ft_memset(ptr, perturb, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
+
 			if		(ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
 			else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 

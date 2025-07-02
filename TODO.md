@@ -1,25 +1,5 @@
 sizeof(t_chunk) + size + (alignment - 1)
 
-Busco chunk de ese tamaño.
-Si no es el primer chunk, obtengo el chunk anterior.
-Determino donde debe empezar el puntero.
-Retrocedo el sizeof(t_chunk)
-Establezco el tamaño del chunk anterior y el tamaño de prev_size del chunk nuevo.
-El tamaño del chunk nuevo también.
-
-Problema. El primer chunk no tiene chunk anterior. Y no puedo anadir el espacio extra a ningun sitio.
-
-Como podria hacer?
-Si es el primer chunk tendria que crear uno nuevo vacio.
-
-Pero igualmente, si me piden un tamaño grande, hago un mmap directamente. Pero claro, el header tiene que ir primero y si dejo espacio antes del inicio del header, no coincidiría el chunk con el inicio de mmap...
-Si es mmap desplazo y en heap->padding pongo el espacio extra hasta el inicio del heap.
-En tiny y small, si chunk es igual a heap->ptr, creo un chunk nuevo antes. Pero tiene que ser de sizeof(t_chunk) * 2
-Asi que no se si al tamaño de alignment anadir sizeof(t_chunk) * 2 para tener un margen extra.
-Como ahora necesito añadir heap->padding, de quizas uint8_t tendria que ajustar la cantidad de heaps por info  page
-
--
-
 vcalloc y pvcalloc (alineacion a 4096) y alineaciones que sean > CHUNK_SMALL
 Se tiene que reservar size + sizeof(t_chunk) alineado a alignment.
 Ea decir, si size es 4096, pues se tiene que alinear a 4096 * 2
@@ -34,7 +14,7 @@ El unico cambio es a la hora de eliminar chunks grandes. Lo demas no deberia de 
 Bueno, si fusiono con un chunk de fastbin libre, tendria que hacerle un unlink y luego un link para actualizar los bins... De hecho, creo que tendria que actualizar todos los bins independientemente del tamaño del chunk... Vamos un unlink y un link simplemente
 
 Si el chunk actual se puede agrandar al necesario, simplemente devuelvo el mismo puntero.
-Si hay que reducir, calculo la alineación que sirve para el tamaño y creo otro chunk (si es de un tamaño aceptable, si no, se lo queda igualmente.
+Si hay que reducir, calculo la alineación que sirve para el tamaño y creo otro chunk (si es de un tamaño aceptable, si no, se lo queda igualmente).
 En el caso de que haga falta espacio, compruebo si puede expandirse a la derecha, si el siguiente es libre:
 Si siguen siendo pequeño, compruebo si el siguiente también está libre. Si entre todos los libres tengo, entonces realizo las fusiones de chunks y spliteo si es necesario.
 Si llego al top chunk necesito splitear el top chunk aunque sea al minimo de 16 bytes y size 0.
@@ -48,9 +28,10 @@ Si no sirve nada de eso. Nuevo chunk, copiar y liberar.
 - [ ] Unsortedbin
 - [ ] Largebin - (coalescing)
 - [ ] Coalescing
+
 - [ ] alloc_aligned()
 - [ ] heap_find (solo busca en la arena actual)
-- [ ] Data-Races
+- [ ] realloc and reallocarray
 
 - mmap (if too large)
 - fastbin
@@ -71,8 +52,8 @@ Si no sirve nada de eso. Nuevo chunk, copiar y liberar.
 ## Extra
 
 - [ ] reallocarray
-- [X] aligned_alloc
-- [X] memalign
+- [ ] aligned_alloc
+- [ ] memalign
 - [ ] posix_memalign
 - [X] malloc_usable_size
 - [X] valloc

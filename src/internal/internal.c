@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 08:28:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 08:51:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,6 +185,17 @@
 
 #pragma endregion
 
+#pragma region "Print"
+
+	bool print_log(bool error) {
+		if (error) return (g_manager.options.DEBUG || g_manager.options.LOGGING);
+		return (g_manager.options.LOGGING);
+	}
+
+	bool print_error()	{ return (!g_manager.options.DEBUG && g_manager.options.LOGGING != 2 && g_manager.options.CHECK_ACTION != 2); }
+
+#pragma endregion
+
 #pragma region "Abort"
 
 	int abort_now() {
@@ -234,10 +245,3 @@
 	__attribute__((constructor)) static void malloc_initialize() { ensure_init(); }
 
 #pragma endregion
-
-bool print_log(bool error) {
-	if (error) return (g_manager.options.DEBUG || g_manager.options.LOGGING);
-	return (g_manager.options.LOGGING);
-}
-
-bool print_error()	{ return (!g_manager.options.DEBUG && g_manager.options.LOGGING != 2 && g_manager.options.CHECK_ACTION != 2); }
