@@ -92,6 +92,7 @@ for t in "${tests[@]}"; do
 	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/eval_tests/$t")
 	N_MEM[$t]=$mem; N_PAGES[$t]=$pages; N_MIN[$t]=$minor; N_REALLOC[$t]=$realloc; N_ABORT[$t]=$abort
 	# custom malloc
+	unset MALLOC_DEBUG MALLOC_LOGGING
 	export LD_LIBRARY_PATH="${SCRIPT_DIR}/../build/lib:$LD_LIBRARY_PATH"
 	export LD_PRELOAD="libft_malloc.so"
 	export MALLOC_CHECK_=2;
