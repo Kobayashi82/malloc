@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:05 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:03:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 13:47:53 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@
 		}
 
 		ptr = allocate_aligned("POSIX_MEMALIGN", alignment, size);
-	
-		// aprintf(2, 0, "ALINEADO: %s\n", (((uintptr_t)(ptr) & ((alignment) - 1)) == 0) ? "YES" : "NO");
 
 		if (ptr && print_log(0))		aprintf(g_manager.options.fd_out, 1, "%p\t [POSIX_MEMALIGN] Allocated %u bytes\n", ptr, size);
 		else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);

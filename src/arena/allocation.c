@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:33:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 13:46:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,108 +42,96 @@
 			if (is_large) {
 				ptr = heap_create(tcache, LARGE, size, alignment);
 			} else {
-				// 1. Calcular el peor caso de padding para ambos tipos
-				size_t max_padding_data_tiny = alignment - 1;
-				size_t max_padding_data_small = alignment - 1;
-
-				// 2. Tamaños mínimos según el tipo de heap
-				size_t min_chunk_data_tiny = 16;
-				size_t min_chunk_data_small = TINY_CHUNK + 16;
-
-				// 3. Ajustar padding si es muy pequeño para cada tipo
-				size_t max_padding_total_tiny = max_padding_data_tiny + sizeof(t_chunk);
-				if (max_padding_data_tiny < min_chunk_data_tiny) {
-					max_padding_total_tiny = min_chunk_data_tiny + sizeof(t_chunk);
-				}
-
-				size_t max_padding_total_small = max_padding_data_small + sizeof(t_chunk);
-				if (max_padding_data_small < min_chunk_data_small) {
-					max_padding_total_small = min_chunk_data_small + sizeof(t_chunk);
-				}
-
-				// 4. Calcular tamaño total para cada tipo
-				size_t new_chunk_total = ALIGN(size + sizeof(t_chunk));
-				size_t total_if_tiny = max_padding_total_tiny + new_chunk_total;
-				size_t total_if_small = max_padding_total_small + new_chunk_total;
-
-				// 5. Determinar tipo: si cabe en TINY, usar TINY; si no, usar SMALL
-				int type;
-				size_t total_worst_case;
-				size_t min_chunk_data;
-
-				if (total_if_tiny <= TINY_CHUNK) {
-					type = TINY;
-					total_worst_case = total_if_tiny;
-					min_chunk_data = min_chunk_data_tiny;
-				} else {
-					type = SMALL;
-					total_worst_case = total_if_small;
-					min_chunk_data = min_chunk_data_small;
-				}
-
-				// 6. Obtener heap del tipo correcto
-				t_heap *heap = get_bestheap(tcache, type, total_worst_case);
+				// Para chunks pequeños y medianos, usar la lógica simplificada
+				// Calcular el tamaño del chunk del usuario
+				size_t user_chunk_size = ALIGN(size + sizeof(t_chunk));
+				
+				// Calcular el peor caso de padding necesario para la alineación
+				size_t max_padding_needed = alignment - 1 + sizeof(t_chunk) + (2 * sizeof(void *)); // peor caso + header + datos mínimos
+				
+				// Tamaño total en el peor caso
+				size_t worst_case_total = max_padding_needed + user_chunk_size;
+				
+				// Determinar tipo de heap basado en el peor caso
+				int type = (worst_case_total > TINY_CHUNK) ? SMALL : TINY;
+				t_heap *heap = get_bestheap(tcache, type, worst_case_total);
 				if (!heap) {
 					mutex(&tcache->mutex, MTX_UNLOCK);
 					return (NULL);
 				}
 
-				// 7. Calcular padding real
-				char *current_ptr = (char *)GET_PTR(heap->top_chunk);
-				char *aligned_user_ptr = (char *)ALIGN_UP((uintptr_t)(current_ptr + sizeof(t_chunk)), alignment);
-				char *new_chunk_start = aligned_user_ptr - sizeof(t_chunk);
-				size_t real_padding_total = new_chunk_start - current_ptr;
-				size_t real_padding_data = real_padding_total - sizeof(t_chunk);
-
-				// 8. Ajustar si el padding es muy pequeño
-				if (real_padding_total > 0 && real_padding_data < min_chunk_data) {
-					aligned_user_ptr += alignment;
-					new_chunk_start = aligned_user_ptr - sizeof(t_chunk);
-					real_padding_total = new_chunk_start - current_ptr;
-					real_padding_data = real_padding_total - sizeof(t_chunk);
-				}
-
-				// 9. Calcular el tamaño total real necesario
-				size_t total_real = real_padding_total + ALIGN(size + sizeof(t_chunk));
-
-				// 10. Dividir el top chunk del tamaño total
-				t_chunk *big_chunk = split_top_chunk(heap, total_real);
-				if (!big_chunk) {
-					mutex(&tcache->mutex, MTX_UNLOCK);
-					return (NULL);
-				}
-
-				// 11. Si hay padding, crear el chunk de padding
-				t_chunk *user_chunk;
-				if (real_padding_total > 0) {
-					// Configurar el chunk de padding - preservar flags originales
-					t_chunk *padding_chunk = big_chunk;
-					size_t original_flags = padding_chunk->size & (HEAP_TYPE | PREV_INUSE | MMAP_CHUNK | TOP_CHUNK);
-					padding_chunk->size = real_padding_data | original_flags;
-					SET_POISON(GET_PTR(padding_chunk));
-
-					// El chunk del usuario empieza después del padding
-					user_chunk = (t_chunk *)((char *)big_chunk + real_padding_total);
-					// El chunk del usuario tiene PREV_INUSE (porque el anterior ya no está libre) 
-					// y el mismo HEAP_TYPE que el chunk de padding
-					size_t heap_type_flag = original_flags & HEAP_TYPE;
-
-					size_t user_chunk_size = ALIGN(size + sizeof(t_chunk)) - sizeof(t_chunk);
-					user_chunk->size = user_chunk_size | PREV_INUSE | heap_type_flag;
-
-					SET_PREV_SIZE(user_chunk, GET_SIZE(padding_chunk));
-					SET_PREV_SIZE(heap->top_chunk, GET_SIZE(user_chunk));
-					link_chunk(padding_chunk, GET_SIZE(padding_chunk), heap->type, tcache, heap);
-					heap->free_chunks++;
-					heap->free += GET_SIZE(padding_chunk) + sizeof(t_chunk);
+				// Calcular donde está actualmente el top chunk
+				char *current_start = (char *)heap->top_chunk;
+				char *current_user_ptr = (char *)GET_PTR(heap->top_chunk);
+				
+				// Calcular donde debería estar el user pointer alineado
+				uintptr_t aligned_user_addr = ALIGN_UP((uintptr_t)current_user_ptr, alignment);
+				char *aligned_user_ptr = (char *)aligned_user_addr;
+				char *aligned_chunk_start = aligned_user_ptr - sizeof(t_chunk);
+				
+				// Calcular cuánto padding necesitamos
+				size_t padding_needed = aligned_chunk_start - current_start;
+				
+				// Si no necesitamos padding, usar directamente
+				if (padding_needed == 0) {
+					t_chunk *chunk = split_top_chunk(heap, user_chunk_size);
+					if (!chunk) {
+						mutex(&tcache->mutex, MTX_UNLOCK);
+						return (NULL);
+					}
+					heap->free -= user_chunk_size;
+					ptr = GET_PTR(chunk);
 				} else {
-					// No hay padding, el chunk dividido es directamente el del usuario
-					user_chunk = big_chunk;
-					aprintf(2, 0, "PTR: %p\n", GET_PTR(user_chunk));
+					// Si necesitamos padding, verificar que sea suficiente para un chunk válido
+					size_t min_padding_size = sizeof(t_chunk) + (2 * sizeof(void *)); // header + 2 punteros
+					
+					if (padding_needed < min_padding_size) {
+						// Padding demasiado pequeño, avanzar al siguiente múltiplo de alignment
+						size_t adjustment = min_padding_size - padding_needed;
+						adjustment = ALIGN_UP(adjustment, alignment);
+						aligned_user_addr += adjustment;
+						aligned_user_ptr = (char *)aligned_user_addr;
+						aligned_chunk_start = aligned_user_ptr - sizeof(t_chunk);
+						padding_needed = aligned_chunk_start - current_start;
+					}
+					
+					// Ahora dividir el espacio total necesario
+					size_t total_needed = padding_needed + user_chunk_size;
+					t_chunk *big_chunk = split_top_chunk(heap, total_needed);
+					if (!big_chunk) {
+						mutex(&tcache->mutex, MTX_UNLOCK);
+						return (NULL);
+					}
+					
+					// Crear chunk de padding
+					t_chunk *padding_chunk = big_chunk;
+					size_t padding_data_size = padding_needed - sizeof(t_chunk);
+					size_t original_flags = padding_chunk->size & (HEAP_TYPE | PREV_INUSE | MMAP_CHUNK);
+					padding_chunk->size = padding_data_size | original_flags;
+					SET_POISON(GET_PTR(padding_chunk));
+					
+					// Crear chunk del usuario
+					t_chunk *user_chunk = (t_chunk *)aligned_chunk_start;
+					size_t user_data_size = user_chunk_size - sizeof(t_chunk);
+					user_chunk->size = user_data_size | PREV_INUSE | (original_flags & HEAP_TYPE);
+					user_chunk->magic = 0; // Se configurará después
+					
+					// Configurar prev_size para el siguiente chunk
+					SET_PREV_SIZE(heap->top_chunk, user_data_size);
+					
+					// Añadir el padding chunk a los bins
+					size_t padding_total_size = padding_needed;
+					if (padding_total_size <= (size_t)g_manager.options.MXFAST) {
+						link_chunk(padding_chunk, padding_total_size, FASTBIN, tcache, heap);
+					} else {
+						link_chunk(padding_chunk, padding_total_size, UNSORTEDBIN, tcache, heap);
+					}
+					heap->free_chunks++;
+					heap->free += padding_total_size;
+					heap->free -= total_needed; // Restar el total usado
+					
+					ptr = GET_PTR(user_chunk);
 				}
-
-				// 12. Devolver el puntero alineado
-				ptr = GET_PTR(user_chunk);
 			}
 
 			if (g_manager.options.PERTURB && !is_large) perturb = g_manager.options.PERTURB;

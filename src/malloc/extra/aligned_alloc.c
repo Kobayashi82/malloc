@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 12:50:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 13:50:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,56 +18,42 @@
 
 #pragma region "Aligned Alloc"
 
-	// __attribute__((visibility("default")))
-	// void *aligned_alloc(size_t alignment, size_t size) {
-	// 	ensure_init();
+	__attribute__((visibility("default")))
+	void *aligned_alloc(size_t alignment, size_t size) {
+		ensure_init();
 
-	// 	if (alignment < sizeof(void *) || !is_power_of_two(alignment) || size % alignment) {
-	// 		if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
-	// 		errno = EINVAL; return (NULL);
-	// 	}
+		if (alignment < sizeof(void *) || !is_power_of_two(alignment) || size % alignment) {
+			if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
+			errno = EINVAL; return (NULL);
+		}
 
-	// 	t_arena	*arena;
-	// 	void	*ptr = NULL;
+		void	*ptr = NULL;
 
-	// 	if (!size) {
-	// 		mutex(&g_manager.mutex, MTX_LOCK);
+		if (!size) {
+			mutex(&g_manager.mutex, MTX_LOCK);
 
-	// 			size_t aligned_offset = (g_manager.alloc_zero_counter * alignment);
-	// 			g_manager.alloc_zero_counter++;
+				size_t aligned_offset = (g_manager.alloc_zero_counter * alignment);
+				g_manager.alloc_zero_counter++;
 				
-	// 		mutex(&g_manager.mutex, MTX_UNLOCK);
+			mutex(&g_manager.mutex, MTX_UNLOCK);
 
-	// 		ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
-	// 		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [ALIGNED_ALLOC] Allocated %u bytes\n", ptr, size);
-	// 		else if (!ptr) errno = ENOMEM;
+			ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
+			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [ALIGNED_ALLOC] Allocated %u bytes\n", ptr, size);
+			else if (!ptr) errno = ENOMEM;
 
-	// 		return (ptr);
-	// 	}
+			return (ptr);
+		}
 
-	// 	if (!tcache) {
-	// 		arena = arena_get();
-	// 		tcache = arena;
-	// 		if (!arena) {
-	// 			if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
-	// 			return (NULL);
-	// 		}
-	// 	} else arena = tcache;
+		ptr = allocate_aligned("ALIGNED_ALLOC", alignment, size);
+		
+		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [ALIGNED_ALLOC] Allocated %u bytes\n", ptr, size);
+		else if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
-	// 	mutex(&arena->mutex, MTX_LOCK);
+		if (ptr) SET_MAGIC(ptr);
+		else errno = ENOMEM;
 
-	// 		ptr = allocate_aligned("ALIGNED_ALLOC", alignment, size);
-			
-	// 		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [ALIGNED_ALLOC] Allocated %u bytes\n", ptr, size);
-	// 		else if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
-
-	// 		if (ptr) SET_MAGIC(ptr);
-	// 		else errno = ENOMEM;
-
-	// 	mutex(&arena->mutex, MTX_UNLOCK);
-
-	// 	return (ptr);
-	// }
+		return (ptr);
+	}
 
 #pragma endregion
 
