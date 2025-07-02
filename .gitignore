@@ -6,6 +6,8 @@
 !doc
 !doc/**
 doc/malloc\ 6.2.pdf
+doc/Evaliation.pdf
+doc/Evaliation.md
 !inc
 !inc/**
 !src
