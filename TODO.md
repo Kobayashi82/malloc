@@ -9,6 +9,7 @@
 
 - [ ] arreglar allocate_aligned()
 - [ ] heap_find (solo busca en la arena actual)
+- [ ] valloc falla con el Double free (inactive)
 
 - mmap (if too large)
 - fastbin
