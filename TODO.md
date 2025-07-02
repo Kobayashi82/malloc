@@ -1,11 +1,5 @@
 sizeof(t_chunk) + size + (alignment - 1)
 
-vcalloc y pvcalloc (alineacion a 4096) y alineaciones que sean > CHUNK_SMALL
-Se tiene que reservar size + sizeof(t_chunk) alineado a alignment.
-Ea decir, si size es 4096, pues se tiene que alinear a 4096 * 2
-Como son LARGE tengo que hacer heap->padding= alignment - sizeof(t_chunk) y ptr estaria a alignment - sizeof(t_chunk)
-Cuando se elimine el heap, se hace heap->ptr - heap->padding. Y como size, heap->size + padding.
-
 Para tiny y small, se suma al tamaño total necesitado un minimo para crear otro chunk.
 Por ejemplo, en tiny se haria por ejemplo 32 + 16 bytes y en small, 512 + 64. O algo asi
 Asi cuando creo un chunk desplazado, lo que hay detras del chunk, se fusiona con el chunk anterior (libre o no) o se crea un chunk nuevo vacio.

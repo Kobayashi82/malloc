@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 10:04:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/02 10:21:58 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@
 			t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 
 			for (int i = 0; i < heap_header->used; ++i) {
-				if (ptr >= heap->ptr && ptr < (void *)((char *)heap->ptr + heap->size)) {
+				size_t padding = (heap->padding >= sizeof(t_chunk)) ? heap->padding - sizeof(t_chunk) : 0;
+				if (ptr >= heap->ptr - padding && ptr < (void *)((char *)heap->ptr + heap->size)) {
 					if (heap->active) return (heap);
 					found = heap;
 				}
@@ -192,8 +193,10 @@
 		// 	aprintf(2, 0, "Eliminadas: %d\n", popo++);
 		// }
 
+		size_t padding = (heap->padding >= sizeof(t_chunk)) ? heap->padding - sizeof(t_chunk) : 0;
+
 		int result = 0;
-		if (munmap(heap->ptr - heap->padding, heap->size)) {
+		if (munmap(heap->ptr - padding, heap->size + padding)) {
 			result = 1;
 			if (print_log(0) && heap->type == LARGE)		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory of size %d bytes\n", heap->ptr, heap->size);
 			if (print_log(0) && heap->type != LARGE)		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to detroy heap of size %s (%d)\n", heap->ptr, (heap->type == TINY ? "TINY" : "SMALL"), heap->size);
