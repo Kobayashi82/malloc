@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 11:48:55 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:21:39 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 23:00:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 		// Not aligned
 		if (!IS_ALIGNED(ptr)) {
 			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
-			if (print_error())			aprintf(2, 0, "Invalid pointer\n");
+			if (print_error())			aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 			abort_now();
 			return (0);
 		}
@@ -33,10 +33,10 @@
 		if (!heap->active) {
 			if (heap->type == LARGE && GET_PTR(heap->ptr) == ptr) {
 				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
-				if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+				if (print_error())		aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 			} else {
 				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-				if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+				if (print_error())		aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 			}
 			abort_now();
 			return (0);
@@ -46,7 +46,7 @@
 		if (heap->type == LARGE) {
 				if (GET_HEAD(ptr) != heap->ptr) {
 				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-				if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+				if (print_error())		aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 				abort_now();
 				return (0);
 			}
@@ -55,7 +55,7 @@
 		// Double free
 		if (HAS_POISON(ptr)) {
 			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
-			if (print_error())			aprintf(2, 0, "Invalid pointer\n");
+			if (print_error())			aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 			abort_now();
 			return (0);
 		}
@@ -64,7 +64,7 @@
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK) && heap->type != LARGE) {
 			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
-			if (print_error())			aprintf(2, 0, "Invalid pointer\n");
+			if (print_error())			aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 			abort_now();
 			return (0);
 		}
@@ -74,7 +74,7 @@
 			t_chunk *next_chunk = GET_NEXT(chunk);
 			if (!(next_chunk->size & PREV_INUSE)) {
 				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
-				if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+				if (print_error())		aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 				abort_now();
 				return (0);
 			}
@@ -105,14 +105,14 @@
 
 				if ((uintptr_t)ptr % ALIGNMENT) {
 					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
-					if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+					if (print_error())		aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 					mutex(&g_manager.mutex, MTX_UNLOCK);
 					abort_now(); return (0);
 				}
 
 				if (ptr < ZERO_MALLOC_BASE || ptr >= (void *)((char *)ZERO_MALLOC_BASE + (g_manager.alloc_zero_counter * ALIGNMENT))) {
 					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not allocated)\n", ptr);
-					if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+					if (print_error())		aprintf(2, 0, "malloc_usable_size: Invalid pointer\n");
 					mutex(&g_manager.mutex, MTX_UNLOCK);
 					abort_now(); return (0);
 				}

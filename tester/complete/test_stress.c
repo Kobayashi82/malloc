@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 23:39:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 23:05:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -379,9 +379,9 @@ void test_error_conditions() {
     printf(CYAN "\n=== Testing error conditions ===" NC "\n");
   
     // Test 1: Invalid realloc
-    void *invalid_ptr = (void*)0xDEADBEEF;
-    void *result = realloc(invalid_ptr, 100);
-    test_assert(result == NULL, "Realloc with invalid pointer fails gracefully");
+    // void *invalid_ptr = (void*)0xDEADBEEF;
+    // void *result = realloc(invalid_ptr, 100);
+    // test_assert(result == NULL, "Realloc with invalid pointer fails gracefully");
     
     // Test 2: Extremely large allocation
     void *huge = malloc(SIZE_MAX - 1);

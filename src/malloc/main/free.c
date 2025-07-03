@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 21:00:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 23:03:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,14 @@
 			}
 
 			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk (LARGE))\n", ptr);
-			if (print_error())				aprintf(2, 0, "Invalid pointer\n");
+			if (print_error())				aprintf(2, 0, "free: Invalid pointer\n");
 			return (abort_now());
 		}
 
 		// Double free
 		if (HAS_POISON(ptr)) {
 			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Double free (Poison)\n", ptr);
-			if (print_error())				aprintf(2, 0, "Double free\n");
+			if (print_error())				aprintf(2, 0, "free: Double free\n");
 			return (abort_now());
 		}
 
@@ -52,7 +52,7 @@
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK)) {
 			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
-			if (print_error())				aprintf(2, 0, "Invalid pointer\n");
+			if (print_error())				aprintf(2, 0, "free: Invalid pointer\n");
 			return (abort_now());
 		}
 
@@ -60,7 +60,7 @@
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
 			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunks (not allocated))\n", ptr);
-			if (print_error())				aprintf(2, 0, "Invalid pointer\n");
+			if (print_error())				aprintf(2, 0, "free: Invalid pointer\n");
 			return (abort_now());
 		}
 
@@ -120,7 +120,7 @@
 		// Not aligned
 		if ((uintptr_t)ptr % ALIGNMENT) {
 			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
-			if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+			if (print_error())		aprintf(2, 0, "free: Invalid pointer\n");
 			abort_now(); return ;
 		}
 
@@ -172,7 +172,7 @@
 		// Heap freed
 		if (inactive) {
 			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (posible free when heap is unmamped)\n", ptr);
-			if (print_error())		aprintf(2, 0, "Invalid pointer\n");
+			if (print_error())		aprintf(2, 0, "free: Invalid pointer\n");
 			abort_now(); return ;
 		}
 	}

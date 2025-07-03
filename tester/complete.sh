@@ -40,8 +40,7 @@ if ! make; then	exit 1; fi
 
 if [ -f "./tester/load.sh" ]; then
     source ./tester/load.sh
-	export MALLOC_CHECK_=1
-	export MALLOC_PERTURB_=42
+	export MALLOC_PERTURB_=213
 else
     exit 1
 fi
@@ -58,16 +57,18 @@ fi
 
 # Check if user wants to run specific tests
 if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-    echo -e "${CYAN}Usage: $0 [options]${NC}"
+    echo ""
+	echo -e "${CYAN}Usage: $0 [options]${NC}"
     echo ""
     echo "Options:"
+	echo ""
     echo "  --help, -h       Show this help message"
     echo "  --main           Run only main functions test"
     echo "  --alignment      Run only alignment functions test"
     echo "  --extra          Run only extra functions test"
     echo "  --stress         Run only stress test"
-    echo "  --quick          Run all tests without detailed output"
     echo "  (no options)     Run all tests with detailed output"
+	echo ""
     exit 0
 elif [ "$1" = "--main" ]; then
     echo ""
@@ -81,9 +82,6 @@ elif [ "$1" = "--extra" ]; then
 elif [ "$1" = "--stress" ]; then
     echo ""
     ./test_stress
-elif [ "$1" = "--quick" ]; then
-    echo ""
-    ./run_all_tests
 else
     echo ""
     ./run_all_tests
@@ -97,7 +95,6 @@ echo -e "${CYAN}========================================${NC}"
 rm -f run_all_tests test_main test_extra test_alignment test_stress 2> /dev/null
 
 source ../unload.sh
-unset MALLOC_CHECK_
 unset MALLOC_PERTURB_
 
 exit $test_result

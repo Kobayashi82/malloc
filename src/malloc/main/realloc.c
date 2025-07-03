@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 20:03:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 23:05:37 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 		if (!IS_ALIGNED(ptr)) {
 			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
 			if (print_error())			aprintf(2, 0, "realloc: Invalid pointer\n");
-			return (1);
+			return (abort_now());
 		}
 
 		// Heap freed
@@ -37,7 +37,7 @@
 				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
 				if (print_error())		aprintf(2, 0, "realloc: Invalid pointer\n");
 			}
-			return (1);
+			return (abort_now());
 		}
 
 		// LARGE
@@ -45,7 +45,7 @@
 				if (GET_HEAD(ptr) != heap->ptr) {
 				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
 				if (print_error())		aprintf(2, 0, "realloc: Invalid pointer\n");
-				return (1);
+				return (abort_now());
 			}
 		}
 
@@ -53,7 +53,7 @@
 		if (HAS_POISON(ptr)) {
 			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
 			if (print_error())			aprintf(2, 0, "realloc: Invalid pointer\n");
-			return (1);
+			return (abort_now());
 		}
 
 		// In top chunk
@@ -61,7 +61,7 @@
 		if ((chunk->size & TOP_CHUNK) && heap->type != LARGE) {
 			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
 			if (print_error())			aprintf(2, 0, "realloc: Invalid pointer\n");
-			return (1);
+			return (abort_now());
 		}
 
 		// In middle chunk
@@ -70,7 +70,7 @@
 			if (!(next_chunk->size & PREV_INUSE)) {
 				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
 				if (print_error())		aprintf(2, 0, "realloc: Invalid pointer\n");
-				return (1);
+				return (abort_now());
 			}
 		}
 
@@ -98,12 +98,12 @@
 			heap = heap_find(tcache, ptr);
 			if (!heap) {
 				mutex(&tcache->mutex, MTX_UNLOCK);
-				return (NULL);
+				return (abort_now(), NULL);
 			}
 
 			if (usable_ptr(ptr, heap)) {
 				mutex(&tcache->mutex, MTX_UNLOCK);
-				return (NULL);
+				return (abort_now(), NULL);
 			}
 
 			size_t	old_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
@@ -197,7 +197,7 @@
 			size_t new_size = GET_SIZE((t_chunk *)GET_HEAD(new_ptr));
 			if (new_size > old_size) {
 				size_t len = new_size - old_size;
-				ft_memset((char *)new_ptr + old_size, g_manager.options.PERTURB, len);
+				ft_memset((char *)new_ptr + old_size, g_manager.options.PERTURB ^ 0xFF, len);
 			}
 		}
 

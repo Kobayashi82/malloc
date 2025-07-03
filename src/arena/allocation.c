@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 19:53:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 22:18:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@
 				}
 			}
 
-			if (ptr && g_manager.options.PERTURB) ft_memset(ptr, g_manager.options.PERTURB, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
+			if (ptr && g_manager.options.PERTURB) ft_memset(ptr, g_manager.options.PERTURB ^ 0xFF, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
 
 			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
 			if (!ptr && print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
@@ -219,7 +219,7 @@
 
 			if (ptr && (g_manager.options.PERTURB || (!is_large && !ft_strcmp(source, "CALLOC")))) {
 				if (!is_large && !ft_strcmp(source, "CALLOC")) ft_memset(ptr, 0, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
-				else if (ft_strcmp(source, "CALLOC")) ft_memset(ptr, g_manager.options.PERTURB, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
+				else if (ft_strcmp(source, "CALLOC")) ft_memset(ptr, g_manager.options.PERTURB ^ 0xFF, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
 			}
 
 			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
