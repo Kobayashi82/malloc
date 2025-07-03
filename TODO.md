@@ -10,12 +10,10 @@
 - [ ] Poner bonito allocate_aligned()
 - [ ] heap_find (solo busca en la arena actual)
 - [ ] heap_create (reutilizar old heaps)
-- [ ] Double free (inactive) - En valloc falla
+
 - [ ] Data-Races
 
-- [ ] Tests perturb
-- [ ] Tests malloc_usable_size
-- [ ] Tests mallopt, show_alloc_history, show_alloc_mem y show_alloc_mem_ex
+- [ ] Test show_alloc_history, show_alloc_mem y show_alloc_mem_ex
 - [ ] Eval.sh show_alloc_mem_ex
 
 ## Main

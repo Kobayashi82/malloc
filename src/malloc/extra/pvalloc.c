@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 22:43:25 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 14:30:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:55:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,31 @@
 
 #pragma endregion
 
-#pragma region "Memalign"
+#pragma region "Pvalloc"
 
 	__attribute__((visibility("default")))
 	void *pvalloc(size_t size) {
 		ensure_init();
 
-		void	*ptr = NULL;
+		void *ptr = NULL;
 
 		if (size > SIZE_MAX - sizeof(t_chunk)) { errno = ENOMEM; return (NULL); }
 		size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+
+		if (!size) {
+			mutex(&g_manager.mutex, MTX_LOCK);
+
+				size_t aligned_offset = (g_manager.alloc_zero_counter * PAGE_SIZE);
+				g_manager.alloc_zero_counter++;
+				
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+
+			ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
+			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [VALLOC] Allocated %u bytes\n", ptr, size);
+			else if (!ptr) errno = ENOMEM;
+
+			return (ptr);
+		}
 
 		ptr = allocate_aligned("PVCALLOC", PAGE_SIZE, size);
 

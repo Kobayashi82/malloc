@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:49:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 21:00:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,9 +170,9 @@
 		// ffmpeg -f lavfi -i testsrc=duration=10:size=1920x1080 -c:v libx264 test.mp4
 
 		// Heap freed
-		if (inactive && (inactive->type != LARGE || GET_HEAD(ptr) == inactive->ptr)) {
-			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Double free (inactive)\n", ptr);
-			if (print_error())		aprintf(2, 0, "Double free\n");
+		if (inactive) {
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (posible free when heap is unmamped)\n", ptr);
+			if (print_error())		aprintf(2, 0, "Invalid pointer\n");
 			abort_now(); return ;
 		}
 	}

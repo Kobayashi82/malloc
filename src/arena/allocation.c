@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 15:01:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 19:53:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@
 		mutex(&tcache->mutex, MTX_LOCK);
 
 			bool is_large = ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK;
-			unsigned char perturb = 0;
 
 			if (is_large) {
 				ptr = heap_create(tcache, LARGE, size, alignment);
@@ -150,8 +149,7 @@
 				}
 			}
 
-			if (g_manager.options.PERTURB && !is_large) perturb = g_manager.options.PERTURB;
-			if (ptr && perturb) ft_memset(ptr, perturb, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
+			if (ptr && g_manager.options.PERTURB) ft_memset(ptr, g_manager.options.PERTURB, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
 
 			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
 			if (!ptr && print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
@@ -204,7 +202,7 @@
 
 #pragma region "Allocate"
 
-	void *allocate(char *source, size_t size, unsigned char perturb) {
+	void *allocate(char *source, size_t size) {
 		if (!source || !*source) source = "UNKOWN";
 
 		if (size > SIZE_MAX - sizeof(t_chunk)) { errno = ENOMEM; return (NULL); }
@@ -219,9 +217,10 @@
 
 			ptr = find_memory(tcache, size);
 
-			if (g_manager.options.PERTURB && !is_large && ft_strcmp(source, "CALLOC")) perturb = g_manager.options.PERTURB;
-			if (ptr && (perturb || (!perturb && !is_large && !ft_strcmp(source, "CALLOC"))))
-				ft_memset(ptr, perturb, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
+			if (ptr && (g_manager.options.PERTURB || (!is_large && !ft_strcmp(source, "CALLOC")))) {
+				if (!is_large && !ft_strcmp(source, "CALLOC")) ft_memset(ptr, 0, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
+				else if (ft_strcmp(source, "CALLOC")) ft_memset(ptr, g_manager.options.PERTURB, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
+			}
 
 			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
 			if (!ptr && print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated 2 %u bytes\n", size);

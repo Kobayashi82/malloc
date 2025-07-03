@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 12:37:30 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:41:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:03:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@
 		if (nmemb && size && nmemb > SIZE_MAX / size) { errno = ENOMEM; return (NULL); }
 		size = nmemb * size;
 			
-		if (!ptr)			return allocate("REALLOC_ARRAY", size, 0);	// ptr NULL is equivalent to malloc(size)
+		if (!ptr)			return allocate("REALLOC_ARRAY", size);		// ptr NULL is equivalent to malloc(size)
 		if (!size)			return (free(ptr), NULL);					// size 0 is equivalent to free(ptr)
 		if (!arena_find()) 	return (NULL);
 		
@@ -109,6 +109,7 @@
 				return (NULL);
 			}
 
+			size_t	old_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
 			t_chunk *chunk = GET_HEAD(ptr);
 			size_t	chunk_size = GET_SIZE(chunk);
 			if (ALIGN(size) <= chunk_size) {
@@ -196,21 +197,18 @@
 			mutex(&tcache->mutex, MTX_UNLOCK);
 
 		if (new_ptr && g_manager.options.PERTURB && heap->type != LARGE) {
-			size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
-			size_t length = GET_SIZE((t_chunk *)GET_HEAD(new_ptr)) - copy_size;
-			ft_memset((char *)new_ptr + copy_size, g_manager.options.PERTURB, length);
+			size_t new_size = GET_SIZE((t_chunk *)GET_HEAD(new_ptr));
+			if (new_size > old_size) {
+				size_t len = new_size - old_size;
+				ft_memset((char *)new_ptr + old_size, g_manager.options.PERTURB, len);
+			}
 		}
 			
 		if (!new_ptr) {
-			new_ptr = allocate("REALLOC_ARRAY", ALIGN(size + sizeof(t_chunk)), 0);
+			new_ptr = allocate("REALLOC_ARRAY", ALIGN(size + sizeof(t_chunk)));
 			if (new_ptr) {
 				is_new = true;
-
-				if (ptr && g_manager.options.PERTURB && heap->type != LARGE)
-					ft_memset(ptr, g_manager.options.PERTURB, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
-
-				size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
-				ft_memcpy(new_ptr, ptr, (size < copy_size) ? size : copy_size);
+				ft_memcpy(new_ptr, ptr, (size < old_size) ? size : old_size);
 			}
 		}
 

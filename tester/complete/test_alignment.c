@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 23:39:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:55:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,22 @@ void test_aligned_alloc() {
         test_assert(memory_usable, "aligned_alloc() memory is writable");
         free(ptr8);
     }
+    
+    // Test 9: PERTURB functionality
+	int perturb_ok = 1;
+    void *ptr_perturb = aligned_alloc(64, 128);  // 128 is multiple of 64
+    if (ptr_perturb) {
+        // Check if memory is initialized with PERTURB value (42)
+        unsigned char *bytes = (unsigned char*)ptr_perturb;
+        for (int i = 0; i < 128; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+    }
+	test_assert(ptr_perturb && perturb_ok, "aligned_alloc() PERTURB initialization (value 42)");
+	if (ptr_perturb) free(ptr_perturb);
 }
 
 void test_memalign() {
@@ -174,6 +190,22 @@ void test_memalign() {
     void *ptr5 = memalign(4096, 1000);
     test_assert(ptr5 != NULL && is_aligned(ptr5, 4096), "memalign() large alignment");
     if (ptr5) free(ptr5);
+    
+    // Test 7: PERTURB functionality
+    void *ptr_perturb = memalign(32, 100);
+    if (ptr_perturb) {
+        // Check if memory is initialized with PERTURB value (42)
+        int perturb_ok = 1;
+        unsigned char *bytes = (unsigned char*)ptr_perturb;
+        for (int i = 0; i < 100; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+        test_assert(perturb_ok, "memalign() PERTURB initialization (value 42)");
+        free(ptr_perturb);
+    }
 }
 
 void test_posix_memalign() {
@@ -225,6 +257,23 @@ void test_posix_memalign() {
     void **null_ptr = NULL;
     int ret6 = posix_memalign(null_ptr, 16, 100);
     test_assert(ret6 == EINVAL, "posix_memalign() returns EINVAL for NULL memptr");
+    
+    // Test 8: PERTURB functionality
+    void *ptr_perturb;
+    int perturb_ok = 1;
+	int ret_perturb = posix_memalign(&ptr_perturb, 64, 128);
+    if (ret_perturb == 0 && ptr_perturb) {       
+        // Check if memory is initialized with PERTURB value (42)
+        unsigned char *bytes = (unsigned char*)ptr_perturb;
+        for (int i = 0; i < 128; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+    }
+	test_assert(ptr_perturb && perturb_ok, "posix_memalign() PERTURB initialization (value 42)");
+	if (ptr_perturb) free(ptr_perturb);
 }
 
 void test_valloc() {
@@ -244,7 +293,7 @@ void test_valloc() {
     test_assert(ptr2 == NULL || ptr2 != NULL, "valloc() handles zero size");
     if (ptr2) free(ptr2);
     
-    // Test 3: Large allocation (FALLA)
+    // Test 3: Large allocation
     void *ptr3 = valloc(1024 * 1024);
     test_assert(ptr3 != NULL && is_aligned(ptr3, page_size), "valloc() large allocation");
     if (ptr3) free(ptr3);
@@ -281,6 +330,22 @@ void test_valloc() {
         test_assert(memory_usable, "valloc() memory is writable");
         free(ptr4);
     }
+    
+    // Test 6: PERTURB functionality
+    void *ptr_perturb = valloc(page_size);
+    int perturb_ok = 1;
+    if (ptr_perturb) {       
+        // Check if memory is initialized with PERTURB value (42)
+        unsigned char *bytes = (unsigned char*)ptr_perturb;
+        for (long i = 0; i < page_size; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+    }
+	test_assert(ptr_perturb && perturb_ok, "valloc() PERTURB initialization (value 42)");
+	if (ptr_perturb) free(ptr_perturb);
 }
 
 void test_pvalloc() {
@@ -292,22 +357,19 @@ void test_pvalloc() {
     
     // Test 1: Size rounded up to page size
     void *ptr1 = pvalloc(100);
-    test_assert(ptr1 != NULL && is_aligned(ptr1, page_size), 
-                "pvalloc() returns page-aligned memory");
+    test_assert(ptr1 != NULL && is_aligned(ptr1, page_size), "pvalloc() returns page-aligned memory");
     if (ptr1) free(ptr1);
     
     // Test 2: Exact page size
     void *ptr2 = pvalloc(page_size);
-    test_assert(ptr2 != NULL && is_aligned(ptr2, page_size), 
-                "pvalloc() exact page size");
+    test_assert(ptr2 != NULL && is_aligned(ptr2, page_size), "pvalloc() exact page size");
     if (ptr2) free(ptr2);
     
     // Test 3: Multiple pages
     void *ptr3 = pvalloc(page_size + 1);
-    test_assert(ptr3 != NULL && is_aligned(ptr3, page_size), 
-                "pvalloc() multiple pages");
+    test_assert(ptr3 != NULL && is_aligned(ptr3, page_size), "pvalloc() multiple pages");
     if (ptr3) free(ptr3);
-    
+
     // Test 4: Zero size
     void *ptr4 = pvalloc(0);
     test_assert(ptr4 == NULL || ptr4 != NULL, "pvalloc() handles zero size");
@@ -328,6 +390,22 @@ void test_pvalloc() {
         test_assert(memory_usable, "pvalloc() allocates full page");
         free(ptr5);
     }
+    
+    // Test 6: PERTURB functionality
+    void *ptr_perturb = pvalloc(100);  // Should allocate at least one page
+    int perturb_ok = 1;
+	if (ptr_perturb) {
+        // Check if memory is initialized with PERTURB value (42)
+        unsigned char *bytes = (unsigned char*)ptr_perturb;
+        for (long i = 0; i < page_size; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+    }
+	test_assert(ptr_perturb && perturb_ok, "pvalloc() PERTURB initialization (value 42)");
+	if (ptr_perturb) free(ptr_perturb);
 }
 
 void test_alignment_stress() {

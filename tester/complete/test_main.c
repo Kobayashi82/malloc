@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 23:39:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:51:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void test_malloc_basic() {
     
     // Test 2: Zero allocation (implementation defined)
     void *ptr2 = malloc(0);
-    test_assert(ptr2 == NULL || ptr2 != NULL, "malloc(0) handled");
+    test_assert(ptr2 != NULL, "malloc(0) handled");
     
     // Test 3: Large allocation
     void *ptr3 = malloc(1024 * 1024);
@@ -75,6 +75,22 @@ void test_malloc_basic() {
     free(ptr3);
     for (int i = 0; i < 10; i++) {
         if (ptrs[i]) free(ptrs[i]);
+    }
+    
+    // Test 6: PERTURB functionality
+    void *ptr_perturb = malloc(100);
+    if (ptr_perturb) {
+        // Check if memory is initialized with PERTURB value (42)
+        int perturb_ok = 1;
+        unsigned char *bytes = (unsigned char*)ptr_perturb;
+        for (int i = 0; i < 100; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+        test_assert(perturb_ok, "malloc() PERTURB initialization (value 42)");
+        free(ptr_perturb);
     }
 }
 
@@ -185,6 +201,22 @@ void test_calloc_basic() {
     if (ptr1) free(ptr1);
     if (ptr2) free(ptr2);
     if (ptr3) free(ptr3);
+    
+    // Test 6: PERTURB should NOT affect calloc (memory must remain zeroed)
+    void *ptr_perturb = calloc(100, 1);
+    if (ptr_perturb) {
+        // Memory should still be zeroed despite PERTURB being enabled
+        int all_zero = 1;
+        unsigned char *bytes = (unsigned char*)ptr_perturb;
+        for (int i = 0; i < 100; i++) {
+            if (bytes[i] != 0) {
+                all_zero = 0;
+                break;
+            }
+        }
+        test_assert(all_zero, "calloc() ignores PERTURB and keeps memory zeroed");
+        free(ptr_perturb);
+    }
 }
 
 void test_realloc_basic() {
@@ -245,6 +277,39 @@ void test_realloc_basic() {
     
     // Clean up
     if (ptr1) free(ptr1);
+    
+    // Test 5: PERTURB functionality
+    void *ptr_perturb = realloc(NULL, 100);  // Acts like malloc
+    if (ptr_perturb) {
+        // Check if memory is initialized with PERTURB value (42)
+        int perturb_ok = 1;
+        unsigned char *bytes = (unsigned char*)ptr_perturb;
+        for (int i = 0; i < 100; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+        test_assert(perturb_ok, "realloc() PERTURB initialization (value 42)");
+        
+        // Test expansion with PERTURB
+        void *ptr_expanded = realloc(ptr_perturb, 200);
+        if (ptr_expanded) {
+            // New memory (from 100 to 200) should be initialized with PERTURB value
+            unsigned char *new_bytes = (unsigned char*)ptr_expanded;
+            int new_perturb_ok = 1;
+            for (int i = 100; i < 200; i++) {
+                if (new_bytes[i] != 42) {
+                    new_perturb_ok = 0;
+                    break;
+                }
+            }
+            test_assert(new_perturb_ok, "realloc() expansion PERTURB initialization");
+            free(ptr_expanded);
+        } else {
+            free(ptr_perturb);
+        }
+    }
 }
 
 void test_integration() {

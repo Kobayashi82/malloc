@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 09:20:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 19:49:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 	void *malloc(size_t size) {
 		ensure_init();
 
-		return (allocate("MALLOC", size, 0));
+		return (allocate("MALLOC", size));
 	}
 
 #pragma endregion

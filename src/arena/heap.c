@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:59:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:31:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,7 @@
 			t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 
 			for (int i = 0; i < heap_header->used; ++i) {
-				size_t padding = (heap->padding >= sizeof(t_chunk)) ? heap->padding - sizeof(t_chunk) : 0;
-				if (ptr >= heap->ptr - padding && ptr < (void *)((char *)heap->ptr + heap->size)) {
+				if (ptr >= (void *)((char *)heap->ptr - heap->padding) && ptr < (void *)((char *)heap->ptr + heap->size)) {
 					if (heap->active) return (heap);
 					found = heap;
 				}

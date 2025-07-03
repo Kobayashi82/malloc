@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 23:39:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:09:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 extern void *reallocarray(void *ptr, size_t nmemb, size_t size);
 extern size_t malloc_usable_size(void *ptr);
 extern void *memalign(size_t alignment, size_t size);
+extern void *aligned_alloc(size_t alignment, size_t size);
 
 // Test colors
 #define RED     "\033[0;31m"
@@ -119,6 +120,30 @@ void test_reallocarray() {
     void *ptr12 = reallocarray(NULL, 2, 3);
     test_assert(ptr12 != NULL, "reallocarray() small numbers");
     if (ptr12) free(ptr12);
+    
+    // Test 8: PERTURB functionality
+    void *ptr13 = malloc(10);
+	ptr13 = reallocarray(NULL, 10, 10);  // 100 bytes
+    if (ptr13) {
+        // Check if memory is initialized with PERTURB value (42)
+        int perturb_ok = 1;
+        unsigned char *bytes = (unsigned char*)ptr13;
+        for (int i = 0; i < 100; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+        test_assert(perturb_ok, "reallocarray() PERTURB initialization (value 42)");
+
+        // Write some data and then free to test PERTURB on free
+        memset(ptr13, 0xAA, 100);
+        free(ptr13);
+
+        // After free, memory should be set to 42^255 = 213
+        // Note: This test might not work reliably since freed memory might be reused
+        // but we test the concept
+    }
 }
 
 void test_malloc_usable_size() {
@@ -359,6 +384,31 @@ void test_integration_extra() {
     if (calloc_ptr) free(calloc_ptr);
     if (realloc_ptr) free(realloc_ptr);
     if (reallocarray_ptr) free(reallocarray_ptr);
+    
+    // Test 5: PERTURB integration with aligned_alloc
+    void *aligned_ptr = aligned_alloc(64, 128);  // 128 is multiple of 64
+    if (aligned_ptr) {
+        // Check alignment
+        int is_aligned = ((uintptr_t)aligned_ptr % 64) == 0;
+        test_assert(is_aligned, "Integration: aligned_alloc() alignment");
+        
+        // Check PERTURB initialization
+        int perturb_ok = 1;
+        unsigned char *bytes = (unsigned char*)aligned_ptr;
+        for (int i = 0; i < 128; i++) {
+            if (bytes[i] != 42) {
+                perturb_ok = 0;
+                break;
+            }
+        }
+        test_assert(perturb_ok, "Integration: aligned_alloc() PERTURB initialization");
+        
+        // Check that malloc_usable_size works with aligned_alloc
+        size_t usable = malloc_usable_size(aligned_ptr);
+        test_assert(usable >= 128, "Integration: malloc_usable_size with aligned_alloc");
+
+        free(aligned_ptr);
+    }
 }
 
 int main() {

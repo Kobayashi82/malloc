@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 22:43:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 14:30:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 20:45:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,13 @@
 
 #pragma endregion
 
-#pragma region "Memalign"
+#pragma region "Valloc"
 
 	__attribute__((visibility("default")))
 	void *valloc(size_t size) {
 		ensure_init();
 
-		void	*ptr = NULL;
+		void *ptr = NULL;
 
 		if (!size) {
 			mutex(&g_manager.mutex, MTX_LOCK);

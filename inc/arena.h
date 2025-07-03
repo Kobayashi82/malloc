@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 15:02:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 19:49:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,6 @@
 	int		check_digit(void *ptr1, void *ptr2);
 	void	*allocate_aligned(char *source, size_t alignment, size_t size);
 	void	*allocate_zero(char *source);
-	void	*allocate(char *source, size_t size, unsigned char perturb);
+	void	*allocate(char *source, size_t size);
 
 #pragma endregion

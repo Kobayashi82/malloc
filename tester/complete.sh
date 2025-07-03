@@ -41,6 +41,7 @@ if ! make; then	exit 1; fi
 if [ -f "./tester/load.sh" ]; then
     source ./tester/load.sh
 	export MALLOC_CHECK_=1
+	export MALLOC_PERTURB_=42
 else
     exit 1
 fi
@@ -97,6 +98,7 @@ rm -f run_all_tests test_main test_extra test_alignment test_stress 2> /dev/null
 
 source ../unload.sh
 unset MALLOC_CHECK_
+unset MALLOC_PERTURB_
 
 exit $test_result
 

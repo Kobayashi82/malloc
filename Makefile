@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/03 15:10:16 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/03 20:44:50 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -87,6 +87,7 @@ SRCS		= internal/internal.c internal/options.c					\
 \
 			  malloc/extra/reallocarray.c malloc/extra/aligned_alloc.c	\
 			  malloc/extra/memalign.c malloc/extra/posix_memalign.c		\
+			  malloc/extra/valloc.c malloc/extra/pvalloc.c				\
 			  malloc/extra/malloc_usable_size.c							\
 \
 			  malloc/debug/mallopt.c malloc/debug/alloc_hist.c			\

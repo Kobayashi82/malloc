@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 12:25:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 22:46:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 19:49:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 
 		if (nmemb && size && nmemb > SIZE_MAX / size) return (NULL);
 
-		return (allocate("CALLOC", nmemb * size, 0));
+		return (allocate("CALLOC", nmemb * size));
 	}
 
 #pragma endregion
