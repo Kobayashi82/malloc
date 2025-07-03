@@ -1,33 +1,22 @@
 
 # TODO
 
-- [X] Fastbin (MXFAST) - (no coalescing)
+- [ ] Fastbin (MXFAST) - (no coalescing)
 - [ ] Smallbin - (coalescing)
 - [ ] Unsortedbin
 - [ ] Largebin - (coalescing)
 - [ ] Coalescing
 
-- [ ] arreglar allocate_aligned()
+- [ ] Poner bonito allocate_aligned()
 - [ ] heap_find (solo busca en la arena actual)
-- [ ] valloc falla con el Double free (inactive)
+- [ ] heap_create (reutilizar old heaps)
+- [ ] Double free (inactive) - En valloc falla
+- [ ] Data-Races
 
-- [ ] Documentar .h
-
-- [ ] Añadir a tests perturb
-- [ ] Terminar de arreglar tests
-- [ ] Malloc_usable en tests
-- [ ] Test para mallopt, show alloc history, show alloc mem y show alloc mem ex
-- [ ] Anadir show alloc mem ex a eval.sh
-- [ ] Data races
-
-- mmap (if too large)
-- fastbin
-- smallbin
-- coalescing
-- unsorted bin
-- largebin
-- repeat if fastbin not empty
-- top chunk
+- [ ] Tests perturb
+- [ ] Tests malloc_usable_size
+- [ ] Tests mallopt, show_alloc_history, show_alloc_mem y show_alloc_mem_ex
+- [ ] Eval.sh show_alloc_mem_ex
 
 ## Main
 
@@ -71,3 +60,13 @@
 - [ ] Fork-Safe
 - [ ] Preload library
 
+### Notes
+
+- mmap (if too large)
+- fastbin
+- smallbin
+- coalescing
+- unsorted bin
+- largebin
+- repeat if fastbin not empty
+- top chunk
