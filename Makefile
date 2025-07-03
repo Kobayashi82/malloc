@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/03 13:21:07 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/03 15:10:16 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -239,6 +239,7 @@ fclean:
 	fi
 	@printf "\r%50s\r\t$(CYAN)Deleted     $(GREEN)✓ $(YELLOW)library$(NC)\n"
 	@find $(BLD_DIR) -type d -empty -delete >/dev/null 2>&1 || true
+	@find $(LIB_DIR) -type d -empty -delete >/dev/null 2>&1 || true
 
 	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
@@ -293,6 +294,7 @@ _delete_objects:
 
 wipe:
 	@rm -rf $(BLD_DIR)
+	@rm -rf $(LIB_DIR)
 	@rm -f /tmp/malloc_*.log 2> /dev/null
 
 # ─────────────────── #
