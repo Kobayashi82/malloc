@@ -16,17 +16,17 @@
 - [ ] Perturb en realloc
 - [ ] Show alloc history if logging
 - [ ] Perturb en allocation_aligned?
-- [ ] Mover /lib a la raiz
+- [X] Mover /lib a la raiz
 - [ ] Documentar .h
 - [ ] Terminar de arreglar tests
 - [ ] Malloc_usable en tests
 - [ ] Test para mallopt, show alloc history, show alloc mem y show alloc mem ex
-- [ ] Data races
 - [ ] Anadir show alloc mem ex a eval.sh
-- [ ] Quitar nativos
+- [X] Quitar nativos
 - [ ] Free allocation para evitar llamar a free
-- [ ] _pid.log en logfile always
-- [ ] Make borra los logs en /tmp/malloc_*.log
+- [X] _pid.log en logfile always
+- [X] Make borra los logs en /tmp/malloc_*.log
+- [ ] Data races
 
 - mmap (if too large)
 - fastbin

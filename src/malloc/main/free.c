@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 21:06:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:21:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
-		// stress-ng --malloc 4 --malloc-bytes 1G --verify --timeout 60s
+		// stress-ng --malloc 4 --malloc-bytes 1G --verify --timeout 10s
 		// git clone https://github.com/redis/redis
 		// ffmpeg -f lavfi -i testsrc=duration=10:size=1920x1080 -c:v libx264 test.mp4
 
@@ -175,9 +175,6 @@
 			if (print_error())		aprintf(2, 0, "Double free\n");
 			abort_now(); return ;
 		}
-
-		// Delegate
-		if (!inactive && !heap) native_free(ptr);
 	}
 
 #pragma endregion

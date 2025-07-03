@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:46:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:12:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,33 +119,39 @@
 		static int validate_logfile(char *value) {
 			if (!value || !*value) value = "auto";
 
-			char filename[64] = {0};
-			char pid_str[16] = {0};
+			char pid_str[21] = {0};
 			pid_t pid = getpid();
 
-			// Default filename with PID
-			ft_strlcpy(filename, "malloc_", sizeof(filename));
-			ft_itoa_buffered(pid, pid_str, sizeof(pid_str));
-			ft_strlcat(filename, pid_str, sizeof(filename));
-			ft_strlcat(filename, ".log", sizeof(filename));
+			pid_str[0] = '_';
+			ft_itoa_buffered(pid, pid_str + 1, sizeof(pid_str) - 1);
+			ft_strlcat(pid_str, ".log", sizeof(pid_str));
 
 			size_t value_len = ft_strlen(value);
 
 			if (!ft_strcmp(value, "auto")) {
-				ft_strlcpy(g_manager.options.LOGFILE, "/tmp/", PATH_MAX);			// Temp Directory
-				ft_strlcat(g_manager.options.LOGFILE, filename, PATH_MAX);			// Default Filename
+				ft_strlcpy(g_manager.options.LOGFILE, "/tmp/malloc", PATH_MAX);
+				ft_strlcat(g_manager.options.LOGFILE, pid_str, PATH_MAX);
 			} else if (ft_strchr(value, '/')) {
-				ft_strlcpy(g_manager.options.LOGFILE, value, PATH_MAX);				// Directory + Filename
-				if (value[value_len - 1] == '/')
-					ft_strlcat(g_manager.options.LOGFILE, filename, PATH_MAX);		// Directory + Default Filename
+				ft_strlcpy(g_manager.options.LOGFILE, value, PATH_MAX);
+				if (value[value_len - 1] == '/') {
+					ft_strlcat(g_manager.options.LOGFILE, "malloc", PATH_MAX);
+					ft_strlcat(g_manager.options.LOGFILE, pid_str, PATH_MAX);
+				}
 			} else {
-				if (!getcwd(g_manager.options.LOGFILE, PATH_MAX))					// Current Directory
-					ft_strlcpy(g_manager.options.LOGFILE, "/tmp", PATH_MAX);		// Temp Directory (getcwd failed)
+				if (!getcwd(g_manager.options.LOGFILE, PATH_MAX))
+					ft_strlcpy(g_manager.options.LOGFILE, "/tmp", PATH_MAX);
 				ft_strlcat(g_manager.options.LOGFILE, "/", PATH_MAX);
-				ft_strlcat(g_manager.options.LOGFILE, value, PATH_MAX);				// Filename
+				ft_strlcat(g_manager.options.LOGFILE, value, PATH_MAX);
+				ft_strlcat(g_manager.options.LOGFILE, pid_str, PATH_MAX);
 			}
 
 			g_manager.options.fd_out = open(g_manager.options.LOGFILE, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+			if (g_manager.options.fd_out == -1) {
+				if (g_manager.options.DEBUG) aprintf(2, 1, "\t\t  [ERROR] Unable to create log, falling back to default location '/tmp/malloc_[PID].log'\n");
+				ft_strlcpy(g_manager.options.LOGFILE, "/tmp/malloc", PATH_MAX);
+				ft_strlcat(g_manager.options.LOGFILE, pid_str, PATH_MAX);
+				g_manager.options.fd_out = open(g_manager.options.LOGFILE, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+			}
 
 			return (1);
 		}
@@ -193,7 +199,7 @@
 		if (var && ft_isdigit_s(var))	validate_logging(ft_atoi(var));
 		else							g_manager.options.LOGGING = 0;
 
-		if (g_manager.options.LOGGING && g_manager.options.LOGGING != 2) {
+		if (g_manager.options.LOGGING == 1) {
 			var = getenv("MALLOC_LOGFILE");
 			if (var)					validate_logfile(var);
 			else						validate_logfile("auto");
@@ -230,7 +236,7 @@
 		}
 
 		if (param == M_DEBUG || param == M_LOGGING) {
-			if (g_manager.options.LOGGING && g_manager.options.LOGGING != 2 && !*g_manager.options.LOGFILE) {
+			if (g_manager.options.LOGGING == 1 && !*g_manager.options.LOGFILE) {
 				char *var = getenv("MALLOC_LOGFILE");
 				if (var)	validate_logfile(var);
 			}

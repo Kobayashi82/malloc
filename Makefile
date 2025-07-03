@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/03 12:37:08 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/03 13:21:07 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -77,7 +77,7 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= internal/internal.c internal/options.c internal/native.c	\
+SRCS		= internal/internal.c internal/options.c					\
 \
 			  arena/arena.c arena/heap.c arena/bin.c arena/coalescing.c	\
 			  arena/allocation.c										\
@@ -127,6 +127,7 @@ $(LIB_DIR)/$(LIB_NAME): $(OBJS)
 	@printf " $(CYAN)To evaluate the library run:\t$(YELLOW)source ./tester/eval.sh$(NC)\n\n"
 
 	@$(MAKE) -s _show_cursor
+	@rm -f /tmp/malloc_*.log 2> /dev/null
 
 # ───────────── #
 # ── OBJECTS ── #
@@ -220,6 +221,7 @@ clean:
 
 	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
+	@rm -f /tmp/malloc_*.log 2> /dev/null
 
 # ──────────── #
 # ── FCLEAN ── #
@@ -240,6 +242,7 @@ fclean:
 
 	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
+	@rm -f /tmp/malloc_*.log 2> /dev/null
 
 # ───────────────────────────────────────────────────────────── #
 # ───────────────────────── FUNCTIONS ───────────────────────── #
@@ -290,6 +293,7 @@ _delete_objects:
 
 wipe:
 	@rm -rf $(BLD_DIR)
+	@rm -f /tmp/malloc_*.log 2> /dev/null
 
 # ─────────────────── #
 # ── PROGRESS LINE ── #

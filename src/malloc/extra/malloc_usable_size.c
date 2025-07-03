@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 11:48:55 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 09:44:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:21:39 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,8 +153,6 @@
 
 			mutex(&g_manager.mutex, MTX_UNLOCK);
 		}
-
-		if (!heap_ptr) chunk_size = native_malloc_usable_size(ptr);
 
 		return (chunk_size);
 	}

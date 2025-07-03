@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 22:36:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:21:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@
 			heap = heap_find(tcache, ptr);
 			if (!heap) {
 				mutex(&tcache->mutex, MTX_UNLOCK);
-				// return (native_realloc(ptr, size));
 				return (NULL);
 			}
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 11:30:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:21:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,10 +187,5 @@
 	// Options
 	void	options_initialize();
 	int		options_set(int param, int value);
-
-	// Native
-	void	native_free(void *ptr);
-	void	*native_realloc(void *ptr, size_t size);
-	size_t	native_malloc_usable_size(void *ptr);
 
 #pragma endregion

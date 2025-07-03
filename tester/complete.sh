@@ -1,16 +1,7 @@
 #!/bin/bash
 
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    test.sh                                            :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/07/02 19:12:47 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/06 11:32:02 by vzurera-         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "$SCRIPT_DIR"
 
 # Colors
 RED='\033[0;31m'
@@ -20,8 +11,6 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 NC='\033[0m'
-
-cd complete
 
 # Function to print colored output
 print_header() {
@@ -46,14 +35,7 @@ print_info() {
     echo -e "${CYAN} $1${NC}"
 }
 
-# Check if we're in the right directory
-if [ ! -f "../../Makefile" ]; then
-    print_error "This script should be run from the tester/complete directory"
-    print_info "Current directory: $(pwd)"
-    exit 1
-fi
-
-cd ../..
+cd ..
 if ! make; then	exit 1; fi
 
 if [ -f "./tester/load.sh" ]; then
