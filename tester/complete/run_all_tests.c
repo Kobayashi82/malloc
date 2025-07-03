@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 23:39:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 23:12:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ int main() {
         }
         
         // Small delay between tests
-        sleep(1);
+        // sleep(1);
     }
     
 	(void) passed;
