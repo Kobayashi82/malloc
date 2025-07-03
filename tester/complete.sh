@@ -122,11 +122,11 @@ exit $test_result
 
 # -Wno-free-nonheap-object	= Desactiva advertencia de free() al compilar
 # -lft_malloc				= -l busca lib + ft_malloc + .so
-# -Wl,-rpath=./build/lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
+# -Wl,-rpath=./lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
 
 # Unix:
-# export LD_LIBRARY_PATH="/home/kobay/malloc/build/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
+# export LD_LIBRARY_PATH="/home/kobay/malloc/lib:$LD_LIBRARY_PATH" && export LD_PRELOAD="libft_malloc.so"
 # export MALLOC_DEBUG=1
 
 # Mac:
-# export DYLD_LIBRARY_PATH="/[project_path]/build/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/[project_path]/build/lib/libft_malloc.so"
+# export DYLD_LIBRARY_PATH="/[project_path]/lib:$DYLD_LIBRARY_PATH" && export DYLD_INSERT_LIBRARIES="/[project_path]/lib/libft_malloc.so"

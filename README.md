@@ -42,7 +42,7 @@ git clone git@github.com:Kobayashi82/Malloc.git
 cd malloc
 make
 
-# La librería se genera en ./build/lib como:
+# La librería se genera en ./lib como:
 # libft_malloc_$(HOSTTYPE).so
 
 # y se crea el enlace simbolico:
@@ -54,14 +54,14 @@ make
 ### Uso Básico
 ```bash
 # Precargar la librería
-export LD_LIBRARY_PATH="./build/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="./lib:$LD_LIBRARY_PATH"
 export LD_PRELOAD="libft_malloc.so"
 
 # Ejecutar
 ./program
 
 # O en una sola línea
-LD_PRELOAD="./build/lib/libft_malloc.so" ./pogram
+LD_PRELOAD="./lib/libft_malloc.so" ./pogram
 ```
 
 ### Integración en Código C
@@ -85,7 +85,7 @@ int main() {
 ### Compilación con la Librería
 ```bash
 # Compilar y enlazar
-gcc program.c -L./build/lib -lft_malloc -o program
+gcc program.c -L./lib -lft_malloc -o program
 
 # Ejecutar
 ./program

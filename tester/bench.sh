@@ -42,7 +42,7 @@ if [ $? -ne 0 ]; then
 fi
 
 (
-    export LD_LIBRARY_PATH="/home/kobay/malloc/build/lib:$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH="/home/kobay/malloc/lib:$LD_LIBRARY_PATH"
     export LD_PRELOAD="libft_malloc.so"
     /usr/bin/time -v "$PROGRAM" $ARGS 2>"$CUSTOM_OUTPUT" >/dev/null
 )

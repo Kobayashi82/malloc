@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/02 08:45:08 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/03 12:37:08 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -70,7 +70,7 @@ endif
 INC_DIR		= inc/
 BLD_DIR		= build/
 OBJ_DIR		= $(BLD_DIR)obj/
-LIB_DIR		= $(BLD_DIR)lib/
+LIB_DIR		= lib/
 SRC_DIR		= src/
 
 # ─────────── #

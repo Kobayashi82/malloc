@@ -13,7 +13,7 @@ for t in "${tests[@]}"; do
 	[[ -f "$file" ]] || { echo -e "${RED}Missing $file${NC}"; exit 1; }
 	
 	if [[ "$t" == "test5" ]]; then
-		clang "$file" -o "${SCRIPT_DIR}/evaluation/$t" -L"${SCRIPT_DIR}/../build/lib" -I"${SCRIPT_DIR}/../inc" -lft_malloc || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
+		clang "$file" -o "${SCRIPT_DIR}/evaluation/$t" -L"${SCRIPT_DIR}/../lib" -I"${SCRIPT_DIR}/../inc" -lft_malloc || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
 	else
 		clang "$file" -o "${SCRIPT_DIR}/evaluation/$t" || { echo -e "${RED}Compilation failed $file${NC}"; exit 1; }
 	fi
@@ -93,7 +93,7 @@ for t in "${tests[@]}"; do
 	N_MEM[$t]=$mem; N_PAGES[$t]=$pages; N_MIN[$t]=$minor; N_REALLOC[$t]=$realloc; N_ABORT[$t]=$abort
 	# custom malloc
 	unset MALLOC_DEBUG MALLOC_LOGGING
-	export LD_LIBRARY_PATH="${SCRIPT_DIR}/../build/lib:$LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH="${SCRIPT_DIR}/../lib:$LD_LIBRARY_PATH"
 	export LD_PRELOAD="libft_malloc.so"
 	export MALLOC_CHECK_=2;
 	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/evaluation/$t")

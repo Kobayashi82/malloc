@@ -7,7 +7,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUILD_LIB_DIR="$SCRIPT_DIR/../build/lib"
+BUILD_LIB_DIR="$SCRIPT_DIR/../lib"
 
 if [ -d "$BUILD_LIB_DIR" ]; then
     LIB_PATH="$(cd "$BUILD_LIB_DIR" && pwd)/libft_malloc.so"
