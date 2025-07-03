@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 20:53:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 21:21:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,24 +22,16 @@
 
 	int main() {
 		mallopt(M_DEBUG, 1);
+		mallopt(M_LOGGING, 2);
 
-		char *popo1 = pvalloc(0);
-		// char *popo2 = malloc(100);
-		// strcpy(popo1, "Hello World!");
-		// show_alloc_mem();
-		show_alloc_mem_ex(popo1, 0, 0);
-		free(popo1);
-		// show_alloc_history();
-		// popo += 8;
-
+		char *ptr = malloc(30);
+		strcpy(ptr, "Hello World!\n");
+		show_alloc_mem();
+		show_alloc_mem_ex(ptr, 0, 0);
+		free(ptr);
+		show_alloc_history();
 	}
 
 #pragma endregion
 
 #pragma region "Information"
-
-	// gcc -g -Wno-free-nonheap-object -o testing testing.c -I./inc -L./lib -lft_malloc -Wl,-rpath=./lib -pthread
-	//
-	// -Wno-free-nonheap-object	= Desactiva advertencia de free() al compilar
-	// -lft_malloc				= -l busca lib + ft_malloc + .so
-	// -Wl,-rpath=./lib	= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime

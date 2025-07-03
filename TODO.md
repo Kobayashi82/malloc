@@ -13,9 +13,6 @@
 
 - [ ] Data-Races
 
-- [ ] Test show_alloc_history, show_alloc_mem y show_alloc_mem_ex
-- [ ] Eval.sh show_alloc_mem_ex
-
 ## Main
 
 - [X] free

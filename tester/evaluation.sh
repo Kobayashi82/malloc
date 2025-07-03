@@ -217,7 +217,7 @@ echo -e "  ${CYAN}SHOW_ALLOC_MEM${YELLOW}${NC}"
 echo -e "${CYAN}------------------${NC}"
 echo
 
-# "${SCRIPT_DIR}/evaluation/test5"
+"${SCRIPT_DIR}/evaluation/test5"
 echo
 
 rm -f "${SCRIPT_DIR}/evaluation/test0" "${SCRIPT_DIR}/evaluation/test1" "${SCRIPT_DIR}/evaluation/test2" "${SCRIPT_DIR}/evaluation/test3" "${SCRIPT_DIR}/evaluation/test4" "${SCRIPT_DIR}/evaluation/test5"

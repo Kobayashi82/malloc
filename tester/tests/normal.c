@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   koba.c                                             :+:      :+:    :+:   */
+/*   normal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:58:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 21:13:53 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,24 +30,24 @@
 		#define DEBUG_MODE 0
 	#endif
 
-	#define M_ARENA_MAX					-8				//
-	#define M_ARENA_TEST				-7				//
-	#define M_PERTURB					-6				//
-	#define M_CHECK_ACTION				-5				//
-	#define M_MXFAST			 		 1				//
-	#define M_FRAG_PERCENT			 	 2				// Si una zona esta mas fragmentada que esto, no usarla (crear nueva si es necesario)
-	#define M_MIN_USAGE					 3				// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
-	#define M_DEBUG						 7				// (DEBUG) Enable debug mode
-	#define M_LOGGING					 8				// (DEBUG) Captura backtrace con backtrace() y lo guardas junto con cada allocación.
-	#define M_LOGFILE					 9				// (DEBUG) Con diferentes comportamientos según el valor:
+	#define M_ARENA_MAX					-8
+	#define M_ARENA_TEST				-7
+	#define M_PERTURB					-6
+	#define M_CHECK_ACTION				-5
+	#define M_MXFAST			 		 1
+	#define M_FRAG_PERCENT			 	 2
+	#define M_MIN_USAGE					 3
+	#define M_DEBUG						 7
+	#define M_LOGGING					 8
+	#define M_LOGFILE					 9
 
-	#define TINY_ALLOC					 16				// 
-	#define SMALL_ALLOC					 64				// 
-	#define MEDIUM_ALLOC				 570			// 
-	#define LARGE_ALLOC					 1024 * 1024	// 
+	#define TINY_ALLOC					 16
+	#define SMALL_ALLOC					 64
+	#define MEDIUM_ALLOC				 570
+	#define LARGE_ALLOC					 1024 * 1024
 	
-	#define THREADS						 4				// 
-	#define THREADS_ALLOC				 1				// 
+	#define THREADS						 4
+	#define THREADS_ALLOC				 1
 
 	static pthread_t	threads[THREADS];
 	static unsigned int	n_threads;
@@ -229,21 +229,11 @@
 
 		threads_create();
 
-		// fork_test();					// Fork with threads
+		fork_test();					// Fork with threads
 
-		// threads_join();
+		threads_join();
 
 		fork_test();
-
-		// char *ptr = malloc(1);
-		// size_t size = malloc_usable_size(ptr);
-		// printf("[MALLOC_USABLE_SIZE]\t%zu bytes available\t\t\t(%p)\n", size, ptr);
-
-		// char *ptr2 = reallocarray(ptr, 15, 10);
-		// size = malloc_usable_size(ptr2);
-		// printf("[MALLOC_USABLE_SIZE]\t%zu bytes available\t\t\t(%p)\n", size, ptr2);
-
-		// free(ptr2);
 
 		printf("\n");
 
