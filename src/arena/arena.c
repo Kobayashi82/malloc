@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 08:27:58 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 14:50:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #pragma region "Initialize"
 
 	void arena_initialize(t_arena *arena) {
-		arena->id = g_manager.arena_count + 1;
+		arena->id = g_manager.arena_count++;
 		arena->alloc_count = 0;
 		arena->free_count = 0;
 		ft_memset(arena->fastbin, 0, 20 * sizeof(void *));
@@ -29,7 +29,6 @@
 		arena->heap_header = NULL;
 		arena->next = NULL;
 		mutex(&arena->mutex, MTX_INIT);
-		g_manager.arena_count++;
 	}
 
 #pragma endregion
@@ -40,7 +39,7 @@
 		if (!tcache) {
 			tcache = arena_get();
 			if (!tcache) {
-				if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
+				if (print_log(1)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
 				errno = ENOMEM;
 				return (NULL);
 			}
@@ -95,7 +94,7 @@
 			while (current->next) current = current->next;
 			current->next = new_arena;
 
-			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Arena #%d created\n", new_arena->id);
+			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Arena #%d created\n", new_arena->id);
 
 			return (new_arena);
 		}
@@ -137,13 +136,13 @@
 				initialized = true;
 				arena_initialize(&g_manager.arena);
 				arena = &g_manager.arena;
-				if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
+				if (print_log(2))	aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Arena #%d created\n", arena->id);
 			}
 			if (!arena) arena = arena_reuse();
 			if (!arena) arena = arena_create();
 			if (!arena) arena = &g_manager.arena;
 
-			if (print_log(0))		aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Arena #%d assigned\n", arena->id);
+			if (print_log(2))		aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Arena #%d assigned\n", arena->id);
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 

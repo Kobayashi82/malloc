@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 12:37:30 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:21:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:41:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,13 +192,23 @@
 					}
 				} else new_ptr = ptr;
 			}
+		
+			mutex(&tcache->mutex, MTX_UNLOCK);
 
-		mutex(&tcache->mutex, MTX_UNLOCK);
-
+		if (new_ptr && g_manager.options.PERTURB && heap->type != LARGE) {
+			size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
+			size_t length = GET_SIZE((t_chunk *)GET_HEAD(new_ptr)) - copy_size;
+			ft_memset((char *)new_ptr + copy_size, g_manager.options.PERTURB, length);
+		}
+			
 		if (!new_ptr) {
 			new_ptr = allocate("REALLOC_ARRAY", ALIGN(size + sizeof(t_chunk)), 0);
 			if (new_ptr) {
 				is_new = true;
+
+				if (ptr && g_manager.options.PERTURB && heap->type != LARGE)
+					ft_memset(ptr, g_manager.options.PERTURB, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
+
 				size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
 				ft_memcpy(new_ptr, ptr, (size < copy_size) ? size : copy_size);
 			}

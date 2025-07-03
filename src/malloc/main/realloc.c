@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:21:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:40:37 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,10 +192,17 @@
 
 		mutex(&tcache->mutex, MTX_UNLOCK);
 
+		if (new_ptr && g_manager.options.PERTURB && heap->type != LARGE) {
+			size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
+			size_t length = GET_SIZE((t_chunk *)GET_HEAD(new_ptr)) - copy_size;
+			ft_memset((char *)new_ptr + copy_size, g_manager.options.PERTURB, length);
+		}
+
 		if (!new_ptr) {
 			new_ptr = allocate("REALLOC", ALIGN(size + sizeof(t_chunk)), 0);
 			if (new_ptr) {
 				is_new = true;
+
 				size_t copy_size = GET_SIZE((t_chunk *)GET_HEAD(ptr));
 				ft_memcpy(new_ptr, ptr, (size < copy_size) ? size : copy_size);
 			}

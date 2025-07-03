@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 13:06:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:49:59 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 14:33:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 		ensure_init();
 
 		if (alignment < sizeof(void *) || !is_power_of_two(alignment)) {
-			if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR]  Failed to allocated %u bytes\n", size);
+			if (print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR]  Failed to allocated %u bytes (EINVAL)\n", size);
 			errno = EINVAL; return (NULL);
 		}
 
@@ -47,7 +47,7 @@
 		ptr = allocate_aligned("MEMALIGN", alignment, size);
 			
 		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [MEMALIGN] Allocated %u bytes\n", ptr, size);
-		else if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+		if (!ptr && print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 		if (ptr) SET_MAGIC(ptr);
 		else errno = ENOMEM;

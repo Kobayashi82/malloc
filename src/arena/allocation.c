@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 22:11:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 15:01:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,23 @@
 
 #pragma endregion
 
-#pragma region "Allocate Aligned"
+#pragma region "Check Digit"
 
-	#define ALIGN_UP(addr, align) (((addr) + (align) - 1) & ~((align) - 1))
+	int check_digit(void *ptr1, void *ptr2) {
+		if (!ptr1 || !ptr2) return (0);
+
+		uintptr_t val1 = (uintptr_t)ptr1;
+		uintptr_t val2 = (uintptr_t)ptr2;
+
+		while (val1 >= 0x10) val1 /= 0x10;
+		while (val2 >= 0x10) val2 /= 0x10;
+
+		return ((val1 & 0xF) == (val2 & 0xF));
+	}
+
+#pragma endregion
+
+#pragma region "Allocate Aligned"
 
 	void *allocate_aligned(char *source, size_t alignment, size_t size) {
 		if (!source || !*source) source = "UNKOWN";
@@ -26,7 +40,7 @@
 		if (size > SIZE_MAX - sizeof(t_chunk)) { errno = ENOMEM; return (NULL); }
 
 		if (alignment < sizeof(void *) || !is_power_of_two(alignment)) {
-			if (print_log(0))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+			if (print_log(1)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 			errno = EINVAL;
 			return (NULL);
 		}
@@ -139,8 +153,8 @@
 			if (g_manager.options.PERTURB && !is_large) perturb = g_manager.options.PERTURB;
 			if (ptr && perturb) ft_memset(ptr, perturb, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
 
-			if		(ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
-			else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
+			if (!ptr && print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
 
 			if (ptr) {
 				SET_MAGIC(ptr);
@@ -172,8 +186,8 @@
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
 		ptr = (void*)(ZERO_MALLOC_BASE + aligned_offset);
-		if		(ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated 0 bytes\n", ptr, source);
-		else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated 0 bytes\n");
+		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated 0 bytes\n", ptr, source);
+		if (!ptr && print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated 0 bytes\n");
 
 		if (ptr) {
 			mutex(&tcache->mutex, MTX_LOCK);
@@ -209,8 +223,8 @@
 			if (ptr && (perturb || (!perturb && !is_large && !ft_strcmp(source, "CALLOC"))))
 				ft_memset(ptr, perturb, GET_SIZE((t_chunk *)GET_HEAD(ptr)));
 
-			if		(ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
-			else if (print_log(0))			aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
+			if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [%s] Allocated %u bytes\n", ptr, source, size);
+			if (!ptr && print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated 2 %u bytes\n", size);
 
 			if (ptr) {
 				SET_MAGIC(ptr);

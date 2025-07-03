@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 08:51:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 15:01:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,9 @@
 		}
 
 		if (result) {
-			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Mutex failed\n");
-			abort();
+			if (print_log(1)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Mutex failed\n");
+			if (print_error())	aprintf(2, 0, "Mutex failed\n");
+			abort(); return (1);
 		}
 
 		return (result);
@@ -59,22 +60,6 @@
 
 #pragma endregion
 
-#pragma region "Check Digit"
-
-	int check_digit(void *ptr1, void *ptr2) {
-		if (!ptr1 || !ptr2) return (0);
-
-		uintptr_t val1 = (uintptr_t)ptr1;
-		uintptr_t val2 = (uintptr_t)ptr2;
-
-		while (val1 >= 0x10) val1 /= 0x10;
-		while (val2 >= 0x10) val2 /= 0x10;
-
-		return ((val1 & 0xF) == (val2 & 0xF));
-	}
-
-#pragma endregion
-
 #pragma region "Fork"
 
 	#pragma region "Prepare"
@@ -85,19 +70,19 @@
 				if (!ret) return (0);
 
 				if (ret != EBUSY) {
-					if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] locking mutex in fork\n");
+					if (print_log(1)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] locking mutex in fork\n");
 					return (ret);
 				}
 				
 				usleep(1000);
 			}
 
-			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] timeout locking mutex in fork\n");
+			if (print_log(1)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] timeout locking mutex in fork\n");
 			return (ETIMEDOUT);
 		}
 
 		void prepare_fork() {
-			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Prepare fork\n");
+			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Prepare fork\n");
 
 			int ret = try_lock_timeout(&g_manager.mutex, 1000);
 			if (ret) return;
@@ -124,7 +109,7 @@
 	#pragma region "Parent"
 
 		void parent_fork() {
-			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Parent fork\n");
+			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Parent fork\n");
 
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
@@ -139,7 +124,7 @@
 	#pragma region "Child"
 
 		void child_fork() {
-			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Child fork\n");
+			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "\t\t [SYSTEM] Child fork\n");
 
 			t_arena *arena = &g_manager.arena;
 			while (arena) {
@@ -161,7 +146,8 @@
 		size_t total_size = (size + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 		void *ptr = mmap(NULL, total_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (ptr == MAP_FAILED) {
-			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
+			if (print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Unable to map memory (internal allocation)\n");
+			if (print_error())	aprintf(2, 0, "Memory exhausted\n");
 			abort(); return (NULL);
 		}
 
@@ -176,7 +162,7 @@
 		if (!ptr || !size) return (0);
 
 		if (munmap(ptr, size)) {
-			if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
+			if (print_log(1)) aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Unable to unmap memory (internal allocation)\n", ptr);
 			return (1);
 		}
 
@@ -187,37 +173,21 @@
 
 #pragma region "Print"
 
-	bool print_log(bool error) {
-		if (error) return (g_manager.options.DEBUG || g_manager.options.LOGGING);
+	bool print_log(int mode) {
+		if (mode == 1) return (g_manager.options.DEBUG || g_manager.options.LOGGING);
+		if (mode == 2) return (g_manager.options.DEBUG == 2 || g_manager.options.LOGGING);
 		return (g_manager.options.LOGGING);
 	}
 
-	bool print_error()	{ return (!g_manager.options.DEBUG && g_manager.options.LOGGING != 2 && g_manager.options.CHECK_ACTION != 2); }
+	bool print_error() {
+		return (!g_manager.options.DEBUG && g_manager.options.LOGGING != 2 && g_manager.options.CHECK_ACTION != 2);
+	}
 
 #pragma endregion
 
 #pragma region "Abort"
 
 	int abort_now() {
-		// t_arena *arena = tcache;
-		// t_heap_header *heap_header = arena->heap_header;
-
-		// while (heap_header) {
-		// 	t_heap *heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
-
-		// 	for (int i = 0; i < heap_header->used; ++i) {
-		// 		char *type;
-		// 		if (heap->type == TINY) type = "Tiny";
-		// 		if (heap->type == SMALL) type = "Small";
-		// 		if (heap->type == LARGE) type = "Large";
-		// 		aprintf(g_manager.options.fd_out, 1, "heap: %p\nptr: %p\ntype: %s\nActive: %s\n\n", heap, heap->ptr, type, heap->active == true ? "True" : "False");
-
-		// 		heap = (t_heap *)((char *)heap + ALIGN(sizeof(t_heap)));
-		// 	}
-
-		// 	heap_header = heap_header->next;
-		// }
-
 		if (!g_manager.options.CHECK_ACTION) abort();
 		return (1);
 	}

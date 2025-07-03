@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:12:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:59:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@
 	#pragma region "DEBUG"
 
 		static int validate_debug(int value) {
-			if (value <= 0 || value > 1) return (0);
+			if (value <= 0 || value > 2) return (0);
 
 			g_manager.options.DEBUG = value;
 
@@ -147,7 +147,7 @@
 
 			g_manager.options.fd_out = open(g_manager.options.LOGFILE, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 			if (g_manager.options.fd_out == -1) {
-				if (g_manager.options.DEBUG) aprintf(2, 1, "\t\t  [ERROR] Unable to create log, falling back to default location '/tmp/malloc_[PID].log'\n");
+				if (print_log(1)) aprintf(2, 1, "\t\t  [ERROR] Unable to create log, falling back to default location '/tmp/malloc_[PID].log'\n");
 				ft_strlcpy(g_manager.options.LOGFILE, "/tmp/malloc", PATH_MAX);
 				ft_strlcat(g_manager.options.LOGFILE, pid_str, PATH_MAX);
 				g_manager.options.fd_out = open(g_manager.options.LOGFILE, O_CREAT | O_WRONLY | O_TRUNC, 0644);

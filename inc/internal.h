@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:21:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 15:02:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,6 @@
 
 #pragma region "Defines"
 
-	// ARCHITECTURE
-	#define ARCHITECTURE				(sizeof(size_t) * 8)			// 32 or 64 bits
-	
 	#ifndef SIZE_MAX
 		#define SIZE_MAX				~(size_t)0
 	#endif
@@ -40,56 +37,59 @@
 		#define PATH_MAX 				4096
 	#endif
 	
-	// MAGIC & POISON
-	#define MAGIC_BYTES					((size_t)0xABCDEF0123456789ULL)	// 4 or 8 bytes
-	#define POISON_BYTES				((size_t)0xDEADBEEFCAFEBABEULL)	// 4 or 8 bytes
-	#define HAS_MAGIC(ptr)				(*(const size_t *)((char *)(ptr) - sizeof(size_t)) == MAGIC_BYTES)
-	#define HAS_POISON(ptr)				(*(const size_t *)((char *)(ptr) - sizeof(size_t)) == POISON_BYTES)
-	#define SET_MAGIC(ptr)				(*(size_t *)((char *)(ptr) - sizeof(size_t)) = MAGIC_BYTES)
-	#define SET_POISON(ptr)				(*(size_t *)((char *)(ptr) - sizeof(size_t)) = POISON_BYTES)
+	#define ARCHITECTURE				(sizeof(size_t) * 8)																					// 32 or 64 bits
 
-	// FD & BK
-	#define GET_FD(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk))
-	#define GET_BK(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *))
-	#define SET_FD(chunk, next_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk)) = (next_chunk))
-	#define SET_BK(chunk, prev_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *)) = (prev_chunk))
+	// --- MAGIC / POISON ---
+	#define MAGIC_BYTES					((size_t)0xABCDEF0123456789ULL)																			// Detect chunk corruption (4 or 8 bytes)
+	#define POISON_BYTES				((size_t)0xDEADBEEFCAFEBABEULL)																			// Detect chunk corruption and double free (4 or 8 bytes)
+	#define HAS_MAGIC(ptr)				(*(const size_t *)((char *)(ptr) - sizeof(size_t)) == MAGIC_BYTES)										// Check if chunk has MAGIC header
+	#define HAS_POISON(ptr)				(*(const size_t *)((char *)(ptr) - sizeof(size_t)) == POISON_BYTES)										// Check if chunk has POISON pattern
+	#define SET_MAGIC(ptr)				(*(size_t *)((char *)(ptr) - sizeof(size_t)) = MAGIC_BYTES)												// Set MAGIC header
+	#define SET_POISON(ptr)				(*(size_t *)((char *)(ptr) - sizeof(size_t)) = POISON_BYTES)											// Set POISON pattern
 
-	// CHUNK
-	#define GET_PTR(chunk)				(void *)((char *)(chunk) + sizeof(t_chunk))
-	#define GET_HEAD(chunk) 			(void *)((char *)(chunk) - sizeof(t_chunk))
-	#define GET_NEXT(chunk)				(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~15))
-	#define GET_PREV(chunk)				(t_chunk *)((char *)(chunk) - (*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)) + sizeof(t_chunk)))
+	// --- FD / BK ---
+	#define GET_FD(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk))															// Get forward pointer
+	#define GET_BK(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *))											// Get backward pointer
+	#define SET_FD(chunk, next_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk)) = (next_chunk))											// Set forward pointer
+	#define SET_BK(chunk, prev_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *)) = (prev_chunk))							// Set backward pointer
 
-	#define GET_PREV_SIZE(chunk)		(*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)))
-	#define SET_PREV_SIZE(chunk, size)	(*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)) = (size))
-	#define GET_SIZE(chunk) 			(size_t)((chunk)->size & ~15)
-	#define IS_TOPCHUNK(chunk)			(((chunk)->size & TOP_CHUNK) != 0)
-	#define IS_FREE(chunk)				(((GET_NEXT(chunk))->size & PREV_INUSE) == 0)
+	// --- CHUNK ---
+	#define GET_PTR(chunk)				(void *)((char *)(chunk) + sizeof(t_chunk))																// Get pointer to user data
+	#define GET_HEAD(chunk) 			(void *)((char *)(chunk) - sizeof(t_chunk))																// Get pointer to chunk header
+	#define GET_NEXT(chunk)				(t_chunk *)((char *)(chunk) + sizeof(t_chunk) + ((chunk)->size & ~15))									// Get pointer to next chunk header
+	#define GET_PREV(chunk)				(t_chunk *)((char *)(chunk) - (*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)) + sizeof(t_chunk)))	// Get pointer to previous chunk header
+	#define GET_PREV_SIZE(chunk)		(*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)))														// Get size of previous chunk (without header)
+	#define SET_PREV_SIZE(chunk, size)	(*(uint32_t *)((char *)(chunk) - sizeof(uint32_t)) = (size))											// Set size of previous chunk (without header)
+	#define GET_SIZE(chunk) 			(size_t)((chunk)->size & ~15)																			// Get size of chunk (without header)
+	#define IS_TOPCHUNK(chunk)			(((chunk)->size & TOP_CHUNK) != 0)																		// Check if chunk is the top chunk
+	#define IS_FREE(chunk)				(((GET_NEXT(chunk))->size & PREV_INUSE) == 0)															// Check if chunk is free
 
-	// ALIGMENTS
-	#define ZERO_MALLOC_BASE			(void *)0x100000000000			// 
-	#define PAGE_SIZE					get_pagesize()					// 4096 bytes
-	#define ALIGNMENT					(uint8_t)(ARCHITECTURE / 4)		// 8 or 16 bytes
-	#define IS_ALIGNED(ptr)				(((uintptr_t)GET_HEAD(ptr) & (ALIGNMENT - 1)) == 0)
-	#define ALIGN(size)					(((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
+	// --- CHUNK FLAGS ---
+	#define MMAP_CHUNK    				0x8																										// Bit 3: chunk comes from mmap (LARGE)
+	#define TOP_CHUNK					0x4																										// Bit 2: chunk is the top chunk
+	#define HEAP_TYPE					0x2																										// Bit 1: indicates heap type
+	#define PREV_INUSE					0x1																										// Bit 0: previous chunk is in use
 
-	// HEAPS
-	#define MMAP_CHUNK    				0x8								// Bit 3
-	#define TOP_CHUNK					0x4								// Bit 2
-	#define HEAP_TYPE					0x2								// Bit 1
-	#define PREV_INUSE					0x1								// Bit 0
+	// --- ALIGNMENTS ---
+	#define ZERO_MALLOC_BASE			(void *)0x100000000000																					// Base address returned by malloc(0) to distinguish from NULL
+	#define PAGE_SIZE					get_pagesize()																							// System page size (usually 4096 bytes)
+	#define ALIGNMENT					(uint8_t)(ARCHITECTURE / 4)																				// Global alignment (8 or 16 bytes)
+	#define IS_ALIGNED(ptr)				(((uintptr_t)GET_HEAD(ptr) & (ALIGNMENT - 1)) == 0)														// Check if header is properly aligned
+	#define ALIGN(size)					(((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))															// Align size up to ALIGNMENT
+	#define ALIGN_UP(addr, align)		(((addr) + (align) - 1) & ~((align) - 1))																// Align address upwards to the nearest multiple of 'align'
 
-	#define TINY_CHUNK					512
-	#define TINY_BLOCKS					128
-	#define TINY_SIZE					(((TINY_BLOCKS * TINY_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+	// --- HEAP SIZES ---
+	#define TINY_CHUNK					512																										// Max size for tiny chunk
+	#define TINY_BLOCKS					128																										// Number of tiny chunks per HEAP
+	#define TINY_SIZE					(((TINY_BLOCKS * TINY_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))										// Total size of tiny heap, aligned to page
 
-	#define SMALL_CHUNK					4096
-	#define SMALL_BLOCKS				128
-	#define SMALL_SIZE					(((SMALL_BLOCKS * SMALL_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
+	#define SMALL_CHUNK					4096																									// Max size for small chunk
+	#define SMALL_BLOCKS				128																										// Number of small chunks per HEAP
+	#define SMALL_SIZE					(((SMALL_BLOCKS * SMALL_CHUNK) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))										// Total size of small heap, aligned to page
 
-	#define FREE_PERCENT				10.0f							// 
-	#define CHUNK_PERCENT				40.0f							// 
-	#define FRAG_PERCENT				90.0f							// 
+	// --- HEAP REMOVAL ---
+	#define FREE_PERCENT				10.0f																									// Max % of free memory in other heaps required to consider remove a heap
+	#define FRAG_PERCENT				90.0f																									// Minf % of ragmentation in other heaps required to consider remove a heap
 
 #pragma endregion
 
@@ -102,71 +102,71 @@
 #pragma region "Structures"
 
 	typedef struct s_chunk {
-		size_t			size;						// Size of the chunk's user data
-		size_t			magic;						// Magic or poison (depends on chunk status)
+		size_t			size;						// Size of the user data (include chunk flags)
+		size_t			magic;						// MAGIC header if in use, POISON pattern if freed
 	} t_chunk;
 
 	typedef struct s_heap_header {
-		uint8_t 		total;						// 50 or 60 heaps (depends if there is arena data)
-		uint8_t 		used;						// 
-		void			*next;						// Pointer to next heap header
+		uint8_t 		total;						// Max heap info that can be stored in a pagefile. A pagefile can store 73 or 85 heaps depending if there is arena info in that page
+		uint8_t 		used;						// Number of heap info stored
+		void			*next;						// Pointer to next heap header (in another pagefile)
 	} t_heap_header;
 
 	typedef struct s_heap {
-		void			*ptr;						// Pointer to the heap
-		size_t			padding;					// 
-		size_t			size;						// Size of the heap
-		size_t			free;						// Memory available for allocation in the heap
-		uint16_t		free_chunks;				// 
-		bool			active;						// Set to false when freed
-		int				type;						// Type of the heap
-		t_chunk			*top_chunk;					// Pointer to the top chunk
+		void			*ptr;						// Pointer to the start of the heap (first chunk)
+		size_t			padding;					// Unused space used as padding for the user pointer so it is aligned (only used in LARGE heaps)
+		size_t			size;						// Size of the heap (not including padding)
+		size_t			free;						// Memory available for allocation in the heap (not including padding)
+		uint16_t		free_chunks;				// Number of free chunks in the heap
+		bool			active;						// Indicate if the heap is in used. Set to false when freed (used to detect double free)
+		int				type;						// Type of the heap (TINY, SMALL or LARGE)
+		t_chunk			*top_chunk;					// Pointer to the top chunk (unused memory at the end)
 	} t_heap;
 
 	typedef struct s_arena {
-		int				id;
-		int				alloc_count;				// Current number of allocations
-		int				free_count;					// Current number of frees
-		void			*fastbin[20];				// (8 - 160) or (16 - 160) bytes with 8 bytes increment (LIFO)
-		void			*smallbin[31];				// (176-512 bytes para TINY, 513-4096 para SMALL) Doblemente enlazadas. Tamaños fijos (FIFO)
-		void			*unsortedbin;				// ???
-		void			*largebin[10];				// ???
-		t_heap_header	*heap_header;				// 
+		int				id;							// Arena ID (0 = main thread)
+		int				alloc_count;				// Total number of allocations
+		int				free_count;					// Total number of frees
+		void			*fastbin[20];				// LIFO bins for small sizes (8 to 160 bytes)
+		void			*smallbin[31];				// FIFO bins for small/medium chunks (fixed sizes)
+		void			*unsortedbin;				// Unsorted bin for recently freed chunks
+		void			*largebin[10];				// Reserved for large chunks
+		t_heap_header	*heap_header;				// Pointer to the first heap header
 		struct s_arena	*next;          			// Pointer to the next arena
-		pthread_mutex_t	mutex;          			// Mutex for thread safety in the current arena
+		pthread_mutex_t	mutex;          			// Arena mutex for thread safety
 	} t_arena;
 
 	typedef struct s_options {
-		int				MXFAST;						// Max size (in bytes) for allocations using fastbins (0 disables fastbins)
-		int				MIN_USAGE;					// Si una zona esta menos usada que esto, no usarla (pero si todas estan por debajo del threshold, usar la de mayor tamaño)
-		int				CHECK_ACTION;				// Muestra informacion cuando hay errores
-		unsigned char	PERTURB;					// Rellena la zona de memoria. malloc = ~PERTURB	free = PERTURB
-		int				ARENA_TEST;					// 
-		int				ARENA_MAX;					// Hard limit for arenas based on CPU count
-		bool			DEBUG;						// 
-		int				LOGGING;					// 
-		char 			LOGFILE[PATH_MAX];			// 
-		int				fd_out;						// 
+		int				MXFAST;						// Max size (bytes) for fastbin allocations
+		int				MIN_USAGE;					// Heaps under this usage % are skipped (unless all are under)
+		int				CHECK_ACTION;				// Behaviour on abort errors (0: abort, 1: warning, 2: silence)
+		unsigned char	PERTURB;					// Sets memory to the PERTURB value on allocation, and to value ^ 255 on free
+		int				ARENA_TEST;					// Number of arenas at which a hard limit on arenas is computed
+		int				ARENA_MAX;					// Maximum number of arenas allowed
+		int				DEBUG;						// Enables debug mode (1: error, 2: system)
+		int				LOGGING;					// Enables logging mode (1: to file, 2: to stderr)
+		char 			LOGFILE[PATH_MAX];			// Log file path
+		int				fd_out;						// File descriptor used for logs or output
 	} t_options;
 
 	typedef struct s_manager {
-		int				arena_count;				// Current number of arenas
-		t_options		options;					// Options
-		t_arena			arena;						// Main arena
-		size_t			alloc_zero_counter;			// 
-		char			*hist_buffer;				// 
-		size_t			hist_size;					// 
-		size_t			hist_pos;					// 
-		pthread_mutex_t	hist_mutex;					// Mutex for history synchronization
-		pthread_mutex_t	mutex;						// Mutex for global synchronization
+		int				arena_count;				// Number of arenas created
+		t_options		options;					// Global configuration options
+		t_arena			arena;						// Main arena (thread 0)
+		size_t			alloc_zero_counter;			// Counter for malloc(0) calls
+		char			*hist_buffer;				// History buffer
+		size_t			hist_size;					// Size of history buffer
+		size_t			hist_pos;					// Current write position in history buffer
+		pthread_mutex_t	hist_mutex;					// History mutex for thread safety
+		pthread_mutex_t	mutex;						// Global mutex for thread safety
 	} t_manager;
 
 #pragma endregion
 
 #pragma region "Variables"
 
-	extern __thread t_arena	*tcache;				// 
-	extern t_manager		g_manager;				// 
+	extern __thread t_arena	*tcache;				// Thread-local arena
+	extern t_manager		g_manager;				// Main structure
 
 #pragma endregion
 
@@ -176,13 +176,11 @@
 	int		mutex(pthread_mutex_t *ptr_mutex, int action);
 	void	*internal_alloc(size_t size);
 	int		internal_free(void *ptr, size_t size);
-	void	forksafe_init();
+	bool	print_log(int mode);
+	bool	print_error();
+	int		abort_now();
 	void	ensure_init();
 	size_t	get_pagesize();
-	int		check_digit(void *ptr1, void *ptr2);
-	int		abort_now();
-	bool	print_log(bool error);
-	bool	print_error();
 
 	// Options
 	void	options_initialize();

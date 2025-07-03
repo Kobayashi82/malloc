@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/02 13:23:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:55:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@
 				next->size |= PREV_INUSE;
 
 				ptr = GET_PTR(chunk);
-				if (print_log(0)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
+				if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
 
 				t_heap *heap = heap_find(arena, GET_PTR(chunk));
 				if (heap && heap->active) {

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:16:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/06/30 19:27:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 14:09:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@
 	//   • M_CHECK_ACTION (-5)         (0-2):  Behaviour on abort errors (0: abort, 1: warning, 2: silence).
 	//   • M_MXFAST (1)              (0-160):  Max size (bytes) for fastbin allocations.
 	//   • M_MIN_USAGE (3)           (0-100):  Heaps under this usage % are skipped (unless all are under).
-	//   • M_DEBUG (7)                 (0-1):  Enables debug mode.
-	//   • M_LOGGING (8)               (0-1):  Stores backtrace with each allocation to a file.
+	//   • M_DEBUG (7)                 (0-1):  Enables debug mode (1: errors, 2: system).
+	//   • M_LOGGING (8)               (0-1):  Enables logging mode (1: to file, 2: to stderr).
 	//
 	// Notes:
 	//   • If both M_DEBUG and M_LOGGING are enabled:

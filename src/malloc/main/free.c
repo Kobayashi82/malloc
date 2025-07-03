@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:21:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/03 13:49:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@
 
 				// Corruption
 				if (!HAS_MAGIC(ptr)) {
-					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted memory (LARGE)\n", ptr);
-					if (print_error())		aprintf(2, 0, "Corrupted memory\n");
+					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (LARGE)\n", ptr);
+					if (print_error())		aprintf(2, 0, "Memory corrupted\n");
 					return (abort_now());
 				}
 
@@ -66,8 +66,8 @@
 
 		// Corruption
 		if (!HAS_MAGIC(ptr)) {
-			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted memory\n", ptr);
-			if (print_error())				aprintf(2, 0, "Corrupted memory\n");
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", ptr);
+			if (print_error())				aprintf(2, 0, "Memory corrupted\n");
 			return (abort_now());
 		}
 
