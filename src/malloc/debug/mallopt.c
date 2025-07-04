@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:16:03 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 14:09:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 17:47:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@
 	//   • M_LOGGING (8)               (0-1):  Enables logging mode (1: to file, 2: to stderr).
 	//
 	// Notes:
+	//   • Changes are not allowed after the first memory allocation.
 	//   • If both M_DEBUG and M_LOGGING are enabled:
 	//       – uses $MALLOC_LOGFILE if defined, or fallback to "/tmp/malloc_[PID].log"
 

@@ -250,3 +250,29 @@ make test-compatibility  # Programas reales
 ## License
 
 This project is licensed under the WTFPL – [Do What the Fuck You Want to Public License](http://www.wtfpl.net/about/).
+
+## Main
+
+- [X] free
+- [X] malloc
+- [X] realloc
+- [X] calloc
+
+## Extra
+
+- [X] reallocarray
+- [X] aligned_alloc
+- [X] memalign
+- [X] posix_memalign
+- [X] malloc_usable_size
+- [X] valloc
+- [X] pvalloc
+
+## Debug
+
+- [X] mallopt
+- [X] show_alloc_mem
+- [X] show_alloc_mem_ex
+- [X] show_alloc_hist
+
+- [ ] Fork-Safe
