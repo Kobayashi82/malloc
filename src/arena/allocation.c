@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 13:33:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 14:23:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@
 				ptr = heap_create(tcache, LARGE, size, alignment);
 			} else {
 				size_t user_chunk_size = ALIGN(size + sizeof(t_chunk));
-				size_t worst_case_total = (alignment - 1 + sizeof(t_chunk) + (2 * sizeof(void *) + sizeof(uint32_t))) + user_chunk_size;
+				size_t worst_case_total = (alignment - 1 + sizeof(t_chunk) + sizeof(void *) + sizeof(uint32_t)) + user_chunk_size;
 
 				int type = (worst_case_total > TINY_CHUNK) ? SMALL : TINY;
 				t_heap *heap = get_bestheap(tcache, type, worst_case_total);
@@ -91,7 +91,7 @@
 					heap->free -= user_chunk_size;
 					ptr = GET_PTR(chunk);
 				} else {
-					size_t min_padding_size = sizeof(t_chunk) + (2 * sizeof(void *) + sizeof(uint32_t));
+					size_t min_padding_size = sizeof(t_chunk) + sizeof(void *) + sizeof(uint32_t);
 					if (padding_needed < min_padding_size) {
 						aligned_user_addr += ALIGN_UP(min_padding_size - padding_needed, alignment);
 						padding_needed = ((char *)aligned_user_addr - sizeof(t_chunk)) - (char *)heap->top_chunk;
