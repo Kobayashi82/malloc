@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 15:02:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 22:51:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,9 +128,9 @@
 		int				alloc_count;				// Total number of allocations
 		int				free_count;					// Total number of frees
 		void			*fastbin[20];				// LIFO bins for small sizes (8 to 160 bytes)
-		void			*smallbin[31];				// FIFO bins for small/medium chunks (fixed sizes)
+		void			*smallbin[66];				// FIFO bins for small/medium chunks (fixed sizes)
 		void			*unsortedbin;				// Unsorted bin for recently freed chunks
-		void			*largebin[10];				// Reserved for large chunks
+		void			*largebin[257];				// Reserved for large chunks
 		t_heap_header	*heap_header;				// Pointer to the first heap header
 		struct s_arena	*next;          			// Pointer to the next arena
 		pthread_mutex_t	mutex;          			// Arena mutex for thread safety

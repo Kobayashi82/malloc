@@ -6,13 +6,164 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 20:56:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 23:01:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "arena.h"
+
+#pragma endregion
+
+#pragma region "Link Chunk"
+
+	int link_chunk(t_chunk *chunk, size_t size, int type, t_arena *arena, t_heap *heap) {
+		if (!chunk || !size || !arena || !heap || chunk->size & TOP_CHUNK) return (1);
+
+		heap->free_chunks++;
+
+		if (!HAS_POISON(GET_PTR(chunk))) {
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
+			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
+			return (abort_now());
+		}
+
+		switch (type) {
+			case FASTBIN: {
+				int index = (size - 1) / ALIGNMENT;
+				if (index >= g_manager.options.MXFAST / ALIGNMENT) return (1);
+
+				SET_FD(chunk, arena->fastbin[index]);
+				arena->fastbin[index] = chunk;
+
+				if (g_manager.options.PERTURB) {
+					void *FD = GET_FD(chunk);
+					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB, GET_SIZE(chunk));
+					SET_FD(chunk, FD);
+					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+				}
+
+				if (print_log(2))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to FastBin\n", chunk);
+
+				return (0);
+			}
+			case SMALLBIN: {
+				int index = (size - 1) / ALIGNMENT;
+				if (index >= 1040 / ALIGNMENT) return (1);
+
+				SET_FD(chunk, arena->smallbin[index]);
+				arena->smallbin[index] = chunk;
+
+				if (g_manager.options.PERTURB) {
+					void *FD = GET_FD(chunk);
+					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB, GET_SIZE(chunk));
+					SET_FD(chunk, FD);
+					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+				}
+
+				if (print_log(2))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to Smallbin\n", chunk);
+
+				return (0);
+			}
+			case UNSORTEDBIN: {
+				if (g_manager.options.PERTURB) {
+					void *FD = GET_FD(chunk);
+					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB, GET_SIZE(chunk));
+					SET_FD(chunk, FD);
+					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+				}
+
+				if (print_log(2))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to UnsortedBin\n", chunk);
+
+				return (0);
+			}
+			case LARGEBIN: {
+				int index = (size - 1) / ALIGNMENT;
+				if (index >= 4096 / ALIGNMENT) return (1);
+
+				SET_FD(chunk, arena->largebin[index]);
+				arena->largebin[index] = chunk;
+
+				if (g_manager.options.PERTURB) {
+					void *FD = GET_FD(chunk);
+					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB, GET_SIZE(chunk));
+					SET_FD(chunk, FD);
+					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+				}
+
+				if (print_log(2))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to Largebin\n", chunk);
+
+				return (0);
+			}
+		}
+
+		return (1);
+	}
+
+#pragma endregion
+
+#pragma region "Unlink Chunk"
+
+	int unlink_chunk(t_chunk *chunk, t_arena *arena, t_heap *heap) {
+		if (!chunk || !arena || !heap) return (1);
+
+		if (heap->free_chunks > 0) heap->free_chunks--;
+		if (!HAS_POISON(GET_PTR(chunk))) {
+			return (1);
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
+			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+			mutex(&arena->mutex, MTX_UNLOCK);
+			show_alloc_mem_ex(GET_PTR(chunk), 0, 0);
+			return (abort_now());
+		}
+
+		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
+		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
+			int index = (chunk_size - 1) / ALIGNMENT;
+			if (index >= g_manager.options.MXFAST / ALIGNMENT) return (1);
+
+			void **curr = &arena->fastbin[index];
+			while (*curr) {
+				if (*curr == chunk) {
+					*curr = GET_FD(chunk);
+					return (0);
+				}
+				curr = &(GET_FD(*curr));
+			}
+		} else if (chunk_size <= 1040) {
+			int index = (chunk_size - 1) / ALIGNMENT;
+			if (index >= 1040 / ALIGNMENT) return (1);
+
+			void **curr = &arena->smallbin[index];
+			while (*curr) {
+				if (*curr == chunk) {
+					*curr = GET_FD(chunk);
+					return (0);
+				}
+				curr = &(GET_FD(*curr));
+			}
+		} else if (chunk_size <= 4096) {
+			int index = (chunk_size - 1) / ALIGNMENT;
+			if (index >= 4096 / ALIGNMENT) return (1);
+
+			void **curr = &arena->largebin[index];
+			while (*curr) {
+				if (*curr == chunk) {
+					*curr = GET_FD(chunk);
+					return (0);
+				}
+				curr = &(GET_FD(*curr));
+			}
+		}
+
+		return (1);
+	}
 
 #pragma endregion
 
@@ -136,13 +287,63 @@
 
 	#pragma region "SmallBin"
 
-		// static void *find_in_smallbin(t_arena *arena, size_t size) {
-		// 	if (!arena || !size) return (NULL);
+		static void *find_in_smallbin(t_arena *arena, size_t size) {
+			if (!arena || !size) return (NULL);
 
-		// 	void *ptr = NULL;
+			void *ptr = NULL;
 
-		// 	return (ptr);
-		// }
+			int index = (size - 1) / ALIGNMENT;
+			if (index >= 1040 / ALIGNMENT) return (ptr);
+			if (arena->smallbin[index]) {
+				t_chunk *chunk = (t_chunk *)arena->smallbin[index];
+				arena->smallbin[index] = GET_FD(chunk);
+				t_chunk *next = GET_NEXT(chunk);
+				next->size |= PREV_INUSE;
+				
+				ptr = GET_PTR(chunk);
+				if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Smallbin match for size %d bytes\n", ptr, size);
+				t_heap *heap = heap_find(arena, ptr);
+				if (heap && heap->active) {
+					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
+					if (heap->free_chunks > 0) heap->free_chunks--;
+
+					return (ptr);
+				}
+			}
+
+			return (ptr);
+		}
+
+	#pragma endregion
+
+	#pragma region "LargeBin"
+
+		static void *find_in_largebin(t_arena *arena, size_t size) {
+			if (!arena || !size) return (NULL);
+
+			void *ptr = NULL;
+
+			int index = (size - 1) / ALIGNMENT;
+			if (index >= 4096 / ALIGNMENT) return (ptr);
+			if (arena->largebin[index]) {
+				t_chunk *chunk = (t_chunk *)arena->largebin[index];
+				arena->largebin[index] = GET_FD(chunk);
+				t_chunk *next = GET_NEXT(chunk);
+				next->size |= PREV_INUSE;
+
+				ptr = GET_PTR(chunk);
+				if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Largebin match for size %d bytes\n", ptr, size);
+				t_heap *heap = heap_find(arena, ptr);
+				if (heap && heap->active) {
+					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
+					if (heap->free_chunks > 0) heap->free_chunks--;
+
+					return (ptr);
+				}
+			}
+
+			return (ptr);
+		}
 
 	#pragma endregion
 
@@ -160,11 +361,11 @@
 		size = ALIGN(size + sizeof(t_chunk));
 		if (size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, size);
 
-		// if (!ptr && size <= MAX_SIZE_BIN) ptr = find_in_smallbin(arena, size);
+		if (!ptr && size <= 1040) ptr = find_in_smallbin(arena, size);
 		// if (!ptr) ptr = find_in_unsortedbin(arena, size);
-		// if (!ptr) ptr = find_in_largebin(arena, size);
+		if (!ptr && size <= 4096) ptr = find_in_largebin(arena, size);
 		// if (!ptr && fastbin no vacio, repite
-		// if (!ptr) ptr = find_in_largebin(arena, size);
+		// if (!ptr && size <= 4096) ptr = find_in_largebin(arena, size);
 
 		if (!ptr) {
 			int type = (size > TINY_CHUNK) ? SMALL : TINY;
@@ -214,5 +415,18 @@
 	// - largebin
 	// - repeat if fastbin not empty
 	// - top chunk
+
+	// Si large → mmap?
+	// Fastbin exact match
+	// Smallbin exact match
+	// Si large → consolidar fastbins a unsortedbin
+	// Procesar unsortedbin → small/large bins (coalescing)
+	// Si large → buscar en largebin y superiores (split si > MINSIZE)
+	// Si quedan fastbins → consolidar y repetir
+	// Split top chunk
+
+	// stress-ng --malloc 4 --malloc-bytes 1G --verify --timeout 10s
+	// git clone https://github.com/redis/redis
+	// ffmpeg -f lavfi -i testsrc=duration=10:size=1920x1080 -c:v libx264 test.mp4
 
 #pragma endregion

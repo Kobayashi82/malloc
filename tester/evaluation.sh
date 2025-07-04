@@ -211,6 +211,11 @@ else
 	echo -e "Error Handle: ${GREEN}✓${NC}"
 fi
 
+echo
+echo
+echo "Press any key to continue..."
+read -n 1 -s
+
 # Show Alloc Mem
 echo
 echo -e "  ${CYAN}SHOW_ALLOC_MEM${YELLOW}${NC}"
