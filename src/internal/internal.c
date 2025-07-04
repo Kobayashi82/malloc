@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 15:01:56 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 12:33:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@
 
 	bool print_log(int mode) {
 		if (mode == 1) return (g_manager.options.DEBUG || g_manager.options.LOGGING);
-		if (mode == 2) return (g_manager.options.DEBUG == 2 || g_manager.options.LOGGING);
+		if (mode == 2) return (g_manager.options.DEBUG == 2 && g_manager.options.LOGGING);
 		return (g_manager.options.LOGGING);
 	}
 

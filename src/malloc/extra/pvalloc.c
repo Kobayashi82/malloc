@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 22:43:25 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 20:55:10 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 13:26:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,6 @@
 		}
 
 		ptr = allocate_aligned("PVCALLOC", PAGE_SIZE, size);
-
-		if (ptr && print_log(0))	aprintf(g_manager.options.fd_out, 1, "%p\t [PVALLOC] Allocated %u bytes\n", ptr, size);
-		if (!ptr && print_log(1))	aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to allocated %u bytes\n", size);
-
-		if (ptr) SET_MAGIC(ptr);
-		else errno = ENOMEM;
 
 		return (ptr);
 	}

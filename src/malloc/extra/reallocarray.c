@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 12:37:30 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 23:05:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 13:45:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,17 +95,30 @@
 		void	*new_ptr = NULL;
 		bool	is_new = false;
 		t_heap	*heap = NULL;
+		t_arena	*arena = &g_manager.arena;
 
-		mutex(&tcache->mutex, MTX_LOCK);
+		mutex(&g_manager.mutex, MTX_LOCK);
 
-			heap = heap_find(tcache, ptr);
-			if (!heap) {
-				mutex(&tcache->mutex, MTX_UNLOCK);
-				return (abort_now(), NULL);
+			while (arena) {
+				mutex(&arena->mutex, MTX_LOCK);
+
+					if ((heap = heap_find(arena, ptr)) && heap->active) {
+						mutex(&arena->mutex, MTX_UNLOCK);
+						break;
+					}
+
+				mutex(&arena->mutex, MTX_UNLOCK);
+				arena = arena->next;
 			}
 
+		mutex(&g_manager.mutex, MTX_UNLOCK);
+
+		if (!arena || !heap || !heap->active) return (abort_now(), NULL);
+
+		mutex(&arena->mutex, MTX_LOCK);
+
 			if (usable_ptr(ptr, heap)) {
-				mutex(&tcache->mutex, MTX_UNLOCK);
+				mutex(&arena->mutex, MTX_UNLOCK);
 				return (abort_now(), NULL);
 			}
 
@@ -125,7 +138,7 @@
 						t_chunk *next_chunk = GET_NEXT(new_chunk);
 						SET_PREV_SIZE(next_chunk, remaining - sizeof(t_chunk));
 						next_chunk->size &= ~PREV_INUSE;
-						link_chunk(new_chunk, remaining - sizeof(t_chunk), heap->type, tcache, heap);
+						link_chunk(new_chunk, remaining - sizeof(t_chunk), heap->type, arena, heap);
 						heap->free += remaining;
 						new_ptr = ptr;
 					} else new_ptr = ptr;
@@ -153,7 +166,7 @@
 								}
 								break;
 							} else {
-								unlink_chunk(next, tcache, heap);
+								unlink_chunk(next, arena, heap);
 								absorbed += GET_SIZE(next) + sizeof(t_chunk);
 								if (absorbed >= extra_needed) { can_extend = true; break; }
 								heap->free_chunks--;
@@ -177,7 +190,7 @@
 									t_chunk *next_chunk = GET_NEXT(new_chunk);
 									SET_PREV_SIZE(next_chunk, remaining - sizeof(t_chunk));
 									next_chunk->size &= ~PREV_INUSE;
-									link_chunk(new_chunk, remaining - sizeof(t_chunk), heap->type, tcache, heap);
+									link_chunk(new_chunk, remaining - sizeof(t_chunk), heap->type, arena, heap);
 									heap->free += remaining;
 								}
 							}
@@ -194,7 +207,7 @@
 				} else new_ptr = ptr;
 			}
 		
-			mutex(&tcache->mutex, MTX_UNLOCK);
+			mutex(&arena->mutex, MTX_UNLOCK);
 
 		if (new_ptr && g_manager.options.PERTURB && heap->type != LARGE) {
 			size_t new_size = GET_SIZE((t_chunk *)GET_HEAD(new_ptr));

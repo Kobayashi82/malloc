@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 14:50:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 13:33:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,7 @@
 			tcache = arena_get();
 			if (!tcache) {
 				if (print_log(1)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] Failed to assign arena\n");
-				errno = ENOMEM;
-				return (NULL);
+				errno = ENOMEM; return (NULL);
 			}
 		}
 

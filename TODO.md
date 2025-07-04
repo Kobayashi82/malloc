@@ -7,12 +7,6 @@
 - [ ] Largebin - (coalescing)
 - [ ] Coalescing
 
-- [ ] Poner bonito allocate_aligned()
-- [ ] heap_find (solo busca en la arena actual)
-- [ ] heap_create (reutilizar old heaps)
-
-- [ ] Data-Races
-
 ## Main
 
 - [X] free
