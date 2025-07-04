@@ -320,7 +320,7 @@ Notes:
 
 ### SHOW ALLOCATION MEMORY
 
-Muestra información sobre el estado actual de la memoria asignada. Proporciona un resumen de los bloques en uso.
+Muestra información sobre el estado actual de la memoria asignada y proporciona un resumen de los bloques en uso.
 
 ```c
   void show_alloc_mem(void);
@@ -328,7 +328,7 @@ Muestra información sobre el estado actual de la memoria asignada. Proporciona 
   • On success: prints a detailed report of all current allocations.
 
 Notes:
-  • Output is written to file descriptor 1 (stdout).
+  • Output is written to file descriptor 2 (stderr).
   • Heaps are sorted before printing, and grouped by arena.
 ```
 

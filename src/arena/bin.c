@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 13:55:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 20:56:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,11 +117,10 @@
 				arena->fastbin[index] = GET_FD(chunk);
 				t_chunk *next = GET_NEXT(chunk);
 				next->size |= PREV_INUSE;
-
+				
 				ptr = GET_PTR(chunk);
 				if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
-
-				t_heap *heap = heap_find(arena, GET_PTR(chunk));
+				t_heap *heap = heap_find(arena, ptr);
 				if (heap && heap->active) {
 					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
 					if (heap->free_chunks > 0) heap->free_chunks--;
@@ -167,19 +166,21 @@
 		// if (!ptr && fastbin no vacio, repite
 		// if (!ptr) ptr = find_in_largebin(arena, size);
 
-		int type = (size > TINY_CHUNK) ? SMALL : TINY;
-		t_heap *heap = get_bestheap(arena, type, size);
-		if (heap) {
-			t_chunk	*chunk = split_top_chunk(heap, size);
-			if (!chunk) {
-				heap = (t_heap *)heap_create(arena, type, (type == TINY) ? TINY_SIZE : SMALL_SIZE, 0);
-				if (!heap) return (ptr);
-				chunk = split_top_chunk(heap, size);
-				if (!chunk) return (ptr);
-			}
+		if (!ptr) {
+			int type = (size > TINY_CHUNK) ? SMALL : TINY;
+			t_heap *heap = get_bestheap(arena, type, size);
+			if (heap) {
+				t_chunk	*chunk = split_top_chunk(heap, size);
+				if (!chunk) {
+					heap = (t_heap *)heap_create(arena, type, (type == TINY) ? TINY_SIZE : SMALL_SIZE, 0);
+					if (!heap) return (ptr);
+					chunk = split_top_chunk(heap, size);
+					if (!chunk) return (ptr);
+				}
 
-			heap->free -= size;
-			ptr = (GET_PTR(chunk));
+				heap->free -= size;
+				ptr = (GET_PTR(chunk));
+			}
 		}
 
 		return (ptr);
@@ -198,5 +199,20 @@
 	// if (chunk->size & PREV_INUSE) {		// Comprobar bit
 	// chunk->size ^= PREV_INUSE;			// Alternar bit
 	// chunk->size & ~15;					// Limpiar bits
+
+	// - [ ] Fastbin (MXFAST) - (no coalescing)
+	// - [ ] Smallbin - (coalescing)
+	// - [ ] Unsortedbin
+	// - [ ] Largebin - (coalescing)
+	// - [ ] Coalescing
+
+	// - mmap (if too large)
+	// - fastbin
+	// - smallbin
+	// - coalescing
+	// - unsorted bin
+	// - largebin
+	// - repeat if fastbin not empty
+	// - top chunk
 
 #pragma endregion

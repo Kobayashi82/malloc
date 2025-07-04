@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/05 11:00:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 14:49:49 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 20:56:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,14 +211,5 @@
 	// Si large → buscar en largebin y superiores (split si > MINSIZE)
 	// Si quedan fastbins → consolidar y repetir
 	// Split top chunk
-
-	// - mmap (if too large)
-	// - fastbin
-	// - smallbin
-	// - coalescing
-	// - unsorted bin
-	// - largebin
-	// - repeat if fastbin not empty
-	// - top chunk
 
 #pragma endregion

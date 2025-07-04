@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:02 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 12:20:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/04 19:42:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,7 +243,7 @@
 	//   • On success: prints a detailed report of all current allocations.
 	//
 	// Notes:
-	//   • Output is written to file descriptor 1 (stdout).
+	//   • Output is written to file descriptor 2 (stderr).
 	//   • Heaps are sorted before printing, and grouped by arena.
 
 #pragma endregion

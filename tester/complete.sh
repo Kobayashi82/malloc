@@ -1,8 +1,5 @@
 #!/bin/bash
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-cd "$SCRIPT_DIR"
-
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -11,6 +8,25 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 MAGENTA='\033[0;35m'
 NC='\033[0m'
+
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo ""
+	echo -e "${CYAN}Usage: $0 [options]${NC}"
+    echo ""
+    echo "Options:"
+	echo ""
+    echo "  --help, -h       Show this help message"
+    echo "  --main           Run only main functions test"
+    echo "  --alignment      Run only alignment functions test"
+    echo "  --extra          Run only extra functions test"
+    echo "  --stress         Run only stress test"
+    echo "  (no options)     Run all tests with detailed output"
+	echo ""
+    exit 0
+fi
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd "$SCRIPT_DIR"
 
 # Function to print colored output
 print_header() {
@@ -52,25 +68,12 @@ if make -s all_silent; then
 else
 	echo ""
     print_error "Failed to compile test suites"
+	rm -f run_all_tests test_main test_extra test_alignment test_stress 2> /dev/null
     exit 1
 fi
 
 # Check if user wants to run specific tests
-if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-    echo ""
-	echo -e "${CYAN}Usage: $0 [options]${NC}"
-    echo ""
-    echo "Options:"
-	echo ""
-    echo "  --help, -h       Show this help message"
-    echo "  --main           Run only main functions test"
-    echo "  --alignment      Run only alignment functions test"
-    echo "  --extra          Run only extra functions test"
-    echo "  --stress         Run only stress test"
-    echo "  (no options)     Run all tests with detailed output"
-	echo ""
-    exit 0
-elif [ "$1" = "--main" ]; then
+if [ "$1" = "--main" ]; then
     echo ""
     ./test_main
 elif [ "$1" = "--alignment" ]; then
