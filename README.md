@@ -74,6 +74,7 @@ export LD_PRELOAD="[malloc_path]/lib/libft_malloc.so"
 ### Integración en Código C
 ```c
 #include <stdlib.h>
+#include "malloc.h"
 
 int main() {
     // Usar malloc normalmente
