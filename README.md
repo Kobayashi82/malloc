@@ -6,7 +6,7 @@ Malloc es un proyecto de la escuela 42 que implementa un sistema completo de ges
 
 ## ✨ Características
 
-### 🔧 Funcionalidades Base
+### 🔧 Funcionalidades
 - **Funciones Estándar**: `malloc()`, `calloc()`, `free()`, `realloc()`
 - **Funciones Adicionales**: `reallocarray()`, `aligned_alloc()`, `memalign()`, `posix_memalign()`, `malloc_usable_size()`, `valloc()`, `pvalloc()`
 - **Funciones de Depuración**: `mallopt()`, `show_alloc_history()`, `show_alloc_mem()`, `show_alloc_mem_ex()`
