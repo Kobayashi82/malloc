@@ -56,11 +56,11 @@ make
 export LD_LIBRARY_PATH="[malloc_path]/lib:$LD_LIBRARY_PATH"
 export LD_PRELOAD="libft_malloc.so"
 
-# or
+# o
 
 export LD_PRELOAD="[malloc_path]/lib/libft_malloc.so"
 
-# or
+# o
 
 # Ejecutar loader
 ./tester/load.sh
