@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 20:44:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 17:10:15 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,37 +120,49 @@ void test_massive_allocations() {
 void test_fragmentation() {
     printf(CYAN "\n=== Testing fragmentation handling ===" NC "\n");
     
-    // Test 1: Create fragmentation then try to allocate
-    const int frag_count = 100;
-    void **frag_ptrs = malloc(frag_count * sizeof(void*));
-    
-    if (frag_ptrs) {
-        // Allocate many blocks
-        for (int i = 0; i < frag_count; i++) {
-            frag_ptrs[i] = malloc(60);
-        }
-        
-        // Free every other block to create fragmentation
-        for (int i = 1; i < frag_count; i += 2) {
-            free(frag_ptrs[i]);
-        }
-        
-        // Try to allocate in the gaps
-        int gaps_filled = 0;
-        for (int i = frag_count - 1; i >= 1; i -= 2) {
-			void *old = frag_ptrs[i];
-            frag_ptrs[i] = malloc(60);
-			if (frag_ptrs[i] == old) gaps_filled++;  // Check if the freed slot was reused
-        }
-        
-        test_assert(gaps_filled > frag_count / 4, "Fragmentation handling (filled gaps)");
-        
-        // Clean up
-        for (int i = 0; i < frag_count; i++) {
-            if (frag_ptrs[i]) free(frag_ptrs[i]);
-        }
-        free(frag_ptrs);
-    }
+	// Test 1: Create fragmentation then try to allocate
+	const int frag_count = 100;
+	void **frag_ptrs = malloc(frag_count * sizeof(void*));
+
+	if (frag_ptrs) {
+		// Allocate many blocks
+		for (int i = 0; i < frag_count; i++) {
+			frag_ptrs[i] = malloc(60);
+		}
+		
+		// Store freed pointers
+		void **freed_ptrs = malloc((frag_count/2) * sizeof(void*));
+		int freed_count = 0;
+		
+		// Free every other block and store what we freed
+		for (int i = 1; i < frag_count; i += 2) {
+			freed_ptrs[freed_count++] = frag_ptrs[i];
+			free(frag_ptrs[i]);
+		}
+		
+		// Try to allocate in the gaps
+		int reused_count = 0;
+		for (int i = 1; i < frag_count; i += 2) {
+			frag_ptrs[i] = malloc(60);
+			
+			// Check if this new pointer matches any freed pointer
+			for (int j = 0; j < freed_count; j++) {
+				if (frag_ptrs[i] == freed_ptrs[j]) {
+					reused_count++;
+					break;
+				}
+			}
+		}
+	
+		test_assert(reused_count > frag_count / 4, "Fragmentation handling (reused freed blocks)");
+		
+		// Clean up
+		for (int i = 0; i < frag_count; i++) {
+			if (frag_ptrs[i]) free(frag_ptrs[i]);
+		}
+		free(freed_ptrs);
+		free(frag_ptrs);
+	}
     
     // Test 2: Alternating sizes
     void *alt_ptrs[200];

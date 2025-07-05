@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 16:35:28 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 17:01:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,33 +16,88 @@
 
 #pragma endregion
 
+#pragma region "Coalescing"
+
+	t_chunk *coalescing_neighbours(t_chunk *chunk, t_arena *arena, t_heap *heap) {
+		if (!chunk || !arena || !heap) return (chunk);
+
+		t_chunk *chunk_prev = NULL;
+		t_chunk *chunk_next = NULL;
+		t_chunk *chunk_final = chunk;
+
+		if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Coalescing adjacent chunks\n", chunk);
+
+		// Coalescing Left
+		if (!(chunk->size & PREV_INUSE)) {
+			chunk_prev = GET_PREV(chunk);
+
+			if (HAS_POISON(GET_PTR(chunk_prev))) {
+				if (unlink_chunk(chunk_prev, arena, heap) == 0) {
+					size_t new_size = GET_SIZE(chunk_prev) + GET_SIZE(chunk) + sizeof(t_chunk);
+					chunk_prev->size = (chunk_prev->size & (HEAP_TYPE | PREV_INUSE)) | new_size;
+					
+					chunk_next = GET_NEXT(chunk_prev);
+					SET_PREV_SIZE(chunk_next, new_size);
+					
+					chunk_final = chunk_prev;
+				}
+			}
+		}
+
+		// Coalescing Right
+		chunk_next = GET_NEXT(chunk_final);
+		
+		if (chunk_next->size & TOP_CHUNK) {
+			if (HAS_MAGIC(GET_PTR(chunk_next))) {
+				size_t new_size = GET_SIZE(chunk_final) + GET_SIZE(chunk_next) + sizeof(t_chunk);
+				chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | TOP_CHUNK | new_size;
+				heap->top_chunk = chunk_final;
+				SET_MAGIC(GET_PTR(chunk_final));
+			} else {
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (top chunk)\n", GET_PTR(chunk_next));
+				if (print_error())		aprintf(2, 0, "Memory corrupted\n");
+				abort_now();
+			}
+		} else {
+			t_chunk *chunk_next_next = GET_NEXT(chunk_next);
+			if (!(chunk_next_next->size & PREV_INUSE) && HAS_POISON(GET_PTR(chunk_next))) {
+				if (unlink_chunk(chunk_next, arena, heap) == 0) {
+					size_t new_size = GET_SIZE(chunk_final) + GET_SIZE(chunk_next) + sizeof(t_chunk);
+					chunk_final->size = (chunk_final->size & (HEAP_TYPE | PREV_INUSE)) | new_size;
+					
+					chunk_next_next = GET_NEXT(chunk_final);
+					SET_PREV_SIZE(chunk_next_next, new_size);
+				}
+			}
+		}
+
+		if (!(chunk_final->size & TOP_CHUNK)) link_chunk(chunk_final, arena, heap);
+
+		return (chunk_final);
+	}
+
+#pragma endregion
+
 #pragma region "Link Chunk"
 
 	int link_chunk(t_chunk *chunk, t_arena *arena, t_heap *heap) {
-		if (!chunk || !arena || !heap || chunk->size & TOP_CHUNK) return (1);
+		if (!chunk || !arena || !heap || (chunk->size & TOP_CHUNK)) return (1);
+		
 		heap->free_chunks++;
 		
-		SET_FD(chunk, NULL);
-
-		if (!HAS_POISON(GET_PTR(chunk))) {
-			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (link)\n", GET_PTR(chunk));
-			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
-			return (abort_now());
-		}
-
-		size_t size = GET_SIZE(chunk) + sizeof(t_chunk);
-		int index = (size / ALIGNMENT) - 1;
+		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
+		int index = (chunk_size / ALIGNMENT) - 1;
 		if ((size_t)index >= (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) return (1);
 		
 		SET_FD(chunk, arena->bins[index]);
 		arena->bins[index] = chunk;
 
 		if (g_manager.options.PERTURB) {
-			void *FD = GET_FD(chunk);
-			uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
+			void *fd_backup = GET_FD(chunk);
+			uint32_t prev_size_backup = GET_PREV_SIZE(GET_NEXT(chunk));
 			ft_memset(GET_PTR(chunk), g_manager.options.PERTURB, GET_SIZE(chunk));
-			SET_FD(chunk, FD);
-			SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
+			SET_FD(chunk, fd_backup);
+			SET_PREV_SIZE(GET_NEXT(chunk), prev_size_backup);
 		}
 
 		if (print_log(2))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk added to Bin\n", chunk);
@@ -59,44 +114,24 @@
 
 		if (heap->free_chunks > 0) heap->free_chunks--;
 
-		if (!HAS_POISON(GET_PTR(chunk))) {
-			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (unlink)\n", GET_PTR(chunk));
-			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
-			return (abort_now());
-		}
-
 		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
 		int index = (chunk_size / ALIGNMENT) - 1;
-		if ((size_t)index >= SMALL_CHUNK + sizeof(t_chunk)) return (1);
+		if ((size_t)index >= (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) return (1);
 
-		aprintf(2, 0, "Me cago en tu puta madre\n");
-void **curr = &arena->bins[index];
-int iterations = 0;
-while (*curr && iterations < 10) {  // Límite de seguridad
-    aprintf(2, 0, "Iteration %d: curr=%p, *curr=%p, chunk=%p\n", iterations, curr, *curr, chunk);
-    aprintf(2, 0, "GET_FD(*curr)=%p\n", GET_FD(*curr));
-    
-    if (*curr == chunk) {
-        *curr = GET_FD(chunk);
-        aprintf(2, 0, "Found and removed chunk\n");
-        return (0);
-    }
-    
-    // Verificar que el siguiente puntero no es NULL antes de avanzar
-    void *next_fd = GET_FD(*curr);
-    if (!next_fd) {
-        aprintf(2, 0, "Next FD is NULL, breaking\n");
-        break;
-    }
-    
-    curr = (void**)((char*)*curr + sizeof(t_chunk));
-    iterations++;
-}
-aprintf(2, 0, "Chunk not found after %d iterations\n", iterations);
-		aprintf(2, 0, "Cabron\n");
-		if (print_log(2))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk removed from Bin\n", chunk);
+		t_chunk **current = (t_chunk **)&arena->bins[index];
+		
+		while (*current) {
+			if (*current == chunk) {
+				*current = (t_chunk *)GET_FD(chunk);
+				SET_FD(chunk, NULL);
+				
+				if (print_log(2))	aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Chunk removed from Bin\n", chunk);
+				return (0);
+			}
+			current = (t_chunk **)((char *)*current + sizeof(t_chunk));
+		}
 
-		return (0);
+		return (1);
 	}
 
 #pragma endregion
@@ -188,33 +223,38 @@ aprintf(2, 0, "Chunk not found after %d iterations\n", iterations);
 
 #pragma region "Find in Bin"
 
-	// array = (MXFAST + sizeof(t_chunk)) / NORMAL_STEP
-	// index = (size / NORMAL_STEP) - 1
-
 	void *find_in_bin(t_arena *arena, size_t size) {
 		if (!arena || !size) return (NULL);
 
-		void *ptr = NULL;
-
 		int index = (size / ALIGNMENT) - 1;
-		if ((size_t)index >= (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) return (ptr);
+		if ((size_t)index >= (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) return (NULL);
 
 		if (arena->bins[index]) {
 			t_chunk *chunk = (t_chunk *)arena->bins[index];
+			
+			if (!HAS_POISON(GET_PTR(chunk))) {
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted chunk in bin\n", GET_PTR(chunk));
+				if (print_error())		aprintf(2, 0, "Memory corrupted\n");
+				return (NULL);
+			}
+			
+			arena->bins[index] = GET_FD(chunk);
+			SET_FD(chunk, NULL);
 			t_chunk *next = GET_NEXT(chunk);
 			next->size |= PREV_INUSE;
-			ptr = GET_PTR(chunk);
-
-			t_heap *heap = heap_find(arena, ptr);
-			if (heap && heap->active) {				
-				heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));				
-				unlink_chunk(chunk, arena, heap);
-				
-				if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Bin match for size %d bytes\n", ptr, size);
-			} else ptr = NULL;
+			
+			t_heap *heap = heap_find(arena, GET_PTR(chunk));
+			if (heap && heap->active) {
+				heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
+				if (heap->free_chunks > 0) heap->free_chunks--;
+			}
+			
+			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Bin match for size %zu bytes\n", GET_PTR(chunk), size);
+			
+			return (GET_PTR(chunk));
 		}
 
-		return (ptr);
+		return (NULL);
 	}
 
 #pragma endregion
