@@ -98,15 +98,15 @@ SRCS		= internal/internal.c internal/options.c					\
 # ─────────────────────────── RULES ─────────────────────────── #
 # ───────────────────────────────────────────────────────────── #
 
-all: _show_title $(LIB_DIR)/$(LIB_NAME)
-malloc: _show_title $(LIB_DIR)/$(LIB_NAME)
+all: _show_title $(LIB_DIR)$(LIB_NAME)
+$(NAME): _show_title $(LIB_DIR)$(LIB_NAME)
 
 SRC_PATHS	= $(addprefix $(SRC_DIR), $(SRCS))
 OBJS		= $(SRCS:%.c=$(OBJ_DIR)%.o)
 DEPS		= $(OBJS:.o=.d)
 -include $(DEPS)
 
-$(LIB_DIR)/$(LIB_NAME): $(OBJS)
+$(LIB_DIR)$(LIB_NAME): $(OBJS)
 	@$(MAKE) -s _hide_cursor
 #	Create folder
 	@mkdir -p $(LIB_DIR)
@@ -206,7 +206,7 @@ re:
 	@printf "\033[1A\033[1A\r"
 
 #	Compile library
-	@$(MAKE) -s $(LIB_DIR)/$(LIB_NAME)
+	@$(MAKE) -s $(LIB_DIR)$(LIB_NAME)
 
 # ─────────── #
 # ── CLEAN ── #
