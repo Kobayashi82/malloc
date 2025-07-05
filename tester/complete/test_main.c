@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 20:51:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 18:22:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void test_malloc_basic() {
     // Test 6: PERTURB functionality
     void *ptr_perturb = malloc(100);
     if (ptr_perturb) {
-        // Check if memory is initialized with PERTURB value (42)
+        // Check if memory is initialized with PERTURB value (213)
         int perturb_ok = 1;
         unsigned char *bytes = (unsigned char*)ptr_perturb;
         for (int i = 0; i < 100; i++) {
@@ -89,7 +89,7 @@ void test_malloc_basic() {
                 break;
             }
         }
-        test_assert(perturb_ok, "malloc() PERTURB initialization (value 42)");
+        test_assert(perturb_ok, "malloc() PERTURB initialization (value 213)");
         free(ptr_perturb);
     }
 }
@@ -281,7 +281,7 @@ void test_realloc_basic() {
     // Test 5: PERTURB functionality
     void *ptr_perturb = realloc(NULL, 100);  // Acts like malloc
     if (ptr_perturb) {
-        // Check if memory is initialized with PERTURB value (42)
+        // Check if memory is initialized with PERTURB value (213)
         int perturb_ok = 1;
         unsigned char *bytes = (unsigned char*)ptr_perturb;
         for (int i = 0; i < 100; i++) {
@@ -290,7 +290,7 @@ void test_realloc_basic() {
                 break;
             }
         }
-        test_assert(perturb_ok, "realloc() PERTURB initialization (value 42)");
+        test_assert(perturb_ok, "realloc() PERTURB initialization (value 213)");
         
         // Test expansion with PERTURB
         void *ptr_expanded = realloc(ptr_perturb, 200);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/31 23:43:13 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/01 13:47:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 18:19:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,23 +113,29 @@
 
 			va_end(args);
 
-			if (buf.error && buf.pos > 0) buf.pos = buf.size - 1;
-			if (buf.pos > 0) {
-				if (add_alloc_hist && g_manager.options.LOGGING) {
-					mutex(&g_manager.hist_mutex, MTX_LOCK);
+			mutex(&g_manager.hist_mutex, MTX_LOCK);
 
+				if (buf.error && buf.pos > 0) buf.pos = buf.size - 1;
+				if (buf.pos > 0) {
+					if (add_alloc_hist && g_manager.options.LOGGING) {
 						if (g_manager.hist_size < SIZE_MAX) {
 							if (!g_manager.hist_size || g_manager.hist_pos + buf.pos >= g_manager.hist_size) heap_hist_extend();
 							ft_memcpy(&g_manager.hist_buffer[g_manager.hist_pos], buffer, buf.pos);
 							g_manager.hist_pos += buf.pos;
 						}
+					}
+					if (fd == -1 || (add_alloc_hist && !g_manager.options.DEBUG && !g_manager.options.LOGGING)) {
+						mutex(&g_manager.hist_mutex, MTX_UNLOCK);
+						return (0);
+					}
+
+					int result = write(fd, buffer, buf.pos);
 
 					mutex(&g_manager.hist_mutex, MTX_UNLOCK);
+					return (result == -1 ? -1 : result);
 				}
-				if (fd == -1 || (add_alloc_hist && !g_manager.options.DEBUG && !g_manager.options.LOGGING)) return (0);
-				int result = write(fd, buffer, buf.pos);
-				return (result == -1 ? -1 : result);
-			}
+
+			mutex(&g_manager.hist_mutex, MTX_UNLOCK);
 
 			return (0);
 		}

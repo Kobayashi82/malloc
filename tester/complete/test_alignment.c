@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 23:07:32 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 18:22:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,7 @@ void test_aligned_alloc() {
 	int perturb_ok = 1;
     void *ptr_perturb = aligned_alloc(64, 128);  // 128 is multiple of 64
     if (ptr_perturb) {
-        // Check if memory is initialized with PERTURB value (42)
+        // Check if memory is initialized with PERTURB value (213)
         unsigned char *bytes = (unsigned char*)ptr_perturb;
         for (int i = 0; i < 128; i++) {
             if (bytes[i] != 42) {
@@ -142,7 +142,7 @@ void test_aligned_alloc() {
             }
         }
     }
-	test_assert(ptr_perturb && perturb_ok, "aligned_alloc() PERTURB initialization (value 42)");
+	test_assert(ptr_perturb && perturb_ok, "aligned_alloc() PERTURB initialization (value 213)");
 	if (ptr_perturb) free(ptr_perturb);
 }
 
@@ -194,7 +194,7 @@ void test_memalign() {
     // Test 7: PERTURB functionality
     void *ptr_perturb = memalign(32, 100);
     if (ptr_perturb) {
-        // Check if memory is initialized with PERTURB value (42)
+        // Check if memory is initialized with PERTURB value (213)
         int perturb_ok = 1;
         unsigned char *bytes = (unsigned char*)ptr_perturb;
         for (int i = 0; i < 100; i++) {
@@ -203,7 +203,7 @@ void test_memalign() {
                 break;
             }
         }
-        test_assert(perturb_ok, "memalign() PERTURB initialization (value 42)");
+        test_assert(perturb_ok, "memalign() PERTURB initialization (value 213)");
         free(ptr_perturb);
     }
 }
@@ -263,7 +263,7 @@ void test_posix_memalign() {
     int perturb_ok = 1;
 	int ret_perturb = posix_memalign(&ptr_perturb, 64, 128);
     if (ret_perturb == 0 && ptr_perturb) {       
-        // Check if memory is initialized with PERTURB value (42)
+        // Check if memory is initialized with PERTURB value (213)
         unsigned char *bytes = (unsigned char*)ptr_perturb;
         for (int i = 0; i < 128; i++) {
             if (bytes[i] != 42) {
@@ -272,7 +272,7 @@ void test_posix_memalign() {
             }
         }
     }
-	test_assert(ptr_perturb && perturb_ok, "posix_memalign() PERTURB initialization (value 42)");
+	test_assert(ptr_perturb && perturb_ok, "posix_memalign() PERTURB initialization (value 213)");
 	if (ptr_perturb) free(ptr_perturb);
 }
 
@@ -335,7 +335,7 @@ void test_valloc() {
     void *ptr_perturb = valloc(page_size);
     int perturb_ok = 1;
     if (ptr_perturb) {       
-        // Check if memory is initialized with PERTURB value (42)
+        // Check if memory is initialized with PERTURB value (213)
         unsigned char *bytes = (unsigned char*)ptr_perturb;
         for (long i = 0; i < page_size; i++) {
             if (bytes[i] != 42) {
@@ -344,7 +344,7 @@ void test_valloc() {
             }
         }
     }
-	test_assert(ptr_perturb && perturb_ok, "valloc() PERTURB initialization (value 42)");
+	test_assert(ptr_perturb && perturb_ok, "valloc() PERTURB initialization (value 213)");
 	if (ptr_perturb) free(ptr_perturb);
 }
 
@@ -395,7 +395,7 @@ void test_pvalloc() {
     void *ptr_perturb = pvalloc(100);  // Should allocate at least one page
     int perturb_ok = 1;
 	if (ptr_perturb) {
-        // Check if memory is initialized with PERTURB value (42)
+        // Check if memory is initialized with PERTURB value (213)
         unsigned char *bytes = (unsigned char*)ptr_perturb;
         for (long i = 0; i < page_size; i++) {
             if (bytes[i] != 42) {
@@ -404,7 +404,7 @@ void test_pvalloc() {
             }
         }
     }
-	test_assert(ptr_perturb && perturb_ok, "pvalloc() PERTURB initialization (value 42)");
+	test_assert(ptr_perturb && perturb_ok, "pvalloc() PERTURB initialization (value 213)");
 	if (ptr_perturb) free(ptr_perturb);
 }
 
