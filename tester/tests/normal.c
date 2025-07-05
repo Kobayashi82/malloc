@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:58 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 21:13:53 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 17:17:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@
 	#define M_ARENA_TEST				-7
 	#define M_PERTURB					-6
 	#define M_CHECK_ACTION				-5
-	#define M_MXFAST			 		 1
 	#define M_FRAG_PERCENT			 	 2
 	#define M_MIN_USAGE					 3
 	#define M_DEBUG						 7

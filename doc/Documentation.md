@@ -43,24 +43,7 @@ También hay un truco con el chunk anterior: si está libre, su tamaño se guard
 
 ### Bins
 
-Los bins son como grupos de "listas" organizadas donde se anotan los chunks que has liberado, listos para ser reutilizados. Cada grupo está pensado para un tipo específico de uso:
-
-**FAST BIN**
-
-Es como una pila de platos: el último que pones es el primero que coges. Están pensados para cuando liberas y vuelves a pedir memoria muy rápido, así que no se molestan en fusionar chunks con sus vecinos. Simplemente los guardan tal como están para entregártelos súper rápido. Se guardan aqui solo chunks pequeños, que son los más propensos a la reutilización rápida.
-
-**SMALL BIN**
-
-Están más organizados: cada lista tiene chunks del mismo tamaño exacto, y funcionan como una cola normal (primero en entrar, primero en salir).
-
-**UNSORTED BIN**
-
-Es como un "buzón temporal" donde van todos los chunks recién liberados antes de ser clasificados. Es una zona de paso donde el allocator decide después dónde colocar realmente cada chunk. Cuando se añade un chunk aquí, antes se ha fusionado con sus vecinos si también están libres.
-
-**LARGE BIN**
-
-Están reservados para chunks grandes, organizados por rangos de tamaño en lugar de tamaños exactos.
-Es el último paso a la hora de intentar reutilizar un chunk. Si es necesario, se puede dividir un chunk en dos.
+Los bins son como grupos de "listas" organizadas donde se anotan los chunks que has liberado, listos para ser reutilizados.
 
 **TOP CHUNK**
 
@@ -77,8 +60,6 @@ El allocator se asegura de que cuando te da memoria, esté alineada correctament
 El coalescing es como unir varios documentos de un archivador creando un documento más grande. Cuando liberas memoria, el allocator mira si los chunks vecinos también están libres. Si es así, los fusiona en un chunk más grande.
 
 Esto es importante porque evita la fragmentación: sin coalescing, podrías tener muchos espacios pequeños libres pero ninguno lo suficientemente grande para una asignación grande. Es como tener muchos huecos pequeños en un parking pero no poder aparcar un autobús.
-
-Los fast bins son una excepción: no se fusionan inmediatamente porque están diseñados para velocidad. Pero cuando es necesario, el allocator puede hacer una "limpieza general" y fusionar todo lo que se pueda.
 
 ### Detección de Corrupción
 
@@ -383,7 +364,6 @@ Supported params:
   • M_ARENA_TEST (-7)         (1-160):  Number of arenas at which a hard limit on arenas is computed.
   • M_PERTURB (-6)          (0-32/64):  Sets memory to the PERTURB value on allocation, and to value ^ 255 on free.
   • M_CHECK_ACTION (-5)         (0-2):  Behaviour on abort errors (0: abort, 1: warning, 2: silence).
-  • M_MXFAST (1)              (0-160):  Max size (bytes) for fastbin allocations.
   • M_MIN_USAGE (3)           (0-100):  Heaps under this usage % are skipped (unless all are under).
   • M_DEBUG (7)                 (0-1):  Enables debug mode (1: errors, 2: system).
   • M_LOGGING (8)               (0-1):  Enables logging mode (1: to file, 2: to stderr).
@@ -404,7 +384,6 @@ Las siguientes variables de entorno pueden configurar el comportamiento del allo
 | **MALLOC_ARENA_TEST**    | `M_ARENA_TEST`            | Umbral de prueba para eliminar arenas   |
 | **MALLOC_PERTURB_**      | `M_PERTURB`               | Rellena el heap con un patrón           |
 | **MALLOC_CHECK_**        | `M_CHECK_ACTION`          | Acción ante errores de memoria          |
-| **MALLOC_MXFAST_**       | `M_MXFAST`                | Tamaño máximo de bloques rápidos        |
 | **MALLOC_MIN_USAGE_**    | `M_MIN_USAGE`             | Umbral mínimo de uso para optimización  |
 | **MALLOC_DEBUG**         | `M_DEBUG`                 | Activa el modo debug                    |
 | **MALLOC_LOGGING**       | `M_LOGGING`               | Habilita logging                        |

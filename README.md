@@ -19,13 +19,8 @@ Malloc es un proyecto de la escuela 42 que implementa un sistema completo de ges
 - **Múltiples Arenas**: Cada hilo puede usar arenas separadas para reducir contención
 - **Balanceado de Carga**: Distribución inteligente entre arenas disponibles
 
-#### **Bins Especializados**
-- **FastBin**: Cacheo rápido para asignaciones pequeñas y frecuentes
-- **SmallBin**: Gestión eficiente de bloques pequeños
-- **LargeBin**: Ordenamiento por tamaño para bloques grandes
-- **UnsortedBin**: Buffer temporal para optimizar reutilización
-
 #### **Optimizaciones de Memoria**
+- **Bins**: Gestión de chunks liberados para optimizar reutilización
 - **Coalescing**: Fusión automática de bloques adyacentes libres
 - **Alineación**: Alineación óptima de memoria
 - **Encabezados**: Uso eficiente del espacio para el encabezado
@@ -134,7 +129,6 @@ Las siguientes variables de entorno pueden configurar el comportamiento de mallo
 | **MALLOC_ARENA_TEST**    | `M_ARENA_TEST`            | Umbral de prueba para eliminar arenas   |
 | **MALLOC_PERTURB_**      | `M_PERTURB`               | Rellena el heap con un patrón           |
 | **MALLOC_CHECK_**        | `M_CHECK_ACTION`          | Acción ante errores de memoria          |
-| **MALLOC_MXFAST_**       | `M_MXFAST`                | Tamaño máximo de bloques rápidos        |
 | **MALLOC_MIN_USAGE_**    | `M_MIN_USAGE`             | Umbral mínimo de uso para optimización  |
 | **MALLOC_DEBUG**         | `M_DEBUG`                 | Activa el modo debug                    |
 | **MALLOC_LOGGING**       | `M_LOGGING`               | Habilita logging                        |
@@ -161,7 +155,6 @@ Supported params:
   • M_ARENA_TEST (-7)         (1-160):  Number of arenas at which a hard limit on arenas is computed.
   • M_PERTURB (-6)          (0-32/64):  Sets memory to the PERTURB value on allocation, and to value ^ 255 on free.
   • M_CHECK_ACTION (-5)         (0-2):  Behaviour on abort errors (0: abort, 1: warning, 2: silence).
-  • M_MXFAST (1)              (0-160):  Max size (bytes) for fastbin allocations.
   • M_MIN_USAGE (3)           (0-100):  Heaps under this usage % are skipped (unless all are under).
   • M_DEBUG (7)                 (0-1):  Enables debug mode (1: errors, 2: system).
   • M_LOGGING (8)               (0-1):  Enables logging mode (1: to file, 2: to stderr).
