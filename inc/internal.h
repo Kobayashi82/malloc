@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 22:51:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 12:48:11 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,13 @@
 	#define FREE_PERCENT				10.0f																									// Max % of free memory in other heaps required to consider remove a heap
 	#define FRAG_PERCENT				90.0f																									// Minf % of ragmentation in other heaps required to consider remove a heap
 
+	// --- BINS ---
+	#define NORMAL_STEP					16
+	#define SMALLBIN_MAX				1024 + sizeof(t_chunk)
+	#define LARGEBIN_MIN				SMALLBIN_MAX + 16
+	#define LARGEBIN_MAX				SMALL_CHUNK + sizeof(t_chunk)
+	#define LARGEBIN_STEP				256
+
 #pragma endregion
 
 #pragma region "Enumerators"
@@ -127,10 +134,10 @@
 		int				id;							// Arena ID (0 = main thread)
 		int				alloc_count;				// Total number of allocations
 		int				free_count;					// Total number of frees
-		void			*fastbin[20];				// LIFO bins for small sizes (8 to 160 bytes)
-		void			*smallbin[66];				// FIFO bins for small/medium chunks (fixed sizes)
+		void			*fastbin[11];				// LIFO bins for small sizes (16 to 160 bytes)
+		void			*smallbin[64];				// FIFO bins for small/medium chunks (fixed sizes)
 		void			*unsortedbin;				// Unsorted bin for recently freed chunks
-		void			*largebin[257];				// Reserved for large chunks
+		void			*largebin[12];				// Reserved for large chunks
 		t_heap_header	*heap_header;				// Pointer to the first heap header
 		struct s_arena	*next;          			// Pointer to the next arena
 		pthread_mutex_t	mutex;          			// Arena mutex for thread safety

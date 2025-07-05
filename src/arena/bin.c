@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 23:01:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 14:03:14 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@
 
 		switch (type) {
 			case FASTBIN: {
-				int index = (size - 1) / ALIGNMENT;
-				if (index >= g_manager.options.MXFAST / ALIGNMENT) return (1);
+				int index = (size / NORMAL_STEP) - 1;
+				if ((size_t)index >= (g_manager.options.MXFAST + sizeof(t_chunk)) / NORMAL_STEP) return (1);
 
 				SET_FD(chunk, arena->fastbin[index]);
 				arena->fastbin[index] = chunk;
@@ -50,17 +50,29 @@
 				return (0);
 			}
 			case SMALLBIN: {
-				int index = (size - 1) / ALIGNMENT;
-				if (index >= 1040 / ALIGNMENT) return (1);
+				int index = (size - (g_manager.options.MXFAST + sizeof(t_chunk) + NORMAL_STEP)) / NORMAL_STEP;
+				if ((size_t)index >= ((SMALLBIN_MAX - (g_manager.options.MXFAST + sizeof(t_chunk) + NORMAL_STEP)) / NORMAL_STEP) + 1) return (1);
 
-				SET_FD(chunk, arena->smallbin[index]);
-				arena->smallbin[index] = chunk;
+				t_chunk *bin_chunk = arena->smallbin[index];
+				if (bin_chunk) {
+					t_chunk *prev = GET_BK(bin_chunk);
+					SET_FD(prev, chunk);
+					SET_FD(chunk, bin_chunk);
+					SET_BK(bin_chunk, chunk);
+					SET_BK(chunk, prev);
+				} else {
+					SET_FD(chunk, chunk);
+					SET_BK(chunk, chunk);
+					arena->smallbin[index] = chunk;
+				}
 
 				if (g_manager.options.PERTURB) {
 					void *FD = GET_FD(chunk);
+					void *BK = GET_BK(chunk);
 					uint32_t PREV_SIZE = GET_PREV_SIZE(GET_NEXT(chunk));
 					ft_memset(GET_PTR(chunk), g_manager.options.PERTURB, GET_SIZE(chunk));
 					SET_FD(chunk, FD);
+					SET_BK(chunk, BK);
 					SET_PREV_SIZE(GET_NEXT(chunk), PREV_SIZE);
 				}
 
@@ -82,8 +94,8 @@
 				return (0);
 			}
 			case LARGEBIN: {
-				int index = (size - 1) / ALIGNMENT;
-				if (index >= 4096 / ALIGNMENT) return (1);
+				int index = (size - (LARGEBIN_MIN)) / LARGEBIN_STEP;
+				if ((size_t)index >= ((LARGEBIN_MAX - (LARGEBIN_MIN)) / LARGEBIN_STEP) + 1) return (1);
 
 				SET_FD(chunk, arena->largebin[index]);
 				arena->largebin[index] = chunk;
@@ -113,8 +125,8 @@
 		if (!chunk || !arena || !heap) return (1);
 
 		if (heap->free_chunks > 0) heap->free_chunks--;
+
 		if (!HAS_POISON(GET_PTR(chunk))) {
-			return (1);
 			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", GET_PTR(chunk));
 			if (print_error())		aprintf(2, 0, "Memory corrupted\n");
 			mutex(&g_manager.mutex, MTX_UNLOCK);
@@ -124,9 +136,9 @@
 		}
 
 		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
-		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
-			int index = (chunk_size - 1) / ALIGNMENT;
-			if (index >= g_manager.options.MXFAST / ALIGNMENT) return (1);
+		if (chunk_size <= (size_t)(g_manager.options.MXFAST + sizeof(t_chunk))) {
+			int index = (chunk_size / NORMAL_STEP) - 1;
+			if ((size_t)index >= (g_manager.options.MXFAST + sizeof(t_chunk)) / NORMAL_STEP) return (1);
 
 			void **curr = &arena->fastbin[index];
 			while (*curr) {
@@ -136,26 +148,34 @@
 				}
 				curr = &(GET_FD(*curr));
 			}
-		} else if (chunk_size <= 1040) {
-			int index = (chunk_size - 1) / ALIGNMENT;
-			if (index >= 1040 / ALIGNMENT) return (1);
+		} else if (chunk_size <= SMALLBIN_MAX) {
+			int index = (chunk_size - (g_manager.options.MXFAST + sizeof(t_chunk) + NORMAL_STEP)) / NORMAL_STEP;
+			if ((size_t)index >= ((SMALLBIN_MAX - (g_manager.options.MXFAST + sizeof(t_chunk) + NORMAL_STEP)) / NORMAL_STEP) + 1) return (1);
 
 			void **curr = &arena->smallbin[index];
 			while (*curr) {
 				if (*curr == chunk) {
-					*curr = GET_FD(chunk);
+					t_chunk *next = GET_FD(*curr);
+					t_chunk *prev = GET_BK(*curr);
+					if (next != *curr) *curr = next; else arena->smallbin[index] = NULL;
+					if (prev && prev != *curr) SET_FD(prev, next);
+					if (next && next != *curr) SET_BK(next, prev);
 					return (0);
 				}
 				curr = &(GET_FD(*curr));
 			}
-		} else if (chunk_size <= 4096) {
-			int index = (chunk_size - 1) / ALIGNMENT;
-			if (index >= 4096 / ALIGNMENT) return (1);
+		} else if (chunk_size <= LARGEBIN_MAX) {
+			int index = (chunk_size - (LARGEBIN_MIN)) / LARGEBIN_STEP;
+			if ((size_t)index >= ((LARGEBIN_MAX - (LARGEBIN_MIN)) / LARGEBIN_STEP) + 1) return (1);
 
-			void **curr = &arena->largebin[index];
+			void **curr = &arena->smallbin[index];
 			while (*curr) {
 				if (*curr == chunk) {
-					*curr = GET_FD(chunk);
+					t_chunk *next = GET_FD(*curr);
+					t_chunk *prev = GET_BK(*curr);
+					if (next != *curr) *curr = next; else arena->smallbin[index] = NULL;
+					if (prev && prev != *curr) SET_FD(prev, next);
+					if (next && next != *curr) SET_BK(next, prev);
 					return (0);
 				}
 				curr = &(GET_FD(*curr));
@@ -256,28 +276,30 @@
 
 	#pragma region "FastBin"
 
+		// fastbin array = (MXFAST + sizeof(t_chunk)) / NORMAL_STEP
+		// fastbin index = (size / NORMAL_STEP) - 1
+
 		void *find_in_fastbin(t_arena *arena, size_t size) {
 			if (!arena || !size) return (NULL);
 
 			void *ptr = NULL;
 
-			int index = (size - 1) / ALIGNMENT;
-			if (index >= g_manager.options.MXFAST / ALIGNMENT) return (ptr);
+			int index = (size / NORMAL_STEP) - 1;
+			if ((size_t)index >= (g_manager.options.MXFAST + sizeof(t_chunk)) / NORMAL_STEP) return (ptr);
+
 			if (arena->fastbin[index]) {
 				t_chunk *chunk = (t_chunk *)arena->fastbin[index];
-				arena->fastbin[index] = GET_FD(chunk);
 				t_chunk *next = GET_NEXT(chunk);
 				next->size |= PREV_INUSE;
-				
 				ptr = GET_PTR(chunk);
-				if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
+				
 				t_heap *heap = heap_find(arena, ptr);
-				if (heap && heap->active) {
-					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
-					if (heap->free_chunks > 0) heap->free_chunks--;
-
-					return (ptr);
-				}
+				if (heap && heap->active) {				
+					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));				
+					unlink_chunk(chunk, arena, heap);
+					
+					if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Fastbin match for size %d bytes\n", ptr, size);
+				} else ptr = NULL;
 			}
 
 			return (ptr);
@@ -287,28 +309,32 @@
 
 	#pragma region "SmallBin"
 
-		static void *find_in_smallbin(t_arena *arena, size_t size) {
+		// smallbin array = ((SMALLBIN_MAX - (MXFAST + sizeof(t_chunk) + NORMAL_STEP)) / NORMAL_STEP) + 1
+		// smallbin index = (size - (MXFAST + sizeof(t_chunk) + NORMAL_STEP)) / NORMAL_STEP
+
+		 void *find_in_smallbin(t_arena *arena, size_t size) {
 			if (!arena || !size) return (NULL);
 
 			void *ptr = NULL;
 
-			int index = (size - 1) / ALIGNMENT;
-			if (index >= 1040 / ALIGNMENT) return (ptr);
+			int index = (size - (g_manager.options.MXFAST + sizeof(t_chunk) + NORMAL_STEP)) / NORMAL_STEP;
+			if ((size_t)index >= ((SMALLBIN_MAX - (g_manager.options.MXFAST + sizeof(t_chunk) + NORMAL_STEP)) / NORMAL_STEP) + 1) return (ptr);
+
+			// aprintf(2, 0 , "%d -%d\n", index, ((SMALLBIN_MAX - (g_manager.options.MXFAST + sizeof(t_chunk) + NORMAL_STEP))));
+
 			if (arena->smallbin[index]) {
 				t_chunk *chunk = (t_chunk *)arena->smallbin[index];
-				arena->smallbin[index] = GET_FD(chunk);
 				t_chunk *next = GET_NEXT(chunk);
 				next->size |= PREV_INUSE;
-				
 				ptr = GET_PTR(chunk);
-				if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Smallbin match for size %d bytes\n", ptr, size);
+				
 				t_heap *heap = heap_find(arena, ptr);
 				if (heap && heap->active) {
 					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
-					if (heap->free_chunks > 0) heap->free_chunks--;
-
-					return (ptr);
-				}
+					unlink_chunk(chunk, arena, heap);
+					
+					if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Smallbin match for size %d bytes\n", ptr, size);
+				} else ptr = NULL;
 			}
 
 			return (ptr);
@@ -318,28 +344,30 @@
 
 	#pragma region "LargeBin"
 
-		static void *find_in_largebin(t_arena *arena, size_t size) {
+		// largebin array = ((LARGEBIN_MAX - (LARGEBIN_MIN)) / LARGEBIN_STEP) + 1
+		// largebin index = (size - (LARGEBIN_MIN)) / LARGEBIN_STEP
+
+		void *find_in_largebin(t_arena *arena, size_t size) {
 			if (!arena || !size) return (NULL);
 
 			void *ptr = NULL;
 
-			int index = (size - 1) / ALIGNMENT;
-			if (index >= 4096 / ALIGNMENT) return (ptr);
+			int index = (size - (LARGEBIN_MIN)) / LARGEBIN_STEP;
+			if ((size_t)index >= ((LARGEBIN_MAX - (LARGEBIN_MIN)) / LARGEBIN_STEP) + 1) return (ptr);
+
 			if (arena->largebin[index]) {
 				t_chunk *chunk = (t_chunk *)arena->largebin[index];
-				arena->largebin[index] = GET_FD(chunk);
 				t_chunk *next = GET_NEXT(chunk);
 				next->size |= PREV_INUSE;
-
 				ptr = GET_PTR(chunk);
-				if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Largebin match for size %d bytes\n", ptr, size);
+
 				t_heap *heap = heap_find(arena, ptr);
 				if (heap && heap->active) {
 					heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
-					if (heap->free_chunks > 0) heap->free_chunks--;
-
-					return (ptr);
-				}
+					unlink_chunk(chunk, arena, heap);
+					
+					if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Largebin match for size %d bytes\n", ptr, size);
+				} else ptr = NULL;
 			}
 
 			return (ptr);
@@ -359,11 +387,11 @@
 		void *ptr = NULL;
 
 		size = ALIGN(size + sizeof(t_chunk));
-		if (size <= (size_t)g_manager.options.MXFAST) ptr = find_in_fastbin(arena, size);
+		if (g_manager.options.MXFAST && size <= (size_t)g_manager.options.MXFAST + sizeof(t_chunk)) ptr = find_in_fastbin(arena, size);
 
-		if (!ptr && size <= 1040) ptr = find_in_smallbin(arena, size);
+		if (!ptr && size <= SMALLBIN_MAX) ptr = find_in_smallbin(arena, size);
 		// if (!ptr) ptr = find_in_unsortedbin(arena, size);
-		if (!ptr && size <= 4096) ptr = find_in_largebin(arena, size);
+		if (!ptr && size <= LARGEBIN_MAX) ptr = find_in_largebin(arena, size);
 		// if (!ptr && fastbin no vacio, repite
 		// if (!ptr && size <= 4096) ptr = find_in_largebin(arena, size);
 
@@ -391,42 +419,19 @@
 
 #pragma region "Information"
 
-	// cantidad_fastbins = MXFAST / ALIGNMENT
-	// tamaño_del_chunk = (índice + 1) * ALIGNMENT
-	// tamaño_máximo_real = cantidad_fastbins * ALIGNMENT
-
-	// chunk->size |= PREV_INUSE;			// Activar bit
-	// chunk->size &= ~PREV_INUSE;			// Desactivar bit
-	// if (chunk->size & PREV_INUSE) {		// Comprobar bit
-	// chunk->size ^= PREV_INUSE;			// Alternar bit
-	// chunk->size & ~15;					// Limpiar bits
-
-	// - [ ] Fastbin (MXFAST) - (no coalescing)
-	// - [ ] Smallbin - (coalescing)
-	// - [ ] Unsortedbin
-	// - [ ] Largebin - (coalescing)
-	// - [ ] Coalescing
+	// chunk->size |= PREV_INUSE;			// Activate bit
+	// chunk->size &= ~PREV_INUSE;			// Deactivate bit
+	// if (chunk->size & PREV_INUSE) {		// Check bit
+	// chunk->size ^= PREV_INUSE;			// Swap bit
+	// chunk->size & ~15;					// Clear bits
 
 	// - mmap (if too large)
-	// - fastbin
-	// - smallbin
-	// - coalescing
-	// - unsorted bin
-	// - largebin
+	// - fastbin (exact match)
+	// - smallbin (exact match)
+	// - coalescing fastbins to unsortedbin (coalescing)
+	// - process unsortedbin → small/large bins
+	// - largebin (split si > MINSIZE)
 	// - repeat if fastbin not empty
-	// - top chunk
-
-	// Si large → mmap?
-	// Fastbin exact match
-	// Smallbin exact match
-	// Si large → consolidar fastbins a unsortedbin
-	// Procesar unsortedbin → small/large bins (coalescing)
-	// Si large → buscar en largebin y superiores (split si > MINSIZE)
-	// Si quedan fastbins → consolidar y repetir
-	// Split top chunk
-
-	// stress-ng --malloc 4 --malloc-bytes 1G --verify --timeout 10s
-	// git clone https://github.com/redis/redis
-	// ffmpeg -f lavfi -i testsrc=duration=10:size=1920x1080 -c:v libx264 test.mp4
+	// - split top chunk
 
 #pragma endregion

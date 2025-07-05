@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 14:23:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 12:48:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@
 
 		mutex(&tcache->mutex, MTX_LOCK);
 
-			bool is_large = ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK;
+			bool is_large = ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK + sizeof(t_chunk);
 
 			if (is_large) {
 				ptr = heap_create(tcache, LARGE, size, alignment);
@@ -207,7 +207,7 @@
 
 		mutex(&tcache->mutex, MTX_LOCK);
 
-			bool is_large = ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK;
+			bool is_large = ALIGN(size + sizeof(t_chunk)) > SMALL_CHUNK + sizeof(t_chunk);
 
 			ptr = find_memory(tcache, size);
 

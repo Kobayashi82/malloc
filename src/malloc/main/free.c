@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 23:01:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 13:18:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,14 +81,10 @@
 		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
 			link_chunk(chunk, chunk_size, FASTBIN, arena, heap);
 		} else {
-			// chunk = coalescing_neighbours(chunk, arena, heap);
+			chunk = coalescing_neighbours(chunk, arena, heap);
 			if (!(chunk->size & TOP_CHUNK)) {
-				if (chunk_size <= 1040) {
-					link_chunk(chunk, chunk_size, SMALLBIN, arena, heap);
-				} else if (chunk_size <= 4096) {
-					link_chunk(chunk, chunk_size, LARGEBIN, arena, heap);
-				} else {
-					link_chunk(chunk, chunk_size, UNSORTEDBIN, arena, heap); // Este es el bueno
+				if (chunk_size <= SMALLBIN_MAX) {
+					link_chunk(chunk, chunk_size, UNSORTEDBIN, arena, heap);
 				}
 			}
 		}
