@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 12:37:30 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 13:45:15 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 16:11:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@
 						t_chunk *next_chunk = GET_NEXT(new_chunk);
 						SET_PREV_SIZE(next_chunk, remaining - sizeof(t_chunk));
 						next_chunk->size &= ~PREV_INUSE;
-						link_chunk(new_chunk, remaining - sizeof(t_chunk), heap->type, arena, heap);
+						link_chunk(new_chunk, arena, heap);
 						heap->free += remaining;
 						new_ptr = ptr;
 					} else new_ptr = ptr;
@@ -190,7 +190,7 @@
 									t_chunk *next_chunk = GET_NEXT(new_chunk);
 									SET_PREV_SIZE(next_chunk, remaining - sizeof(t_chunk));
 									next_chunk->size &= ~PREV_INUSE;
-									link_chunk(new_chunk, remaining - sizeof(t_chunk), heap->type, arena, heap);
+									link_chunk(new_chunk, arena, heap);
 									heap->free += remaining;
 								}
 							}

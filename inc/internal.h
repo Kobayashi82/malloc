@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 12:48:11 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 16:14:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,9 @@
 	#define SET_MAGIC(ptr)				(*(size_t *)((char *)(ptr) - sizeof(size_t)) = MAGIC_BYTES)												// Set MAGIC header
 	#define SET_POISON(ptr)				(*(size_t *)((char *)(ptr) - sizeof(size_t)) = POISON_BYTES)											// Set POISON pattern
 
-	// --- FD / BK ---
+	// --- FD ---
 	#define GET_FD(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk))															// Get forward pointer
-	#define GET_BK(chunk)				*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *))											// Get backward pointer
 	#define SET_FD(chunk, next_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk)) = (next_chunk))											// Set forward pointer
-	#define SET_BK(chunk, prev_chunk)	(*(void **)((char *)(chunk) + sizeof(t_chunk) + sizeof(void *)) = (prev_chunk))							// Set backward pointer
 
 	// --- CHUNK ---
 	#define GET_PTR(chunk)				(void *)((char *)(chunk) + sizeof(t_chunk))																// Get pointer to user data
@@ -91,13 +89,6 @@
 	#define FREE_PERCENT				10.0f																									// Max % of free memory in other heaps required to consider remove a heap
 	#define FRAG_PERCENT				90.0f																									// Minf % of ragmentation in other heaps required to consider remove a heap
 
-	// --- BINS ---
-	#define NORMAL_STEP					16
-	#define SMALLBIN_MAX				1024 + sizeof(t_chunk)
-	#define LARGEBIN_MIN				SMALLBIN_MAX + 16
-	#define LARGEBIN_MAX				SMALL_CHUNK + sizeof(t_chunk)
-	#define LARGEBIN_STEP				256
-
 #pragma endregion
 
 #pragma region "Enumerators"
@@ -134,17 +125,13 @@
 		int				id;							// Arena ID (0 = main thread)
 		int				alloc_count;				// Total number of allocations
 		int				free_count;					// Total number of frees
-		void			*fastbin[11];				// LIFO bins for small sizes (16 to 160 bytes)
-		void			*smallbin[64];				// FIFO bins for small/medium chunks (fixed sizes)
-		void			*unsortedbin;				// Unsorted bin for recently freed chunks
-		void			*largebin[12];				// Reserved for large chunks
+		void			*bins[257];					// LIFO bins for small sizes (16 to 160 bytes)
 		t_heap_header	*heap_header;				// Pointer to the first heap header
 		struct s_arena	*next;          			// Pointer to the next arena
 		pthread_mutex_t	mutex;          			// Arena mutex for thread safety
 	} t_arena;
 
 	typedef struct s_options {
-		int				MXFAST;						// Max size (bytes) for fastbin allocations
 		int				MIN_USAGE;					// Heaps under this usage % are skipped (unless all are under)
 		int				CHECK_ACTION;				// Behaviour on abort errors (0: abort, 1: warning, 2: silence)
 		unsigned char	PERTURB;					// Sets memory to the PERTURB value on allocation, and to value ^ 255 on free

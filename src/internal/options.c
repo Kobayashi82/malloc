@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 18:02:43 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 20:01:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 16:14:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,6 @@
 #pragma endregion
 
 #pragma region "Validate"
-
-	#pragma region "MXFAST"
-
-		static int validate_mxfast(int value) {
-			if (value < 0 || value > 160) return (0);
-
-			g_manager.options.MXFAST = value;
-
-			return (1);
-		}
-
-	#pragma endregion
 
 	#pragma region "MIN_ZONE_USAGE"
 
@@ -167,10 +155,6 @@
 
 		g_manager.options.fd_out = 2;
 
-		var = getenv("MALLOC_MXFAST_");
-		if (var && ft_isdigit_s(var))	validate_mxfast(ft_atoi(var));
-		else							g_manager.options.MXFAST = 80;
-
 		var = getenv("MALLOC_MIN_USAGE_");
 		if (var && ft_isdigit_s(var))	validate_min_usage(ft_atoi(var));
 		else							g_manager.options.MIN_USAGE = 10;
@@ -225,7 +209,6 @@
 
 		int result = 0;
 		switch (param) {
-			case M_MXFAST:			result = validate_mxfast(value);		break;
 			case M_MIN_USAGE:		result = validate_min_usage(value);		break;
 			case M_CHECK_ACTION:	result = validate_check_action(value);	break;
 			case M_PERTURB:			result = validate_perturb(value);		break;

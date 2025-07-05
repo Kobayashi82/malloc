@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:42:37 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 19:49:14 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 15:46:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 	void	heap_hist_destroy();
 
 	// Coalescing
-	int		link_chunk(t_chunk *chunk, size_t size, int type, t_arena *arena, t_heap *heap);
+	int		link_chunk(t_chunk *chunk, t_arena *arena, t_heap *heap);
 	int		unlink_chunk(t_chunk *chunk, t_arena *arena, t_heap *heap);
 	t_chunk	*coalescing_neighbours(t_chunk *chunk, t_arena *arena, t_heap *heap);
 	void	coalescing(t_arena *arena, t_heap *heap);

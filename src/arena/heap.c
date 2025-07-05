@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 20:31:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 15:40:38 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@
 			} else {
 				t_heap_header *heap_header = (t_heap_header *)((char *)arena + ALIGN(sizeof(t_arena)));
 				arena->heap_header = heap_header;
-				heap_header->total = 73;
+				heap_header->total = 40;
 				heap_header->used = 1;
 				heap_header->next = NULL;
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/30 09:56:07 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 12:48:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 15:46:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,8 +122,7 @@
 					SET_PREV_SIZE(user_chunk, padding_needed - sizeof(t_chunk));
 					SET_PREV_SIZE(heap->top_chunk, (user_chunk_size - sizeof(t_chunk)));
 
-					if (padding_needed <= (size_t)g_manager.options.MXFAST)		link_chunk(padding_chunk, padding_needed, FASTBIN, tcache, heap);
-					else														link_chunk(padding_chunk, padding_needed, UNSORTEDBIN, tcache, heap);
+					link_chunk(padding_chunk, tcache, heap);
 
 					heap->free_chunks++;
 					heap->free += padding_needed;

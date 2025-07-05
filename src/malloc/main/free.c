@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 13:18:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 16:14:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 
 				// Corruption
 				if (!HAS_MAGIC(ptr)) {
-					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (LARGE)\n", ptr);
+					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (free)\n", ptr);
 					if (print_error())		aprintf(2, 0, "Memory corrupted\n");
 					return (abort_now());
 				}
@@ -66,7 +66,7 @@
 
 		// Corruption
 		if (!HAS_MAGIC(ptr)) {
-			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted\n", ptr);
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (free)\n", ptr);
 			if (print_error())				aprintf(2, 0, "Memory corrupted\n");
 			return (abort_now());
 		}
@@ -78,16 +78,7 @@
 		next_chunk->size &= ~PREV_INUSE;
 		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
 		SET_PREV_SIZE(next_chunk, GET_SIZE(chunk));
-		if (chunk_size <= (size_t)g_manager.options.MXFAST) {
-			link_chunk(chunk, chunk_size, FASTBIN, arena, heap);
-		} else {
-			chunk = coalescing_neighbours(chunk, arena, heap);
-			if (!(chunk->size & TOP_CHUNK)) {
-				if (chunk_size <= SMALLBIN_MAX) {
-					link_chunk(chunk, chunk_size, UNSORTEDBIN, arena, heap);
-				}
-			}
-		}
+		chunk = coalescing_neighbours(chunk, arena, heap);
 
 		arena->free_count++;
 

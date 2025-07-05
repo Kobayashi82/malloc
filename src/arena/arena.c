@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 23:58:18 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 13:33:00 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/05 15:36:28 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,7 @@
 		arena->id = g_manager.arena_count++;
 		arena->alloc_count = 0;
 		arena->free_count = 0;
-		ft_memset(arena->fastbin, 0, 20 * sizeof(void *));
-		ft_memset(arena->smallbin, 0, 31 * sizeof(void *));
-		ft_memset(arena->largebin, 0, 10 * sizeof(void *));
-		arena->unsortedbin = NULL;
+		ft_memset(arena->bins, 0, 257 * sizeof(void *));
 		arena->heap_header = NULL;
 		arena->next = NULL;
 		mutex(&arena->mutex, MTX_INIT);
