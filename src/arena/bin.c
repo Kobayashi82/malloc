@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/06 17:54:07 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/06 18:25:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,7 @@
 		
 		heap->free_chunks++;
 		
-		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
-		int index = (chunk_size / ALIGNMENT) - 1;
+		int index = ((GET_SIZE(chunk) + sizeof(t_chunk)) / ALIGNMENT) - 1;
 		if ((size_t)index >= (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) return (1);
 		
 		SET_FD(chunk, arena->bins[index]);
@@ -114,8 +113,7 @@
 
 		if (heap->free_chunks > 0) heap->free_chunks--;
 
-		size_t chunk_size = GET_SIZE(chunk) + sizeof(t_chunk);
-		int index = (chunk_size / ALIGNMENT) - 1;
+		int index = ((GET_SIZE(chunk) + sizeof(t_chunk)) / ALIGNMENT) - 1;
 		if ((size_t)index >= (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) return (1);
 
 		t_chunk **current = (t_chunk **)&arena->bins[index];
@@ -229,10 +227,14 @@
 		int index = (size / ALIGNMENT) - 1;
 		while (!arena->bins[index] && (size_t)index < (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) index++;
 
-		if (arena->bins[index] && (size_t)index < (SMALL_CHUNK + sizeof(t_chunk))) {
+		if (arena->bins[index] && (size_t)index < (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) {
 			t_chunk *chunk = (t_chunk *)arena->bins[index];
 
-			if (!HAS_POISON(GET_PTR(chunk))) return (NULL);
+			if (!HAS_POISON(GET_PTR(chunk))) {
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted chunk in bin\n", GET_PTR(chunk));
+				if (print_error())		aprintf(2, 0, "Memory corrupted\n");
+				abort_now(); return (NULL);
+			}
 
 			bool reduce_chunk = false;
 			size_t min_size = (size > TINY_CHUNK + sizeof(t_chunk)) ? TINY_CHUNK + sizeof(t_chunk) : ALIGNMENT + sizeof(t_chunk);
@@ -275,40 +277,6 @@
 
 			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Bin match for size %zu bytes\n", GET_PTR(chunk), size);
 
-			return (GET_PTR(chunk));
-		}
-
-		return (NULL);
-	}
-
-	void *find_in_bin2(t_arena *arena, size_t size) {
-		if (!arena || !size) return (NULL);
-
-		int index = (size / ALIGNMENT) - 1;
-		if ((size_t)index >= (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) return (NULL);
-
-		if (arena->bins[index]) {
-			t_chunk *chunk = (t_chunk *)arena->bins[index];
-			
-			if (!HAS_POISON(GET_PTR(chunk))) {
-				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Corrupted chunk in bin\n", GET_PTR(chunk));
-				if (print_error())		aprintf(2, 0, "Memory corrupted\n");
-				return (NULL);
-			}
-			
-			arena->bins[index] = GET_FD(chunk);
-			SET_FD(chunk, NULL);
-			t_chunk *next = GET_NEXT(chunk);
-			next->size |= PREV_INUSE;
-			
-			t_heap *heap = heap_find(arena, GET_PTR(chunk));
-			if (heap && heap->active) {
-				heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
-				if (heap->free_chunks > 0) heap->free_chunks--;
-			}
-			
-			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Bin match for size %zu bytes\n", GET_PTR(chunk), size);
-			
 			return (GET_PTR(chunk));
 		}
 

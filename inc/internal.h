@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 13:07:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 16:14:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/06 18:23:20 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@
 		int				id;							// Arena ID (0 = main thread)
 		int				alloc_count;				// Total number of allocations
 		int				free_count;					// Total number of frees
-		void			*bins[257];					// LIFO bins for small sizes (16 to 160 bytes)
+		void			*bins[257];					// LIFO bins
 		t_heap_header	*heap_header;				// Pointer to the first heap header
 		struct s_arena	*next;          			// Pointer to the next arena
 		pthread_mutex_t	mutex;          			// Arena mutex for thread safety
