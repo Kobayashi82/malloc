@@ -73,10 +73,20 @@ basic_test() {
 	echo
 }
 
+ealgar_test() {
+	echo -e " ${GREEN}===============================================${NC}"
+	echo -e "${YELLOW}             Malloc Tester (EALGAR)            ${NC}"
+	echo -e " ${GREEN}===============================================${NC}\n"
+	clang -g -Wno-free-nonheap-object -o test tests/ealgar.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR}
+	./test
+	echo
+}
+
 case "$1" in
 	"debug")					debug_test;;
 	"leak"|"leaks"|"valgrind")	leaks_test;;
 	"basic")					basic_test;;
+	"ealgar")					ealgar_test;;
 	*)							normal_test;;
 esac
 
