@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:33:27 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/06 12:48:45 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/06 19:45:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 
 				// Corruption
 				if (!HAS_MAGIC(ptr)) {
-					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (free)\n", ptr);
+					if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (free: magic)\n", ptr);
 					if (print_error())		aprintf(2, 0, "Memory corrupted\n");
 					return (abort_now());
 				}
@@ -36,14 +36,14 @@
 				return (0);
 			}
 
-			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk (LARGE))\n", ptr);
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (free: in middle of chunk (LARGE))\n", ptr);
 			if (print_error())				aprintf(2, 0, "free: Invalid pointer\n");
 			return (abort_now());
 		}
 
 		// Double free
 		if (HAS_POISON(ptr)) {
-			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Double free (Poison)\n", ptr);
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Double free (free: poison)\n", ptr);
 			if (print_error())				aprintf(2, 0, "free: Double free\n");
 			return (abort_now());
 		}
@@ -51,7 +51,7 @@
 		// Top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK)) {
-			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (free: in top chunk)\n", ptr);
 			if (print_error())				aprintf(2, 0, "free: Invalid pointer\n");
 			return (abort_now());
 		}
@@ -59,14 +59,14 @@
 		// Middle chunk
 		t_chunk *next_chunk = GET_NEXT(chunk);
 		if (!(next_chunk->size & PREV_INUSE)) {
-			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunks (not allocated))\n", ptr);
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (free: in middle of chunks - not allocated))\n", ptr);
 			if (print_error())				aprintf(2, 0, "free: Invalid pointer\n");
 			return (abort_now());
 		}
 
 		// Corruption
 		if (!HAS_MAGIC(ptr)) {
-			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (free)\n", ptr);
+			if (print_log(1))				aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Memory corrupted (free: magic)\n", ptr);
 			if (print_error())				aprintf(2, 0, "Memory corrupted\n");
 			return (abort_now());
 		}
@@ -112,7 +112,7 @@
 
 		// Not aligned
 		if ((uintptr_t)ptr % ALIGNMENT) {
-			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (free: not aligned)\n", ptr);
 			if (print_error())		aprintf(2, 0, "free: Invalid pointer\n");
 			abort_now(); return ;
 		}
@@ -160,7 +160,7 @@
 
 		// Heap freed
 		if (inactive) {
-			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (posible free when heap is unmamped)\n", ptr);
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (free: heap may be unmamped)\n", ptr);
 			if (print_error())		aprintf(2, 0, "free: Invalid pointer\n");
 			abort_now(); return ;
 		}

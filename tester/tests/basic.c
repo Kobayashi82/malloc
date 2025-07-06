@@ -6,16 +6,26 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/29 21:42:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 20:47:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/06 20:06:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "malloc.h"
-
+	#include <malloc.h>
+	#include <stdlib.h>
 	#include <string.h>
-	#include <stdio.h>
+
+#pragma endregion
+
+#pragma region "Defines"
+
+	#define M_DEBUG		2
+	#define M_LOGGING	0
+
+	void show_alloc_mem(void);
+	void show_alloc_mem_ex(void *ptr, size_t offset, size_t length);
+	void show_alloc_history(void);
 
 #pragma endregion
 

@@ -6,13 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 20:12:11 by ealgar-c          #+#    #+#             */
-/*   Updated: 2025/07/06 13:25:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/06 20:09:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
-	#include "malloc.h"
+	#include <stdlib.h>
 	#include <string.h>
 	#include <unistd.h>
 	#include <stdarg.h>
@@ -25,6 +25,8 @@
 	#define BLUE    "\033[0;34m"
 	#define YELLOW  "\033[0;33m"
 	#define RESET   "\033[0m"
+
+	void show_alloc_mem(void);
 
 #pragma endregion
 

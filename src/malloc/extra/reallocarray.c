@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 12:37:30 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 16:11:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/06 19:42:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 
 		// Not aligned
 		if (!IS_ALIGNED(ptr)) {
-			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (not aligned)\n", ptr);
+			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (reallocarray: not aligned)\n", ptr);
 			if (print_error())			aprintf(2, 0, "reallocarray: Invalid pointer\n");
 			return (abort_now());
 		}
@@ -31,10 +31,10 @@
 		// Heap freed
 		if (!heap->active) {
 			if (heap->type == LARGE && GET_PTR(heap->ptr) == ptr) {
-				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (reallocarray: poison)\n", ptr);
 				if (print_error())		aprintf(2, 0, "reallocarray: Invalid pointer\n");
 			} else {
-				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (reallocarray: in middle of chunk)\n", ptr);
 				if (print_error())		aprintf(2, 0, "reallocarray: Invalid pointer\n");
 			}
 			return (abort_now());
@@ -43,7 +43,7 @@
 		// LARGE
 		if (heap->type == LARGE) {
 				if (GET_HEAD(ptr) != heap->ptr) {
-				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (reallocarray: in middle of chunk)\n", ptr);
 				if (print_error())		aprintf(2, 0, "reallocarray: Invalid pointer\n");
 				return (abort_now());
 			}
@@ -51,7 +51,7 @@
 
 		// Double free
 		if (HAS_POISON(ptr)) {
-			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (freed)\n", ptr);
+			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (reallocarray: poison)\n", ptr);
 			if (print_error())			aprintf(2, 0, "reallocarray: Invalid pointer\n");
 			return (abort_now());
 		}
@@ -59,7 +59,7 @@
 		// In top chunk
 		t_chunk *chunk = (t_chunk *)GET_HEAD(ptr);
 		if ((chunk->size & TOP_CHUNK) && heap->type != LARGE) {
-			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in top chunk)\n", ptr);
+			if (print_log(1))			aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (reallocarray: in top chunk)\n", ptr);
 			if (print_error())			aprintf(2, 0, "reallocarray: Invalid pointer\n");
 			return (abort_now());
 		}
@@ -68,7 +68,7 @@
 		if (heap->type != LARGE) {
 			t_chunk *next_chunk = GET_NEXT(chunk);
 			if (!(next_chunk->size & PREV_INUSE)) {
-				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (in middle of chunk)\n", ptr);
+				if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (reallocarray: in middle of chunk)\n", ptr);
 				if (print_error())		aprintf(2, 0, "reallocarray: Invalid pointer\n");
 				return (abort_now());
 			}
@@ -113,7 +113,11 @@
 
 		mutex(&g_manager.mutex, MTX_UNLOCK);
 
-		if (!arena || !heap || !heap->active) return (abort_now(), NULL);
+		if (!arena || !heap || !heap->active) {
+			if (print_log(1))		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Invalid pointer (reallocarray: heap may be unmamped)\n", ptr);
+			if (print_error())		aprintf(2, 0, "reallocarray: Invalid pointer\n");
+			return (abort_now(), NULL);
+		}
 
 		mutex(&arena->mutex, MTX_LOCK);
 

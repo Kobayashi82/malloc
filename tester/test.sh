@@ -68,8 +68,11 @@ basic_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}             Malloc Tester (BASIC)             ${NC}"
 	echo -e " ${GREEN}===============================================${NC}\n"
-	clang -g -Wno-free-nonheap-object -o test tests/basic.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR}
-	./test
+	(
+		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+		clang -Wno-free-nonheap-object -o test tests/basic.c -L${LIB_DIR} -lft_malloc
+		./test
+	)
 	echo
 }
 
@@ -77,8 +80,11 @@ ealgar_test() {
 	echo -e " ${GREEN}===============================================${NC}"
 	echo -e "${YELLOW}             Malloc Tester (EALGAR)            ${NC}"
 	echo -e " ${GREEN}===============================================${NC}\n"
-	clang -g -Wno-free-nonheap-object -o test tests/ealgar.c -I../inc -L${LIB_DIR} -lft_malloc -Wl,-rpath=${LIB_DIR}
-	./test
+	(
+		export LD_LIBRARY_PATH="$LIB_DIR:$LD_LIBRARY_PATH"
+		clang -o test tests/ealgar.c -L${LIB_DIR} -lft_malloc
+		./test
+	)
 	echo
 }
 
