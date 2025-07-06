@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 12:15:02 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/04 19:42:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/06 13:15:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,16 +95,41 @@
 
 	#pragma region "Print HEX8"
 
-		static void print_hex8(int fd, uintptr_t v) {
+		static void print_hex8(void *ptr) {
 			const char *hex = "0123456789ABCDEF";
 			char buf[10];
+			uintptr_t v = (uintptr_t)ptr;
 
 			buf[0] = '0';
 			buf[1] = 'x';
 			for (int i = 0; i < 8; ++i)
 				buf[2 + i] = hex[(v >> ((7 - i) * 4)) & 0xF];
-			write(fd, buf, 10);
+			write(2, buf, 10);
 		}
+
+	#pragma endregion
+
+	#pragma region "Print HEX5"
+
+		// static void print_hex5(void *ptr) {
+		// 	const char *hex = "0123456789ABCDEF";
+		// 	char		buf[7];
+		// 	uintptr_t v = (uintptr_t)ptr;
+
+		// 	buf[0] = '0';
+		// 	buf[1] = 'x';
+		// 	for (int i = 0; i < 5; ++i)
+		// 		buf[2 + i] = hex[(v >> ((4 - i) * 4)) & 0xF];
+		// 	write(2, buf, 7);
+		// }
+
+	#pragma endregion
+
+	#pragma region "Print PTR"
+
+		// static void print_ptr(void *ptr) {
+		// 	aprintf(2, 0, "%p", ptr);
+		// }
 
 	#pragma endregion
 
@@ -120,10 +145,9 @@
 				if (IS_TOPCHUNK(chunk) && heap->type != LARGE) break;
 				if (heap->type == LARGE || !IS_FREE(chunk)) {
 					write(2, " ", 1);
-					print_hex8(1,  (uintptr_t)GET_PTR(chunk));
+					print_hex8(GET_PTR(chunk));
 					write(2, " - ", 3);
-					if (heap->type == LARGE)	print_hex8(1,  (uintptr_t)(char*)GET_PTR(chunk) + GET_SIZE(chunk) - 1);
-					else						print_hex8(1,  (uintptr_t)((char *)GET_NEXT(chunk) - 1));
+					print_hex8((void *)((char *)GET_PTR(chunk) + GET_SIZE(chunk) - 1));
 					aprintf(2, 0, " : %u bytes\n", GET_SIZE(chunk));
 					total += GET_SIZE(chunk);
 					if (heap->type == LARGE) break;
@@ -155,14 +179,14 @@
 				t_heap *heap = heaps[i];
 
 				char *type;
-				if (heaps[i]->type == TINY) type = "TINY";
+				if (heaps[i]->type == TINY) type = "TINY ";
 				if (heaps[i]->type == SMALL) type = "SMALL";
 				if (heaps[i]->type == LARGE) type = "LARGE";
 				
 				if (i > 0) aprintf(2, 0, "\n");
 
 				aprintf(2, 0, " %s : ", type);
-				print_hex8(1,  (uintptr_t)heap->ptr);
+				print_hex8(heap->ptr);
 				write(2, "\n", 1);
 				aprintf(2, 0, "— — — — — — — — — — — — — — — — — — — — —\n");
 				size_t heap_total = print_heap(heaps[i]);
