@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/05 17:01:45 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/06 13:49:38 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -54,7 +54,7 @@ CC			= clang
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	FLAGS		= -Wall -Wextra -Werror -fPIC
+	FLAGS		= -Wall -Wextra -Werror -fPIC -fvisibility=hidden
 	SHARED_FLAG	= -dynamiclib
 	LIB_EXT		= .dylib
 else
@@ -113,7 +113,7 @@ $(LIB_DIR)$(LIB_NAME): $(OBJS)
 
 #	Compile library
 	@printf "\r%50s\r\t$(CYAN)Compiling... $(YELLOW)$(NAME)$(NC)"
-	@$(CC) $(SHARED_FLAG) -o $(LIB_DIR)$(LIB_NAME) $(OBJS)
+	@$(CC) $(FLAGS) $(SHARED_FLAG) -o $(LIB_DIR)$(LIB_NAME) $(OBJS)
 	@printf "\r%50s\r\t$(CYAN)Compiled    $(GREEN)✓ $(YELLOW)$(NAME)$(NC)\n"
 
 #   Symbolic link
