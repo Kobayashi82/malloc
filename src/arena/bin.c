@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 17:01:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/06 17:54:07 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,6 +224,64 @@
 #pragma region "Find in Bin"
 
 	void *find_in_bin(t_arena *arena, size_t size) {
+		if (!arena || !size) return (NULL);
+
+		int index = (size / ALIGNMENT) - 1;
+		while (!arena->bins[index] && (size_t)index < (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) index++;
+
+		if (arena->bins[index] && (size_t)index < (SMALL_CHUNK + sizeof(t_chunk))) {
+			t_chunk *chunk = (t_chunk *)arena->bins[index];
+
+			if (!HAS_POISON(GET_PTR(chunk))) return (NULL);
+
+			bool reduce_chunk = false;
+			size_t min_size = (size > TINY_CHUNK + sizeof(t_chunk)) ? TINY_CHUNK + sizeof(t_chunk) : ALIGNMENT + sizeof(t_chunk);
+			if (GET_SIZE(chunk) + sizeof(t_chunk) >= size + min_size) {
+				arena->bins[index] = GET_FD(chunk);
+
+				size_t original_chunk_size = GET_SIZE(chunk);
+				size_t original_flags = chunk->size & (HEAP_TYPE | PREV_INUSE);
+				size_t new_chunk_size = (original_chunk_size + sizeof(t_chunk)) - size;
+
+				chunk->size = original_flags | (size - sizeof(t_chunk));
+
+				t_chunk *new_chunk = GET_NEXT(chunk);
+				new_chunk->size = (original_flags & HEAP_TYPE) | PREV_INUSE | (new_chunk_size - sizeof(t_chunk));
+				SET_PREV_SIZE(new_chunk, GET_SIZE(chunk));
+				SET_POISON(GET_PTR(new_chunk));
+
+				t_chunk *next_chunk = GET_NEXT(new_chunk);
+				SET_PREV_SIZE(next_chunk, GET_SIZE(new_chunk));
+				next_chunk->size &= ~PREV_INUSE;
+
+				int new_index = ((GET_SIZE(new_chunk) + sizeof(t_chunk)) / ALIGNMENT) - 1;
+				if ((size_t)new_index < (SMALL_CHUNK + sizeof(t_chunk)) / ALIGNMENT) {
+					SET_FD(new_chunk, arena->bins[new_index]);
+					arena->bins[new_index] = new_chunk;
+				}
+			} else {
+				arena->bins[index] = GET_FD(chunk);
+				SET_FD(chunk, NULL);
+				t_chunk *next = GET_NEXT(chunk);
+				next->size |= PREV_INUSE;
+				reduce_chunk = true;
+			}
+			
+			t_heap *heap = heap_find(arena, GET_PTR(chunk));
+			if (heap && heap->active) {
+				heap->free -= (GET_SIZE(chunk) + sizeof(t_chunk));
+				if (heap->free_chunks > 0) heap->free_chunks -= reduce_chunk;
+			}
+
+			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Bin match for size %zu bytes\n", GET_PTR(chunk), size);
+
+			return (GET_PTR(chunk));
+		}
+
+		return (NULL);
+	}
+
+	void *find_in_bin2(t_arena *arena, size_t size) {
 		if (!arena || !size) return (NULL);
 
 		int index = (size / ALIGNMENT) - 1;
