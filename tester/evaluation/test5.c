@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+void *show_alloc_mem_ex(void *ptr, size_t offset, size_t length);
+void *show_alloc_mem();
+
 int main()
 {
 	malloc(1024);

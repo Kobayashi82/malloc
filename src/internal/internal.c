@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 13:40:10 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 15:58:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/07 18:01:00 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@
 	#pragma region "Prepare"
 
 		int try_lock_timeout(pthread_mutex_t *mtx_ptr, int timeout) {
-			for (int i = 0; i < timeout; i++) {
+			for (int i = 0; i < timeout / 10; i++) {
 				int ret = mutex(mtx_ptr, MTX_TRYLOCK);
 				if (!ret) return (0);
 
@@ -74,7 +74,7 @@
 					return (ret);
 				}
 				
-				usleep(1000);
+				usleep(10000);
 			}
 
 			if (print_log(1)) aprintf(g_manager.options.fd_out, 1, "\t\t  [ERROR] timeout locking mutex in fork\n");
