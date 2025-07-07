@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 20:12:11 by ealgar-c          #+#    #+#             */
-/*   Updated: 2025/07/06 20:09:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/07 18:24:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@
 			if (!str)
 				return -1;
 			ft_printf(1, BLUE "\tAllocated 12 bytes string at %p\n" RESET, str);
-			strlcpy(str, "Hello world", 12);
+			strcpy(str, "Hello world");
 			ft_printf(1, BLUE "\tContents at %p: %s\n" RESET, str, str);
 			show_alloc_mem();
 			free(str);
@@ -175,14 +175,14 @@
 			char *str = malloc(6);
 			if (!str)
 				return -1;
-			strlcpy(str, "Hello", 6);
+			strcpy(str, "Hello");
 			ft_printf(1, BLUE "\tAllocated 6 bytes string at %p\n" RESET, str);
 			ft_printf(1, BLUE "\tContents at %p: %s\n" RESET, str, str);
 			show_alloc_mem();
 			char *new_str = realloc(str, 12);
 			if (!new_str)
 				return -1;
-			strlcat(new_str, " world", 12);
+			strcat(new_str, " world");
 			ft_printf(1, BLUE "\tReallocated to 12 bytes at %p\n" RESET, new_str);
 			ft_printf(1, BLUE "\tContents at %p: %s\n" RESET, new_str, new_str);
 			show_alloc_mem();
