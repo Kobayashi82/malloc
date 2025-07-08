@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/08 12:17:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/08 13:06:18 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,10 @@
 	void *heap_create(t_arena *arena, int type, size_t size, size_t alignment) {
 		if (!arena || !size || type < TINY || type > LARGE) return (NULL);
 
+		size_t user_size = ALIGN(size + sizeof(t_chunk));
 		if		(type == TINY)	size = TINY_SIZE;
 		else if (type == SMALL)	size = SMALL_SIZE;
-		else					size = (alignment + size + sizeof(t_chunk) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+		else					size = (((alignment >= PAGE_SIZE) ? PAGE_SIZE : 0) + alignment + size + sizeof(t_chunk) + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
 
 		void *ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (ptr == MAP_FAILED) {
@@ -86,6 +87,10 @@
 		t_heap	*heap = NULL;
 
 		size_t padding = (alignment >= sizeof(t_chunk)) ? alignment - sizeof(t_chunk) : 0;
+		if (padding && ((uintptr_t)ptr % alignment) != 0) {
+			if (((uintptr_t)ptr % alignment) + padding + user_size > size) return (NULL);
+			padding += (uintptr_t)ptr % alignment;
+		}
 
 		if (!arena->heap_header) {
 			if (arena == &g_manager.arena) {
@@ -98,9 +103,9 @@
 
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 				heap->ptr = (void *)((char *)ptr + padding);
-				heap->padding = alignment;
-				heap->size = size - alignment;
-				heap->free = size - alignment;
+				heap->padding = padding;
+				heap->size = size - padding;
+				heap->free = size - padding;
 				heap->type = type;
 				heap->active = true;
 				heap->free_chunks = 1;
@@ -114,9 +119,9 @@
 
 				heap = (t_heap *)((char *)heap_header + ALIGN(sizeof(t_heap_header)));
 				heap->ptr = (void *)((char *)ptr + padding);
-				heap->padding = alignment;
-				heap->size = size - alignment;
-				heap->free = size - alignment;
+				heap->padding = padding;
+				heap->size = size - padding;
+				heap->free = size - padding;
 				heap->type = type;
 				heap->active = true;
 				heap->free_chunks = 1;
@@ -141,9 +146,9 @@
 
 				heap = (t_heap *)((char *)new_heap_header + ALIGN(sizeof(t_heap_header)));
 				heap->ptr = (void *)((char *)ptr + padding);
-				heap->padding = alignment;
-				heap->size = size - alignment;
-				heap->free = size - alignment;
+				heap->padding = padding;
+				heap->size = size - padding;
+				heap->free = size - padding;
 				heap->type = type;
 				heap->active = true;
 				heap->free_chunks = 1;
@@ -153,9 +158,9 @@
 				heap = (t_heap *)((char *)heap + ((ALIGN(sizeof(t_heap)) * heap_header->used)));
 				heap_header->used++;
 				heap->ptr = (void *)((char *)ptr + padding);
-				heap->padding = alignment;
-				heap->size = size - alignment;
-				heap->free = size - alignment;
+				heap->padding = padding;
+				heap->size = size - padding;
+				heap->free = size - padding;
 				heap->type = type;
 				heap->free_chunks = 1;
 				heap->active = true;
@@ -180,10 +185,8 @@
 	int heap_destroy(t_heap *heap) {
 		if (!heap) return (1);
 
-		size_t padding = (heap->padding >= sizeof(t_chunk)) ? heap->padding - sizeof(t_chunk) : 0;
-
 		int result = 0;
-		if (munmap(heap->ptr - padding, heap->size + padding)) {
+		if (munmap(heap->ptr - heap->padding, heap->size + heap->padding)) {
 			result = 1;
 			if (print_log(1) && heap->type == LARGE)		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to unmap memory of size %d bytes\n", heap->ptr, heap->size);
 			if (print_log(1) && heap->type != LARGE)		aprintf(g_manager.options.fd_out, 1, "%p\t  [ERROR] Failed to detroy heap of size %s (%d)\n", heap->ptr, (heap->type == TINY ? "TINY" : "SMALL"), heap->size);
