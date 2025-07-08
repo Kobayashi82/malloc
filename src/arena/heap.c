@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:24 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/05 15:40:38 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/08 12:17:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,14 +83,7 @@
 			return (NULL);
 		}
 
-		// static int popo = 0;
-		// if (type == TINY) {
-		// 	aprintf(2, 0, "Creadas: %d\n", popo++);
-		// }
-
 		t_heap	*heap = NULL;
-
-		// buscar en las lista si hay un heap con el mismo puntero y longitud igual o menor y usar ese si esta inactivo
 
 		size_t padding = (alignment >= sizeof(t_chunk)) ? alignment - sizeof(t_chunk) : 0;
 
@@ -187,11 +180,6 @@
 	int heap_destroy(t_heap *heap) {
 		if (!heap) return (1);
 
-		// static int popo = 0;
-		// if (heap->type == TINY) {
-		// 	aprintf(2, 0, "Eliminadas: %d\n", popo++);
-		// }
-
 		size_t padding = (heap->padding >= sizeof(t_chunk)) ? heap->padding - sizeof(t_chunk) : 0;
 
 		int result = 0;
@@ -210,9 +198,3 @@
 	}
 
 #pragma endregion
-
-// Arena:						568
-// Heap_Header:					16
-// Heap:						48
-
-// aprintf(2, 0, "heap: %u\n", ALIGN(sizeof(t_heap)));
