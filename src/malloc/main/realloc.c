@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/18 11:32:56 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/06 19:42:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/08 10:32:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,18 @@
 		if (!ptr)			return allocate("REALLOC", size);			// ptr NULL is equivalent to malloc(size)
 		if (!size)			return (free(ptr), NULL);					// size 0 is equivalent to free(ptr)
 		if (!arena_find()) 	return (NULL);
+
+		// alloc zero
+		if (check_digit(ptr, ZERO_MALLOC_BASE)) {
+			mutex(&g_manager.mutex, MTX_LOCK);
+
+				if (ptr > ZERO_MALLOC_BASE && ptr < (void *)((char *)ZERO_MALLOC_BASE + (g_manager.alloc_zero_counter * ALIGNMENT))) {
+					mutex(&g_manager.mutex, MTX_UNLOCK);
+					return allocate("REALLOC", size);
+				}
+			
+			mutex(&g_manager.mutex, MTX_UNLOCK);
+		}
 
 		void	*new_ptr = NULL;
 		bool	is_new = false;

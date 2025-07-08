@@ -107,7 +107,6 @@ rm test
 # -lft_malloc				= -l busca lib + ft_malloc + .so
 # -Wl,-rpath=./lib			= Pasa al linker el parametro rpath para que busque en esa ruta las bibliotecas en runtime
 
-
 # stress-ng --malloc 4 --malloc-bytes 1G --verify --timeout 10s
-# git clone https://github.com/redis/redis
+# git clone https://github.com/Kobayashi82/Malloc
 # ffmpeg -f lavfi -i testsrc=duration=10:size=1920x1080 -c:v libx264 test.mp4
