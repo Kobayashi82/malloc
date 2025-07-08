@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 18:14:23 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/03 23:12:56 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/08 10:05:05 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,6 @@ void print_header() {
     printf(YELLOW "This test suite will thoroughly test your malloc implementation\n");
     printf("including all main functions, alignment functions, extra functions,\n");
     printf("and stress/edge case scenarios.\n" NC);
-    printf("\n");
-    printf(MAGENTA "Make sure your malloc library is loaded with: " YELLOW "source ../load.sh\n" NC);
 }
 
 void print_summary(int failed_tests) {

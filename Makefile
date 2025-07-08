@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/18 11:22:48 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/07 18:00:45 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/08 10:07:27 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -124,7 +124,7 @@ $(LIB_DIR)$(LIB_NAME): $(OBJS)
 	@if [ -f ./tester/load.sh ]; then chmod +x ./tester/load.sh; fi
 	@if [ -f ./tester/unload.sh ]; then chmod +x ./tester/unload.sh; fi
 	@printf " $(CYAN)To load the library run:\t$(YELLOW)source ./tester/load.sh$(NC)\n"
-	@printf " $(CYAN)To evaluate the library run:\t$(YELLOW)source ./tester/eval.sh$(NC)\n\n"
+	@printf " $(CYAN)To evaluate the library run:\t$(YELLOW)source ./tester/evaluation.sh$(NC)\n\n"
 
 	@$(MAKE) -s _show_cursor
 	@rm -f /tmp/malloc_*.log 2> /dev/null
