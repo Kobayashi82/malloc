@@ -88,6 +88,11 @@ get_color() {
 # ────────────── Executions ───────────────
 declare -A N_MEM N_PAGES N_MIN N_REALLOC N_ABORT C_MEM C_PAGES C_MIN C_REALLOC C_ABORT
 for t in "${tests[@]}"; do
+	unset LD_PRELOAD
+	unset MALLOC_CHECK_;
+	unset MALLOC_DEBUG MALLOC_LOGGING
+	unset MALLOC_DEBUG
+	unset MALLOC_LOGGING
 	# native malloc
 	read mem pages minor realloc abort < <(run "${SCRIPT_DIR}/evaluation/$t")
 	N_MEM[$t]=$mem; N_PAGES[$t]=$pages; N_MIN[$t]=$minor; N_REALLOC[$t]=$realloc; N_ABORT[$t]=$abort
