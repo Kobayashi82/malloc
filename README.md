@@ -1,3 +1,14 @@
+<div align="center">
+
+![System & Kernel](https://img.shields.io/badge/System-brown?style=for-the-badge)
+![Memory Management](https://img.shields.io/badge/Memory-Management-blue?style=for-the-badge)
+![Dynamic Allocation](https://img.shields.io/badge/Dynamic-Allocation-green?style=for-the-badge)
+![C Language](https://img.shields.io/badge/Language-C-red?style=for-the-badge)
+
+*Una reimplementación de malloc y sus funciones asociadas*
+
+</div>
+
 # Malloc
 
 ## 🎯 Descripción
@@ -230,6 +241,16 @@ Notes:
 
 - Muestra el historial de asignaciones y liberaciones de memoria realizadas por el programa.
 
-## License
+## 📄 Licencia
 
-This project is licensed under the WTFPL – [Do What the Fuck You Want to Public License](http://www.wtfpl.net/about/).
+Este proyecto está licenciado bajo la WTFPL – [Do What the Fuck You Want to Public License](http://www.wtfpl.net/about/).
+
+---
+
+<div align="center">
+
+**🌐 Desarrollado como parte del curriculum de 42 School 🌐**
+
+*"Because glibc is too mainstream"*
+
+</div>
