@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 22:11:21 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/06 18:25:45 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/08/15 13:50:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,7 +275,7 @@
 				if (heap->free_chunks > 0) heap->free_chunks -= reduce_chunk;
 			}
 
-			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Bin match for size %zu bytes\n", GET_PTR(chunk), size);
+			if (print_log(2)) aprintf(g_manager.options.fd_out, 1, "%p\t [SYSTEM] Bin match for size %u bytes\n", GET_PTR(chunk), size);
 
 			return (GET_PTR(chunk));
 		}
