@@ -13,7 +13,8 @@ int main()
 	malloc(1024 * 1024 * 16);
 	malloc(1024 * 1024 * 128);
 	show_alloc_mem();
-	write (2, "\n\n", 2);
+
+	write(1, "\n\n\033[0;36m  SHOW_ALLOC_MEM_EX\n---------------------\n\n\033[0m", 56);
 	char *ptr = malloc(30);
 	strcpy(ptr, "Hello World!\n");
 	show_alloc_mem_ex(ptr, 0, 0);

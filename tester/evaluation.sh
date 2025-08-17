@@ -223,7 +223,7 @@ read -n 1 -s
 
 # Show Alloc Mem
 echo
-echo -e "  ${CYAN}SHOW_ALLOC_MEM${YELLOW}${NC}"
+echo -e "  ${CYAN}SHOW_ALLOC_MEM${NC}"
 echo -e "${CYAN}------------------${NC}"
 echo
 
